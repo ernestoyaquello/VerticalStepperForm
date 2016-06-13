@@ -1,5 +1,5 @@
 # Vertical Stepper Form Library
-This library implements a [**vertical stepper form**](https://material.google.com/components/steppers.html) for Android following Google Material Design guidelines.
+This Android library implements a [**vertical stepper form**](https://material.google.com/components/steppers.html) following Google Material Design guidelines.
 
 ## Demo
 ![Demo picture](http://i.imgur.com/pSNKLFe.gif)
