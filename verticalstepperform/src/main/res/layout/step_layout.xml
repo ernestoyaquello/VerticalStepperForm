@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_marginLeft="8dp"
+    android:layout_marginStart="8dp">
+
+    <LinearLayout
+        android:layout_marginTop="6dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:id="@+id/step_header"
+        android:clickable="true">
+
+        <LinearLayout
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:background="@drawable/circle_step_done"
+            android:layout_marginRight="12dp"
+            android:layout_marginEnd="12dp">
+            <TextView
+                android:id="@+id/step_number"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textColor="#ffffff"
+                android:gravity="center"
+                android:layout_gravity="center_vertical"
+                android:textSize="16sp"/>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/step_title"
+            android:layout_width="match_parent"
+            android:layout_height="28dp"
+            android:gravity="center_vertical"
+            android:textColor="#212121"
+            android:textSize="17sp" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_marginTop="12dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="4dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_height="match_parent"
+            android:background="#e0e0e0"
+            android:orientation="vertical"
+            android:id="@+id/vertical_line">
+        </LinearLayout>
+
+        <RelativeLayout
+            android:id="@+id/step_content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Step content -->
+
+        </RelativeLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/next_step_button_container"
+        android:layout_marginBottom="6dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:layout_width="4dp"
+            android:layout_marginLeft="12dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_height="match_parent"
+            android:background="#e0e0e0">
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_marginTop="12dp">
+
+            <Button
+                android:id="@+id/next_step"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/vertical_form_stepper_form_continue"
+                android:backgroundTint="?attr/colorPrimary"
+                android:textColor="#FFFFFF"
+                android:layout_marginRight="8dp"
+                android:layout_marginEnd="8dp"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</LinearLayout>
