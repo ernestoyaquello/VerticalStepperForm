@@ -32,6 +32,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import ernestoyaquello.com.verticalstepperform.utils.Animations;
+
 public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity implements View.OnClickListener {
 
     protected static int NUMBER_OF_STEPS;
@@ -251,7 +253,8 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity 
             LinearLayout stepLayout = stepLayouts.get(activeStep);
             LinearLayout buttonContainer = (LinearLayout) stepLayout.findViewById(
                     R.id.next_step_button_container);
-            buttonContainer.setVisibility(View.VISIBLE);
+            //buttonContainer.setVisibility(View.VISIBLE);
+            Animations.slideDown(buttonContainer);
             enableNextButtonInBottomNavigationLayout();
         }
     }
@@ -304,14 +307,16 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity 
         stepHeader.setAlpha(1);
         LinearLayout button = (LinearLayout) stepLayout.findViewById(R.id.next_step_button_container);
         if(completedSteps[stepNum]) {
-            button.setVisibility(View.VISIBLE);
+            //button.setVisibility(View.VISIBLE);
+            Animations.slideDown(button);
             enableNextButtonInBottomNavigationLayout();
         } else {
             button.setVisibility(View.GONE);
             disableNextButtonInBottomNavigationLayout();
         }
         RelativeLayout stepContent = (RelativeLayout) stepLayout.findViewById(R.id.step_content);
-        stepContent.setVisibility(View.VISIBLE);
+        //stepContent.setVisibility(View.VISIBLE);
+        Animations.slideDown(stepContent);
         if(stepNum > 0) {
             enablePreviousButtonInBottomNavigationLayout();
         } else {
@@ -367,7 +372,8 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity 
         LinearLayout stepLayout = stepLayouts.get(stepNum);
         if(stepNum == activeStep) {
             LinearLayout buttons = (LinearLayout) stepLayout.findViewById(R.id.next_step_button_container);
-            buttons.setVisibility(View.VISIBLE);
+            //buttons.setVisibility(View.VISIBLE);
+            Animations.slideDown(buttons);
             enableNextButtonInBottomNavigationLayout();
         }
         LinearLayout stepHeader = (LinearLayout) stepLayout.findViewById(R.id.step_header);
@@ -379,7 +385,8 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity 
         completedSteps[stepNum] = false;
         LinearLayout stepLayout = stepLayouts.get(stepNum);
         LinearLayout buttons = (LinearLayout) stepLayout.findViewById(R.id.next_step_button_container);
-        buttons.setVisibility(View.GONE);
+        //buttons.setVisibility(View.GONE);
+        Animations.slideUp(buttons);
         if (stepNum == activeStep) {
             disableNextButtonInBottomNavigationLayout();
         } else {
