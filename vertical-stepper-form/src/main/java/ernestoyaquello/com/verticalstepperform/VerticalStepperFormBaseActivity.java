@@ -112,7 +112,7 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity 
         LinearLayout stepLayout = createStepLayout(numStep);
         if(numStep < NUMBER_OF_STEPS) {
             RelativeLayout stepContent = (RelativeLayout) stepLayout.findViewById(R.id.step_content);
-            View view = addCustomStep(numStep, stepContent);
+            View view = createCustomStep(numStep, stepContent);
             if(view != null) {
                 stepContent.addView(view);
             }
@@ -499,7 +499,7 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity 
      * @return The view that will be automatically added by the system to "stepContent"
      *         (if the view is manually added inside the method, then it must return null)
      */
-    protected abstract View addCustomStep(int numStep, RelativeLayout stepContent);
+    protected abstract View createCustomStep(int numStep, RelativeLayout stepContent);
 
     /**
      * This method will be called every time a step is open
