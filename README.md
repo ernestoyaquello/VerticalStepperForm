@@ -3,22 +3,24 @@ This Android library implements a [**vertical stepper form**](https://material.g
 
 ## Demo
 ![Demo picture](http://i.imgur.com/pSNKLFe.gif)
-
-You can take a look at the [example application code](https://github.com/ernestoyaquello/vertical-stepper-form/tree/master/app/src/main/java/verticalstepperform/ernestoyaquello/com/verticalstepperform) if you wish.
+### Example application
+Take a look at the [example application code](https://github.com/ernestoyaquello/vertical-stepper-form/tree/master/app/src/main/java/verticalstepperform/ernestoyaquello/com/verticalstepperform) if you wish.
 
 ## Installation and usage
 1. To include the library in your project, add it via Gradle:
 
 	```
 	dependencies {
-		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.7.1'
+		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.7.2'
 	}
 	```
 2. Now, you have to add a ```VerticalStepperFormLayout``` view to your activity layout. This view will contain the vertical stepper form. For design purposes, it is recommended that you don't put anything else than this view in your activity layout (see the code below).
 
   ```xml
   <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-      android:layout_width="match_parent" android:layout_height="match_parent">
+      xmlns:tools="http://schemas.android.com/tools"
+      android:layout_width="match_parent" android:layout_height="match_parent"
+      tools:context=".StepperExampleActivity">
   
       <ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout
           android:id="@+id/vertical_stepper_form"
@@ -28,8 +30,9 @@ You can take a look at the [example application code](https://github.com/ernesto
   
   </RelativeLayout>
   ```
-3. Edit your activity class to make it extend ```VerticalStepperFormBaseActivity``` and implement the methods ```createCustomStep()```, ```customStepsCheckingOnStepOpening()``` and ```sendData()```..
-4. Finally, you will need to add some lines to ```onCreate()``` in order to initialize the stepper form:
+3. Edit your activity class to make it extend ```VerticalStepperFormBaseActivity``` (you will need to import ```ernestoyaquello.com.verticalstepperform.*```).
+4. Implement the methods ```createCustomStep()```, ```customStepsCheckingOnStepOpening()``` and ```sendData()```.
+5. Finally, you will need to write some lines in ```onCreate()``` to initialize the stepper form (remember to edit this code in order to add your own step names):
 
   ```java
   @Override
@@ -53,8 +56,8 @@ You can take a look at the [example application code](https://github.com/ernesto
   }
   ```
 
-####Implementing the methods
-#####createCustomStep()
+###Implementing the methods
+####createCustomStep()
 This method will be called automatically by the system to generate the view of each step. You have to implement the generation of the corresponding step view and return it:
 ```java
 @Override
@@ -107,7 +110,7 @@ private View createPhoneNumberStep() {
 ```
 
 
-#####customStepsCheckingOnStepOpening()
+####customStepsCheckingOnStepOpening()
 This method will be called every time a step is open, so it can be used for checking conditions. By default, the button "Continue" is disabled in every step and it only shows up after certain user actions (for example, the introduction of a correct name or email):
 ```java
 @Override
@@ -139,10 +142,55 @@ private void checkEmail() {
 	...
 }
 ```
+NOTE: You can also use this method to trigger some actions whenever a certain step is open.
 
+####sendData()
+In this method you have to implement the sending of the data:
+```java
+@Override
+protected void sendData() {
 
-#####sendData()
-Here you have to implement the sending of the data.
+	// TODO Use here the data of the form as you wish
+
+	// Fake data sending effect
+	new Thread(new Runnable() {
+		@Override
+		public void run() {
+			try {
+				Thread.sleep(1000);
+				Intent intent = getIntent();
+				setResult(RESULT_OK, intent);
+				intent.putExtra("name", name.getText().toString());
+				intent.putExtra("email", email.getText().toString());
+				intent.putExtra("phone_number", phone.getText().toString());
+				// You must set confirmBack to false before calling finish() to avoid the confirmation dialog
+				confirmBack = false;
+				finish();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}).start(); // You should delete this code and add yours
+
+}
+```
+NOTE: If you don't want to call ```finish()``` here because you don't want to close the activity after sending the data, you should dismiss the progress dialog called ```progressDialog```.
+
+### Screen rotation
+This library handles screen rotation by saving and restoring the state of the form. Therefore, if you want to use ```onSaveInstanceState()``` and ```onRestoreInstanceState```, don't forget to call ```super()``` at the end:
+```java
+@Override
+public void onSaveInstanceState(Bundle savedInstanceState) {
+	...
+	super.onSaveInstanceState(savedInstanceState);
+}
+
+@Override
+public void onRestoreInstanceState(Bundle savedInstanceState) {
+	...
+	super.onRestoreInstanceState(savedInstanceState);
+}
+```
 
 ## Minimun SDK Version
 The minimun SDK version for this library is 21.
