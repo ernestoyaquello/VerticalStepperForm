@@ -4,10 +4,17 @@ import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.res.ColorStateList;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.DialogFragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.AppCompatButton;
+import android.support.v7.widget.AppCompatImageButton;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,7 +41,7 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity 
 
     protected LinearLayout content;
     protected ScrollView stepsScrollView;
-    protected ImageButton previousStepButton, nextStepButton;
+    protected AppCompatImageButton previousStepButton, nextStepButton;
     protected ProgressBar progressBar;
     protected static boolean confirmBack = true;
     protected List<LinearLayout> stepLayouts;
@@ -42,7 +49,7 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity 
     protected String[] steps;
     protected boolean[] completedSteps;
     protected ProgressDialog progressDialog;
-    protected Button finalButton;
+    protected AppCompatButton finalButton;
     protected VerticalStepperFormLayout verticalStepperForm;
 
     @Override
@@ -89,9 +96,9 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity 
         stepsScrollView = (ScrollView) verticalStepperForm.findViewById(R.id.steps_scroll);
         progressBar = (ProgressBar) verticalStepperForm.findViewById(R.id.progress_bar);
         progressBar.setMax(NUMBER_OF_STEPS + 1);
-        previousStepButton = (ImageButton) verticalStepperForm.findViewById(R.id.down_previous);
+        previousStepButton = (AppCompatImageButton) verticalStepperForm.findViewById(R.id.down_previous);
         previousStepButton.setOnClickListener(this);
-        nextStepButton = (ImageButton) verticalStepperForm.findViewById(R.id.down_next);
+        nextStepButton = (AppCompatImageButton) verticalStepperForm.findViewById(R.id.down_next);
         nextStepButton.setOnClickListener(this);
         content = (LinearLayout) verticalStepperForm.findViewById(R.id.content);
     }
@@ -107,6 +114,9 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity 
             addStep(i);
         }
         addStep(NUMBER_OF_STEPS);
+        int pressedColour = verticalStepperForm.getButtonPressedColor();
+        int standardColour = verticalStepperForm.getButtonColor();
+        setButtonColoursForOldVersions(pressedColour, standardColour);
     }
 
     private void addStep(int numStep) {
@@ -131,7 +141,7 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity 
         stepLeftLine.setVisibility(View.INVISIBLE);
         LinearLayout buttons = (LinearLayout) stepLayout.findViewById(R.id.next_step_button_container);
         buttons.setVisibility(View.GONE);
-        finalButton = (Button) buttons.findViewById(R.id.next_step);
+        finalButton = (AppCompatButton) buttons.findViewById(R.id.next_step);
         finalButton.setText(R.string.vertical_form_stepper_form_confirm_button);
         // Some content could be added to the final step inside stepContent layout
         // RelativeLayout stepContent = (RelativeLayout) stepLayout.findViewById(R.id.step_content);
@@ -161,6 +171,11 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity 
                 goToNextStep();
             }
         });
+        LinearLayout circle = (LinearLayout) stepLayout.findViewById(R.id.circle);
+        Drawable bg = ContextCompat.getDrawable(getBaseContext(), R.drawable.circle_step_done);
+        bg.setColorFilter(new PorterDuffColorFilter(
+                verticalStepperForm.getStepNumberColor(), PorterDuff.Mode.SRC_IN));
+        circle.setBackground(bg);
         return stepLayout;
     }
 
@@ -386,6 +401,25 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity 
             }
         }
         progressBar.setProgress(progress);
+    }
+
+    protected void setButtonColoursForOldVersions(int pressedColour, int standardColour) {
+        int[][] states = new int[][]{
+                new int [] {android.R.attr.state_pressed},
+                new int [] {android.R.attr.state_focused},
+                new int [] {}
+        };
+        ColorStateList nextStepColours = new ColorStateList(
+                states,
+                new int[]{
+                        pressedColour,
+                        pressedColour,
+                        standardColour
+                });
+        for(LinearLayout stepLayout : stepLayouts) {
+            AppCompatButton next = (AppCompatButton) stepLayout.findViewById(R.id.next_step);
+            next.setSupportBackgroundTintList(nextStepColours);
+        }
     }
 
     protected void confirmBack() {

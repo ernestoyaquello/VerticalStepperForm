@@ -15,6 +15,7 @@
         android:clickable="true">
 
         <LinearLayout
+            android:id="@+id/circle"
             android:layout_width="28dp"
             android:layout_height="28dp"
             android:background="@drawable/circle_step_done"
@@ -93,12 +94,11 @@
             android:orientation="horizontal"
             android:layout_marginTop="12dp">
 
-            <Button
+            <android.support.v7.widget.AppCompatButton
                 android:id="@+id/next_step"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/vertical_form_stepper_form_continue"
-                android:backgroundTint="?attr/colorPrimary"
                 android:textColor="#FFFFFF"
                 android:layout_marginRight="8dp"
                 android:layout_marginEnd="8dp"/>

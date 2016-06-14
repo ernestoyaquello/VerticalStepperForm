@@ -3,11 +3,15 @@ package verticalstepperform.ernestoyaquello.com.verticalstepperform;
 import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.util.Pair;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -68,6 +72,11 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
         verticalStepperForm = (VerticalStepperFormLayout) findViewById(R.id.vertical_stepper_form);
         if(verticalStepperForm != null) {
             verticalStepperForm.setSteps(stepsStrings);
+            int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
+            int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
+            verticalStepperForm.setStepNumberColor(colorPrimary);
+            verticalStepperForm.setButtonColor(colorPrimary);
+            verticalStepperForm.setButtonPressedColor(colorPrimaryDark);
             initStepperForm();
         }
     }
@@ -116,7 +125,6 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
 
     @Override
     protected void sendData() {
-        confirmBack = false;
 
         // TODO Use here the data of the form as you wish
 
@@ -134,6 +142,8 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
                     intent.putExtra(STATE_TIME_HOUR, time.first);
                     intent.putExtra(STATE_TIME_MINUTES, time.second);
                     intent.putExtra(STATE_WEEK_DAYS, weekDays);
+                    // You must set confirmBack to false before calling finish() to avoid the confirmation dialog
+                    confirmBack = false;
                     finish();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
@@ -361,9 +371,13 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
         LinearLayout dayLayout = weekDaysLayouts[i];
         TextView dayText = weekDaysTextviews[i];
         dayLayout.setTag(true);
-        dayLayout.setBackground(getDrawable(R.drawable.circle_step_done));
-        int colour = Color.rgb(255, 255, 255);
-        dayText.setTextColor(colour);
+        Drawable bg = ContextCompat.getDrawable(getBaseContext(),
+                ernestoyaquello.com.verticalstepperform.R.drawable.circle_step_done);
+        bg.setColorFilter(new PorterDuffColorFilter(
+                verticalStepperForm.getStepNumberColor(), PorterDuff.Mode.SRC_IN));
+        dayLayout.setBackground(bg);
+        int color = Color.rgb(255, 255, 255);
+        dayText.setTextColor(color);
         weekDays[i] = true;
         if(check) {
             checkDays();

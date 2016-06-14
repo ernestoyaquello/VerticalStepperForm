@@ -32,7 +32,7 @@
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingEnd="@dimen/activity_horizontal_margin">
 
-        <ImageButton
+        <android.support.v7.widget.AppCompatImageButton
             style="?android:attr/borderlessButtonStyle"
             android:id="@+id/down_previous"
             android:tag="@string/vertical_form_stepper_form_down_previous"
@@ -50,7 +50,7 @@
             android:textColor="#6c6c6c"
             android:alpha="0.25" />
 
-        <ImageButton
+        <android.support.v7.widget.AppCompatImageButton
             style="?android:attr/borderlessButtonStyle"
             android:id="@+id/down_next"
             android:tag="@string/vertical_form_stepper_form_down_next"
@@ -69,7 +69,7 @@
             android:alpha="0.25" />
 
         <ProgressBar
-            style="?android:attr/progressBarStyleHorizontal"
+            style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
             android:id="@+id/progress_bar"
             android:layout_width="match_parent"
             android:layout_height="8dp"

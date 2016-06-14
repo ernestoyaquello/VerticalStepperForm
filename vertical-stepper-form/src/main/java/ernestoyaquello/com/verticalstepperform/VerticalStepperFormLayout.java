@@ -9,6 +9,9 @@ public class VerticalStepperFormLayout extends RelativeLayout {
 
     private LayoutInflater mInflater;
     protected String[] steps;
+    private int stepNumberColor;
+    private int buttonColor;
+    private int buttonPressedColor;
 
     public VerticalStepperFormLayout(Context context) {
         super(context);
@@ -25,11 +28,6 @@ public class VerticalStepperFormLayout extends RelativeLayout {
         init(context);
     }
 
-    public VerticalStepperFormLayout(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        init(context);
-    }
-
     public void init(Context context) {
         mInflater = LayoutInflater.from(context);
         mInflater.inflate(R.layout.vertical_stepper_form_layout, this, true);
@@ -41,5 +39,29 @@ public class VerticalStepperFormLayout extends RelativeLayout {
 
     public String[] getSteps() {
         return steps;
+    }
+
+    public int getStepNumberColor() {
+        return stepNumberColor;
+    }
+
+    public void setStepNumberColor(int stepNumberColor) {
+        this.stepNumberColor = stepNumberColor;
+    }
+
+    public int getButtonColor() {
+        return buttonColor;
+    }
+
+    public void setButtonColor(int buttonColor) {
+        this.buttonColor = buttonColor;
+    }
+
+    public int getButtonPressedColor() {
+        return buttonPressedColor;
+    }
+
+    public void setButtonPressedColor(int buttonPressedColor) {
+        this.buttonPressedColor = buttonPressedColor;
     }
 }
