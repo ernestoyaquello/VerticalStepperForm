@@ -145,8 +145,36 @@ private void checkEmail() {
 NOTE: You can also use this method to trigger some actions whenever a certain step is open.
 
 #####sendData()
-In this method you have to implement the sending of the data.
-(If you don't want to call ```finish()``` here because you don't want to close the activity after sending the data, you should dismiss the progress dialog called ```progressDialog```).
+In this method you have to implement the sending of the data:
+```java
+@Override
+protected void sendData() {
+
+	// TODO Use here the data of the form as you wish
+
+	// Fake data sending effect
+	new Thread(new Runnable() {
+		@Override
+		public void run() {
+			try {
+				Thread.sleep(1000);
+				Intent intent = getIntent();
+				setResult(RESULT_OK, intent);
+				intent.putExtra("name", name.getText().toString());
+				intent.putExtra("email", email.getText().toString());
+				intent.putExtra("phone_number", phone.getText().toString());
+				// You must set confirmBack to false before calling finish() to avoid the confirmation dialog
+				confirmBack = false;
+				finish();
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}).start(); // You should delete this code and add yours
+
+}
+```
+NOTE: If you don't want to call ```finish()``` here because you don't want to close the activity after sending the data, you should dismiss the progress dialog called ```progressDialog```.
 
 ## Minimun SDK Version
 The minimun SDK version for this library is 21.
