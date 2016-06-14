@@ -3,7 +3,6 @@ This Android library implements a [**vertical stepper form**](https://material.g
 
 ## Demo
 ![Demo picture](http://i.imgur.com/pSNKLFe.gif)
-
 ### Example application
 Take a look at the [example application code](https://github.com/ernestoyaquello/vertical-stepper-form/tree/master/app/src/main/java/verticalstepperform/ernestoyaquello/com/verticalstepperform) if you wish.
 
