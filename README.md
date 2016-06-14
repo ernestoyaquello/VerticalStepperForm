@@ -11,7 +11,7 @@ Take a look at the [example application code](https://github.com/ernestoyaquello
 
 	```
 	dependencies {
-		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.7.2'
+		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.8.0'
 	}
 	```
 2. Now, you have to add a ```VerticalStepperFormLayout``` view to your activity layout. This view will contain the vertical stepper form. For design purposes, it is recommended that you don't put anything else than this view in your activity layout (see the code below).
@@ -47,6 +47,10 @@ Take a look at the [example application code](https://github.com/ernestoyaquello
           String[] mySteps = {"Name", "Email", "Phone Number"}; 
           // Add the steps to the stepper form
           verticalStepperForm.setSteps(mySteps);
+          // Set the colors
+          verticalStepperForm.setStepNumberColor(colorPrimary);
+          verticalStepperForm.setButtonColor(colorPrimary);
+          verticalStepperForm.setButtonPressedColor(colorPrimaryDark);
           // Initialize the stepper
           initStepperForm();
       }
@@ -191,9 +195,6 @@ public void onRestoreInstanceState(Bundle savedInstanceState) {
 	super.onRestoreInstanceState(savedInstanceState);
 }
 ```
-
-## Minimun SDK Version
-The minimun SDK version for this library is 21.
 
 ## Contribution
 Feel free to contribute to this library and help to improve it :)
