@@ -145,6 +145,9 @@ private void checkEmail() {
 #####sendData()
 Here you have to implement the sending of the data.
 
+## Minimun SDK Version
+The minimun SDK version for this library is 21.
+
 ## Contribution
 Feel free to contribute to this library and help to improve it :)
 
