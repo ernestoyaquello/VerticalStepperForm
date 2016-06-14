@@ -56,8 +56,8 @@ You can take a look at the [example application code](https://github.com/ernesto
   }
   ```
 
-####Implementing the methods
-#####createCustomStep()
+###Implementing the methods
+####createCustomStep()
 This method will be called automatically by the system to generate the view of each step. You have to implement the generation of the corresponding step view and return it:
 ```java
 @Override
@@ -110,7 +110,7 @@ private View createPhoneNumberStep() {
 ```
 
 
-#####customStepsCheckingOnStepOpening()
+####customStepsCheckingOnStepOpening()
 This method will be called every time a step is open, so it can be used for checking conditions. By default, the button "Continue" is disabled in every step and it only shows up after certain user actions (for example, the introduction of a correct name or email):
 ```java
 @Override
@@ -144,7 +144,7 @@ private void checkEmail() {
 ```
 NOTE: You can also use this method to trigger some actions whenever a certain step is open.
 
-#####sendData()
+####sendData()
 In this method you have to implement the sending of the data:
 ```java
 @Override
