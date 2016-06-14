@@ -72,6 +72,7 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity 
     protected void initStepperForm() {
         setInitialVariables();
         addSteps();
+        customStepsCheckingOnStepOpening();
     }
 
     protected void setInitialVariables() {
