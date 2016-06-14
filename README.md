@@ -11,14 +11,16 @@ You can take a look at the [example application code](https://github.com/ernesto
 
 	```
 	dependencies {
-		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.7.1'
+		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.7.2'
 	}
 	```
 2. Now, you have to add a ```VerticalStepperFormLayout``` view to your activity layout. This view will contain the vertical stepper form. For design purposes, it is recommended that you don't put anything else than this view in your activity layout (see the code below).
 
   ```xml
   <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-      android:layout_width="match_parent" android:layout_height="match_parent">
+      xmlns:tools="http://schemas.android.com/tools"
+      android:layout_width="match_parent" android:layout_height="match_parent"
+      tools:context=".StepperExampleActivity">
   
       <ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout
           android:id="@+id/vertical_stepper_form"
@@ -28,8 +30,9 @@ You can take a look at the [example application code](https://github.com/ernesto
   
   </RelativeLayout>
   ```
-3. Edit your activity class to make it extend ```VerticalStepperFormBaseActivity``` and implement the methods ```createCustomStep()```, ```customStepsCheckingOnStepOpening()``` and ```sendData()```..
-4. Finally, you will need to add some lines to ```onCreate()``` in order to initialize the stepper form:
+3. Edit your activity class to make it extend ```VerticalStepperFormBaseActivity``` (you will need to import ```ernestoyaquello.com.verticalstepperform.*```).
+4. Implement the methods ```createCustomStep()```, ```customStepsCheckingOnStepOpening()``` and ```sendData()```.
+5. Finally, you will need to write some lines in ```onCreate()``` to initialize the stepper form (remember to edit this code in order to add your own step names):
 
   ```java
   @Override
@@ -142,7 +145,8 @@ private void checkEmail() {
 
 
 #####sendData()
-Here you have to implement the sending of the data.
+In this method you have to implement the sending of the data.
+(If you don't want to call ```finish()``` here because you don't want to leave the activity after sending the data, you should dismiss the progress dialog called ```progressDialog```).
 
 ## Minimun SDK Version
 The minimun SDK version for this library is 21.
