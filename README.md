@@ -4,7 +4,8 @@ This Android library implements a [**vertical stepper form**](https://material.g
 ## Demo
 ![Demo picture](http://i.imgur.com/pSNKLFe.gif)
 
-You can take a look at the [example application code](https://github.com/ernestoyaquello/vertical-stepper-form/tree/master/app/src/main/java/verticalstepperform/ernestoyaquello/com/verticalstepperform) if you wish.
+### Example application
+Take a look at the [example application code](https://github.com/ernestoyaquello/vertical-stepper-form/tree/master/app/src/main/java/verticalstepperform/ernestoyaquello/com/verticalstepperform) if you wish.
 
 ## Installation and usage
 1. To include the library in your project, add it via Gradle:
