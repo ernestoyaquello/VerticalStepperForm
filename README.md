@@ -11,7 +11,7 @@ Take a look at the [example application code](https://github.com/ernestoyaquello
 
 	```
 	dependencies {
-		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.8.0'
+		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.9.0'
 	}
 	```
 2. Now, you have to add a ```VerticalStepperFormLayout``` view to your activity layout. This view will contain the vertical stepper form. For design purposes, it is recommended that you don't put anything else than this view in your activity layout (see the code below).
