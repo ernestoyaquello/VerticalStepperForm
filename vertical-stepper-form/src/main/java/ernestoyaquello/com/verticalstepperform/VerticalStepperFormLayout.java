@@ -1,6 +1,7 @@
 package ernestoyaquello.com.verticalstepperform;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.RelativeLayout;
@@ -9,9 +10,9 @@ public class VerticalStepperFormLayout extends RelativeLayout {
 
     private LayoutInflater mInflater;
     protected String[] steps;
-    private int stepNumberColor;
-    private int buttonColor;
-    private int buttonPressedColor;
+    private int stepNumberColor = Color.rgb(63, 81, 181);
+    private int buttonColor = Color.rgb(63, 81, 181);
+    private int buttonPressedColor = Color.rgb(48, 63, 159);
 
     public VerticalStepperFormLayout(Context context) {
         super(context);
