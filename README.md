@@ -142,7 +142,7 @@ private void checkEmail() {
 	...
 }
 ```
-NOTE: You can also use the method to trigger some actions whenever a certain step is open.
+NOTE: You can also use this method to trigger some actions whenever a certain step is open.
 
 #####sendData()
 In this method you have to implement the sending of the data.
