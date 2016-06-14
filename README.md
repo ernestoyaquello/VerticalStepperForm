@@ -176,6 +176,22 @@ protected void sendData() {
 ```
 NOTE: If you don't want to call ```finish()``` here because you don't want to close the activity after sending the data, you should dismiss the progress dialog called ```progressDialog```.
 
+### Rotation control
+This library handles screen rotation by saving and restoring the state of the form. Therefore, if you want to use ```onSaveInstanceState()``` and ```onRestoreInstanceState```, don't forget to call ```super()``` at the end:
+```java
+@Override
+public void onSaveInstanceState(Bundle savedInstanceState) {
+	...
+	super.onSaveInstanceState(savedInstanceState);
+}
+
+@Override
+public void onRestoreInstanceState(Bundle savedInstanceState) {
+	...
+	super.onRestoreInstanceState(savedInstanceState);
+}
+```
+
 ## Minimun SDK Version
 The minimun SDK version for this library is 21.
 
