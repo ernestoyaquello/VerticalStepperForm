@@ -4,7 +4,7 @@
     <modules>
       <module fileurl="file://$PROJECT_DIR$/VerticalStepperForm.iml" filepath="$PROJECT_DIR$/VerticalStepperForm.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
-      <module fileurl="file://$PROJECT_DIR$/verticalstepperform/verticalstepperform.iml" filepath="$PROJECT_DIR$/verticalstepperform/verticalstepperform.iml" />
+      <module fileurl="file://$PROJECT_DIR$/vertical-stepper-form/vertical-stepper-form.iml" filepath="$PROJECT_DIR$/vertical-stepper-form/vertical-stepper-form.iml" />
     </modules>
   </component>
 </project>
