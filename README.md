@@ -142,11 +142,11 @@ private void checkEmail() {
 	...
 }
 ```
-
+NOTE: You can also use the method to trigger some actions whenever a certain step is open.
 
 #####sendData()
 In this method you have to implement the sending of the data.
-(If you don't want to call ```finish()``` here because you don't want to leave the activity after sending the data, you should dismiss the progress dialog called ```progressDialog```).
+(If you don't want to call ```finish()``` here because you don't want to close the activity after sending the data, you should dismiss the progress dialog called ```progressDialog```).
 
 ## Minimun SDK Version
 The minimun SDK version for this library is 21.
