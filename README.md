@@ -176,7 +176,7 @@ protected void sendData() {
 ```
 NOTE: If you don't want to call ```finish()``` here because you don't want to close the activity after sending the data, you should dismiss the progress dialog called ```progressDialog```.
 
-### Rotation control
+### Screen rotation
 This library handles screen rotation by saving and restoring the state of the form. Therefore, if you want to use ```onSaveInstanceState()``` and ```onRestoreInstanceState```, don't forget to call ```super()``` at the end:
 ```java
 @Override
