@@ -7,8 +7,14 @@ This Android library implements a [**vertical stepper form**](https://material.g
 You can take a look at the [example application code](https://github.com/ernestoyaquello/vertical-stepper-form/tree/master/app/src/main/java/verticalstepperform/ernestoyaquello/com/verticalstepperform) if you wish.
 
 ## Installation and usage
-1. To add the library to your project, write **```compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.7.1'```** in your Gradle configuration file.
-2. Now, you have to add a ```VerticalStepperFormLayout``` view to your activity layout. This view will contain the vertical stepper form. For design purposes, it is recommended that you don't put anything else than this view in your layout (see the code below).
+1. To include the library in your project, add it via Gradle:
+
+	```
+	dependencies {
+		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.7.1'
+	}
+	```
+2. Now, you have to add a ```VerticalStepperFormLayout``` view to your activity layout. This view will contain the vertical stepper form. For design purposes, it is recommended that you don't put anything else than this view in your activity layout (see the code below).
 
   ```xml
   <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -48,7 +54,7 @@ You can take a look at the [example application code](https://github.com/ernesto
 4. Edit your activity class to make it extend ```VerticalStepperFormBaseActivity```.
 5. Finally, you will have to implement the methods ```createCustomStep()```, ```customStepsCheckingOnStepOpening()``` and ```sendData()```.
 
-####Library methods
+####Implementing the methods
 #####createCustomStep()
 This method will be called automatically by the system to generate the view of each step. You have to implement the generation of the corresponding step view and return it:
 ```java
@@ -138,6 +144,9 @@ private void checkEmail() {
 
 #####sendData()
 Here you have to implement the sending of the data.
+
+## Contribution
+Feel free to contribute to this library and help to improve it :)
 
 ## License
 ```
