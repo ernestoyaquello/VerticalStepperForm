@@ -28,7 +28,8 @@ You can take a look at the [example application code](https://github.com/ernesto
   
   </RelativeLayout>
   ```
-3. In your activity Java class, you need to add some lines to ```onCreate()``` in order to initialize the stepper form:
+3. Edit your activity class to make it extend ```VerticalStepperFormBaseActivity``` and implement the methods ```createCustomStep()```, ```customStepsCheckingOnStepOpening()``` and ```sendData()```..
+4. Finally, you will need to add some lines to ```onCreate()``` in order to initialize the stepper form:
 
   ```java
   @Override
@@ -51,8 +52,6 @@ You can take a look at the [example application code](https://github.com/ernesto
       
   }
   ```
-4. Edit your activity class to make it extend ```VerticalStepperFormBaseActivity```.
-5. Finally, you will have to implement the methods ```createCustomStep()```, ```customStepsCheckingOnStepOpening()``` and ```sendData()```.
 
 ####Implementing the methods
 #####createCustomStep()
