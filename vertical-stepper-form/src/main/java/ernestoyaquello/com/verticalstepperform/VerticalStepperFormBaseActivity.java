@@ -36,10 +36,10 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity
         initializeActivity();
     }
 
-    protected void initialiseVerticalStepperForm(int stepperResourceId, String[] stepsNames,
+    protected void initialiseVerticalStepperForm(int stepperLayoutResourceId, String[] stepsNames,
                                                  int colorPrimary, int colorPrimaryDark) {
 
-        verticalStepperForm = (VerticalStepperFormLayout) findViewById(stepperResourceId);
+        verticalStepperForm = (VerticalStepperFormLayout) findViewById(stepperLayoutResourceId);
 
         if(verticalStepperForm != null) {
             verticalStepperForm.setColorPrimary(colorPrimary);
@@ -49,12 +49,12 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity
         }
     }
 
-    protected void initialiseVerticalStepperForm(int stepperResourceId, String[] stepsNames,
+    protected void initialiseVerticalStepperForm(int stepperLayoutResourceId, String[] stepsNames,
                                                  int buttonBackgroundColor, int buttonTextColor,
                                                  int buttonPressedBackgroundColor, int buttonPressedTextColor,
                                                  int stepNumberBackgroundColor, int stepNumberTextColor) {
 
-        verticalStepperForm = (VerticalStepperFormLayout) findViewById(stepperResourceId);
+        verticalStepperForm = (VerticalStepperFormLayout) findViewById(stepperLayoutResourceId);
 
         if(verticalStepperForm != null) {
             verticalStepperForm.setButtonBackgroundColor(buttonBackgroundColor);
