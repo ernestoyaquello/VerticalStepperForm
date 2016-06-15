@@ -3,8 +3,6 @@ This Android library implements a [**vertical stepper form**](https://material.g
 
 ## Demo
 ![Demo picture](https://raw.githubusercontent.com/ernestoyaquello/vertical-stepper-form/master/stepper-example.gif)
-### Example application
-Take a look at the [example application code](https://github.com/ernestoyaquello/vertical-stepper-form/tree/master/app/src/main/java/verticalstepperform/ernestoyaquello/com/verticalstepperform) if you wish.
 
 ## Installation and usage
 1. To include the library in your project, first add it via Gradle:
