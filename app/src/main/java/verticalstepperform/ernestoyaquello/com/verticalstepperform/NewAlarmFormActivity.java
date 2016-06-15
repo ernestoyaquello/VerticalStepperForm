@@ -95,9 +95,8 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
     }
 
     @Override
-    protected void stepsCheckingOnStepOpening() {
-        int activeStep = verticalStepperForm.getActiveStep();
-        switch (activeStep) {
+    protected void checkStepOnOpening(int stepNumber) {
+        switch (stepNumber) {
             case TITLE_STEP_NUM:
                 // When this step is open, we check that the title is correct
                 checkTitleStep(titleEditText.getText().toString());
@@ -106,7 +105,7 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
             case TIME_STEP_NUM:
                 // As soon as they are open, these two steps are marked as completed because they
                 // have default values
-                verticalStepperForm.setStepAsCompleted(activeStep);
+                verticalStepperForm.setStepAsCompleted(stepNumber);
                 break;
             case DAYS_STEP_NUM:
                 // When this step is open, we check the days to verify that at least one is selected

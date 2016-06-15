@@ -88,7 +88,7 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity
 
         verticalStepperForm.initializeForm();
 
-        stepsCheckingOnStepOpening();
+        checkStepOnOpening(verticalStepperForm.getActiveStep());
     }
 
     protected void initializeActivity() {
@@ -97,22 +97,22 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity
 
     protected void goToNextStep() {
         int activeStep = verticalStepperForm.getActiveStep();
-        goToStep(activeStep + 1, true);
+        goToStep(activeStep + 1, true, false);
     }
 
     protected void goToPreviousStep() {
         int activeStep = verticalStepperForm.getActiveStep();
-        goToStep(activeStep - 1, true);
+        goToStep(activeStep - 1, true, false);
     }
 
-    protected void goToStep(int clickedStepNumber, boolean smoothScroll) {
-        if(verticalStepperForm.getActiveStep() != clickedStepNumber) {
+    protected void goToStep(int clickedStepNumber, boolean smoothScroll, boolean restoration) {
+        if(verticalStepperForm.getActiveStep() != clickedStepNumber || restoration) {
             hideSoftKeyboard();
             boolean previousStepsAreCompleted =
                     verticalStepperForm.previousStepsAreCompleted(clickedStepNumber);
             if (clickedStepNumber == 0 || previousStepsAreCompleted) {
                 verticalStepperForm.moveToStep(clickedStepNumber, smoothScroll);
-                stepsCheckingOnStepOpening();
+                checkStepOnOpening(clickedStepNumber);
             } else {
                 userCantGoToOtherStepBeforeCompletingCurrentOneAlert();
             }
@@ -195,7 +195,7 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity
         }
 
         int previouslyActiveStep = savedInstanceState.getInt(STATE_ACTIVE_STEP);
-        goToStep(previouslyActiveStep, false);
+        goToStep(previouslyActiveStep, false, true);
 
         verticalStepperForm.setCurrentProgress();
     }
@@ -211,7 +211,7 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity
 
     @Override
     public void onStepSelected(int stepNum, boolean smoothScrolling) {
-        goToStep(stepNum, smoothScrolling);
+        goToStep(stepNum, smoothScrolling, false);
     }
 
     @Override
@@ -252,15 +252,15 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity
     /**
      * The content of the layout of the corresponding step must be generated here. The system will
      * automatically call this method for every step
-     * @param numStep the number of the step
+     * @param stepNumber the number of the step
      * @return The view that will be automatically added as the content of the step
      */
-    protected abstract View createCustomStep(int numStep);
+    protected abstract View createCustomStep(int stepNumber);
 
     /**
      * This method will be called every time a step is open
      */
-    protected abstract void stepsCheckingOnStepOpening();
+    protected abstract void checkStepOnOpening(int stepNumber);
 
     /**
      * This method will be called when the user confirms the information of the form
