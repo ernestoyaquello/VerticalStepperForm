@@ -12,7 +12,7 @@ This Android library implements a [**vertical stepper form**](https://material.g
 		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.9.3'
 	}
 	```
-2. Now, you have to add a ```VerticalStepperFormLayout``` view to your activity layout. This view will contain the vertical stepper form. For design purposes, it is recommended that you don't put anything else than this view in your activity layout (see the code below).
+2. Now, you have to add a ```VerticalStepperFormLayout``` view to your activity layout, which will contain the vertical stepper form. For design purposes, it is recommended that you don't put anything else than this view in your activity layout (see the code below).
 
   ```xml
   <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -36,12 +36,12 @@ This Android library implements a [**vertical stepper form**](https://material.g
       super.onCreate(savedInstanceState);
       setContentView(R.layout.your_activity_layout);
       
-      VerticalStepperFormLayout verticalStepperForm = 
-          (VerticalStepperFormLayout) findViewById(R.id.vertical_stepper_form);
       String[] mySteps = {"Name", "Email", "Phone Number"};
       int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
       int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
       
+      VerticalStepperFormLayout verticalStepperForm = 
+          (VerticalStepperFormLayout) findViewById(R.id.vertical_stepper_form);
       verticalStepperForm.initialiseVerticalStepperForm(mySteps, colorPrimary, colorPrimaryDark, this, this);
       
       ...
@@ -50,7 +50,7 @@ This Android library implements a [**vertical stepper form**](https://material.g
   ```
   NOTE: In this step you may need need to import ```ernestoyaquello.com.verticalstepperform.*```.
 
-4. Finally, edit your activity class to make it implement ```VerticalStepperForm```. Implement the methods ```createStepContentView()```, ```onStepOpening()``` and ```sendData()```.
+4. Finally, edit your activity class to make it implement ```VerticalStepperForm```. Then, implement the methods ```createStepContentView()```, ```onStepOpening()``` and ```sendData()```.
 
 
 ###Implementing the methods
@@ -108,7 +108,7 @@ private View createPhoneNumberStep() {
 
 
 ####onStepOpening()
-This method will be called every time a step is open, so it can be used for checking conditions. It is noteworthy that the button "Continue" is disabled by default in every step and it only shows up after certain user actions (for example, the introduction of a correct name or email):
+This method will be called every time a step is open, so it can be used for checking conditions. It is noteworthy that the button "Continue" is disabled by default in every step, so it will only show up after certain user actions (for example, after the introduction of a correct name or email):
 ```java
 @Override
 protected void onStepOpening(int stepNumber) {
@@ -121,9 +121,10 @@ protected void onStepOpening(int stepNumber) {
 			break;
 		case 2: 
 			// As soon as the phone number step is open, we mark it as completed in order to show the "Continue"
-			// button (We do this because this field is optional, so the user can skip it without giving any info)
+			// button (We do it because this field is optional, so the user can skip it without giving any info)
 			verticalStepperForm.setStepAsCompleted(2);
-			// In this case, equivalent to: verticalStepperForm.setActiveStepAsCompleted();
+			// In this case, the instruction above is equivalent to: 
+			// verticalStepperForm.setActiveStepAsCompleted();
 			break;
 	}
 }
