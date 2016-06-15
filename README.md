@@ -58,7 +58,7 @@ This Android library implements a [**vertical stepper form**](https://material.g
 This method will be called automatically by the system to generate the view of the content of each step. You have to implement the generation of the corresponding step view and return it:
 ```java
 @Override
-protected View createStepContentView(int stepNumber) {
+public View createStepContentView(int stepNumber) {
 	View view = null;
 	switch (stepNumber) {
 		case 0:
@@ -111,7 +111,7 @@ private View createPhoneNumberStep() {
 This method will be called every time a step is open, so it can be used for checking conditions. It is noteworthy that the button "Continue" is disabled by default in every step, so it will only show up after certain user actions (for example, after the introduction of a correct name or email):
 ```java
 @Override
-protected void onStepOpening(int stepNumber) {
+public void onStepOpening(int stepNumber) {
 	switch (stepNumber) {
 		case 0: 
 			checkName();
