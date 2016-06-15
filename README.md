@@ -32,7 +32,7 @@ Take a look at the [example application code](https://github.com/ernestoyaquello
   ```
 3. Edit your activity class to make it extend ```VerticalStepperFormBaseActivity``` (you will need to import ```ernestoyaquello.com.verticalstepperform.*```).
 4. Implement the methods ```createCustomStep()```, ```stepsCheckingOnStepOpening()``` and ```sendData()```.
-5. Finally, you will need to call ```initialiseVerticalStepperForm()``` in ```onCreate()``` to initialize the stepper form:
+5. Finally, you will need to call ```initialiseVerticalStepperForm()``` in ```onCreate()```:
 
   ```java
   @Override
