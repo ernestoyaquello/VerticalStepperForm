@@ -264,9 +264,9 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
 
         if(title.length() >= MIN_CHARACTERS_TITLE) {
             titleIsCorrect = true;
-            setActiveStepAsCompleted();
+            verticalStepperForm.setActiveStepAsCompleted();
         } else {
-            setActiveStepAsUncompleted();
+            verticalStepperForm.setActiveStepAsUncompleted();
         }
 
         return titleIsCorrect;

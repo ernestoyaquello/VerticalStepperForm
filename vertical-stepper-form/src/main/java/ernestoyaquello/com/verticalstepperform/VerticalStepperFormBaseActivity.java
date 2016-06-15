@@ -126,14 +126,6 @@ public abstract class VerticalStepperFormBaseActivity extends AppCompatActivity
                     .show();*/
     }
 
-    protected void setActiveStepAsCompleted() {
-        verticalStepperForm.setStepAsCompleted(verticalStepperForm.getActiveStep());
-    }
-
-    protected void setActiveStepAsUncompleted() {
-        verticalStepperForm.setStepAsUncompleted(verticalStepperForm.getActiveStep());
-    }
-
     protected void confirmBack() {
         if(verticalStepperForm.isStepCompleted(0)) {
             DialogFragment backConfirmation = new BackConfirmationFragment();
