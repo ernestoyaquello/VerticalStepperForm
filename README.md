@@ -11,7 +11,7 @@ Take a look at the [example application code](https://github.com/ernestoyaquello
 
 	```
 	dependencies {
-		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.9.1'
+		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.9.2'
 	}
 	```
 2. Now, you have to add a ```VerticalStepperFormLayout``` view to your activity layout. This view will contain the vertical stepper form. For design purposes, it is recommended that you don't put anything else than this view in your activity layout (see the code below).
@@ -31,7 +31,7 @@ Take a look at the [example application code](https://github.com/ernestoyaquello
   </RelativeLayout>
   ```
 3. Edit your activity class to make it extend ```VerticalStepperFormBaseActivity``` (you will need to import ```ernestoyaquello.com.verticalstepperform.*```).
-4. Implement the methods ```createCustomStep()```, ```stepsCheckingOnStepOpening()``` and ```sendData()```.
+4. Implement the methods ```createCustomStep()```, ```checkStepOnOpening()``` and ```sendData()```.
 5. Finally, you will need to call ```initialiseVerticalStepperForm()``` in ```onCreate()```:
 
   ```java
@@ -106,13 +106,12 @@ private View createPhoneNumberStep() {
 ```
 
 
-####stepsCheckingOnStepOpening()
+####checkStepOnOpening()
 This method will be called every time a step is open, so it can be used for checking conditions. By default, the button "Continue" is disabled in every step and it only shows up after certain user actions (for example, the introduction of a correct name or email):
 ```java
 @Override
-protected void stepsCheckingOnStepOpening() {
-	int activeStep = verticalStepperForm.getActiveStep();
-	switch (activeStep) {
+protected void checkStepOnOpening(int stepNumber) {
+	switch (stepNumber) {
 		case 0: 
 			checkName();
 			break;
