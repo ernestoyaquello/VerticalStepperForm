@@ -32,7 +32,7 @@ Take a look at the [example application code](https://github.com/ernestoyaquello
   ```
 3. Edit your activity class to make it extend ```VerticalStepperFormBaseActivity``` (you will need to import ```ernestoyaquello.com.verticalstepperform.*```).
 4. Implement the methods ```createCustomStep()```, ```stepsCheckingOnStepOpening()``` and ```sendData()```.
-5. Finally, you will need to call ```initialiseVerticalStepperForm()``` in ```onCreate()``` to initialize the stepper form:
+5. Finally, you will need to call ```initialiseVerticalStepperForm()``` in ```onCreate()```:
 
   ```java
   @Override
@@ -57,7 +57,7 @@ Take a look at the [example application code](https://github.com/ernestoyaquello
 This method will be called automatically by the system to generate the view of each step. You have to implement the generation of the corresponding step view and return it:
 ```java
 @Override
-protected View createCustomStep(int numStep, RelativeLayout stepContent) {
+protected View createCustomStep(int numStep) {
 	View view = null;
 	switch (numStep) {
 		case 0:
@@ -175,7 +175,7 @@ protected void sendData() {
 
 
 ### Screen rotation
-This library handles screen rotation by saving and restoring the state of the form. Therefore, if you want to use ```onSaveInstanceState()``` and ```onRestoreInstanceState```, don't forget to call ```super()``` at the end:
+This library handles screen rotation by saving and restoring the state of the form. Therefore, if you want to use ```onSaveInstanceState()``` and ```onRestoreInstanceState()```, don't forget to call ```super()``` at the end:
 ```java
 @Override
 public void onSaveInstanceState(Bundle savedInstanceState) {
