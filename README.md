@@ -175,7 +175,7 @@ protected void sendData() {
 
 
 ### Screen rotation
-This library handles screen rotation by saving and restoring the state of the form. Therefore, if you want to use ```onSaveInstanceState()``` and ```onRestoreInstanceState```, don't forget to call ```super()``` at the end:
+This library handles screen rotation by saving and restoring the state of the form. Therefore, if you want to use ```onSaveInstanceState()``` and ```onRestoreInstanceState()```, don't forget to call ```super()``` at the end:
 ```java
 @Override
 public void onSaveInstanceState(Bundle savedInstanceState) {
