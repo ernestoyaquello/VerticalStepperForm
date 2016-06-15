@@ -1,6 +1,8 @@
 package verticalstepperform.ernestoyaquello.com.verticalstepperform;
 
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -9,19 +11,23 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.util.Pair;
+import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
-import ernestoyaquello.com.verticalstepperform.VerticalStepperFormBaseActivity;
+import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
+import ernestoyaquello.com.verticalstepperform.fragments.BackConfirmationFragment;
+import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperForm;
 
-public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
+public class NewAlarmFormActivity extends AppCompatActivity implements VerticalStepperForm {
 
     public static final String NEW_ALARM_ADDED = "new_alarm_added";
 
@@ -30,12 +36,6 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
     private static final int DESCRIPTION_STEP_NUM = 1;
     private static final int TIME_STEP_NUM = 2;
     private static final int DAYS_STEP_NUM = 3;
-    private static final String[] stepsNames = {
-            "Title",
-            "Description",
-            "Time",
-            "Week schedule"
-    };
 
     // Title step
     private EditText titleEditText;
@@ -58,22 +58,54 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
     private LinearLayout daysStepContent;
     public static final String STATE_WEEK_DAYS = "week_days";
 
-    // METHODS THAT HAVE TO BE IMPLEMENTED TO MAKE THE LIBRARY WORK
+    private boolean confirmBack = true;
+    private ProgressDialog progressDialog;
+    private VerticalStepperFormLayout verticalStepperForm;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vertical_stepper_form);
 
-        // It is necessary to call initialiseVerticalStepperForm() in order to make the form work
-        int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
-        int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
-        initialiseVerticalStepperForm(
-                R.id.vertical_stepper_form, stepsNames, colorPrimary, colorPrimaryDark);
+        initializeActivity();
     }
 
+    private void initializeActivity() {
+
+        // Time step vars
+        time = new Pair(8, 30);
+        setTimePicker(8, 30);
+
+        // Week days step vars
+        weekDays = new boolean[7];
+
+        // Vertical Stepper form vars
+        int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
+        int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
+        String[] stepsNames = {
+                "Title",
+                "Description",
+                "Time",
+                "Week schedule"
+        };
+
+        // Here we find and initialize the form
+        verticalStepperForm = (VerticalStepperFormLayout) findViewById(R.id.vertical_stepper_form);
+        if(verticalStepperForm != null) {
+            verticalStepperForm.initialiseVerticalStepperForm(
+                    stepsNames,
+                    colorPrimary,
+                    colorPrimaryDark,
+                    this,
+                    this);
+        }
+
+    }
+
+    // METHODS THAT HAVE TO BE IMPLEMENTED TO MAKE THE LIBRARY WORK
+
     @Override
-    protected View createCustomStep(int numStep) {
+    public View createStepContentView(int numStep) {
         // Here we generate the content view of the correspondent step and we return it so it gets
         // automatically added to the step layout (AKA stepContent)
         View view = null;
@@ -95,7 +127,21 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
     }
 
     @Override
-    protected void checkStepOnOpening(int stepNumber) {
+    public void sendData() {
+        verticalStepperForm.disableConfirmationButton();
+        verticalStepperForm.displayMaxProgress();
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(true);
+        progressDialog.show();
+        progressDialog.setMessage(getString(ernestoyaquello.com.verticalstepperform.R.string.vertical_form_stepper_form_sending_data_message));
+
+        executeDataSending();
+    }
+
+
+    @Override
+    public void onStepOpening(int stepNumber) {
         switch (stepNumber) {
             case TITLE_STEP_NUM:
                 // When this step is open, we check that the title is correct
@@ -114,8 +160,9 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
         }
     }
 
-    @Override
-    protected void sendData() {
+    // OTHER METHODS USED TO MAKE THIS EXAMPLE WORK
+
+    private void executeDataSending() {
 
         // TODO Use here the data of the form as you wish
 
@@ -141,10 +188,7 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
                 }
             }
         }).start(); // You should delete this code and add yours
-
     }
-
-    // OTHER METHODS USED TO MAKE THIS EXAMPLE WORK
 
     private View createAlarmTitleStep() {
         // This step view is generated programmatically
@@ -167,7 +211,7 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if(checkTitleStep(v.getText().toString())) {
-                    goToNextStep();
+                    verticalStepperForm.goToNextStep();
                 }
                 return false;
             }
@@ -182,7 +226,7 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
         descriptionEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                goToNextStep();
+                verticalStepperForm.goToNextStep();
                 return false;
             }
         });
@@ -234,19 +278,6 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
             dayText.setText(weekDays[index]);
         }
         return daysStepContent;
-    }
-
-    @Override
-    protected void initializeActivity() {
-        super.initializeActivity();
-
-        // Time step vars
-        time = new Pair(8, 30);
-        setTimePicker(8, 30);
-
-        // Week days step vars
-        weekDays = new boolean[7];
-
     }
 
     private void setTimePicker(int hour, int minutes) {
@@ -337,6 +368,69 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
         return (LinearLayout) daysStepContent.findViewById(id);
     }
 
+    // CONFIRMATION DIALOG WHEN USER TRIES TO LEAVE WITHOUT SUBMITTING
+
+    private void confirmBack() {
+        if(verticalStepperForm.isStepCompleted(0)) {
+            BackConfirmationFragment backConfirmation = new BackConfirmationFragment();
+            backConfirmation.setOnConfirmBack(new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    confirmBack = true;
+                }
+            });
+            backConfirmation.setOnNotConfirmBack(new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    confirmBack = false;
+                    finish();
+                }
+            });
+            backConfirmation.show(getSupportFragmentManager(), null);
+        } else {
+            confirmBack = false;
+            finish();
+        }
+    }
+
+    private void dismissDialog() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
+        }
+        progressDialog = null;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId() == android.R.id.home && confirmBack) {
+            confirmBack();
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onBackPressed(){
+        if(confirmBack) {
+            confirmBack();
+        } else {
+            confirmBack = true;
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        dismissDialog();
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        dismissDialog();
+    }
+
     // SAVING AND RESTORING THE STATE
 
     @Override
@@ -363,6 +457,7 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
             savedInstanceState.putBooleanArray(STATE_WEEK_DAYS, weekDays);
         }
 
+        // The call to super method must be at the end here
         super.onSaveInstanceState(savedInstanceState);
     }
 
@@ -410,6 +505,7 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
             }
         }
 
+        // The call to super method must be at the end here
         super.onRestoreInstanceState(savedInstanceState);
     }
 
