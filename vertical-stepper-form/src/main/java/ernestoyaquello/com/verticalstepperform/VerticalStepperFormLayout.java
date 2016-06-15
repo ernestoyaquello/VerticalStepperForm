@@ -350,7 +350,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     public void displayMaxProgress() {
-        setProgress(completedSteps.length);
+        setProgress(numberOfSteps + 1);
     }
 
     public void setActiveStepAsCompleted() {
@@ -518,7 +518,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     public void setProgress(int progress) {
-        if(progress > 0 && progress <= numberOfSteps) {
+        if(progress > 0 && progress <= (numberOfSteps+1)) {
             progressBar.setProgress(progress);
         }
     }

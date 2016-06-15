@@ -105,11 +105,11 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
     // METHODS THAT HAVE TO BE IMPLEMENTED TO MAKE THE LIBRARY WORK
 
     @Override
-    public View createStepContentView(int numStep) {
+    public View createStepContentView(int stepNumber) {
         // Here we generate the content view of the correspondent step and we return it so it gets
         // automatically added to the step layout (AKA stepContent)
         View view = null;
-        switch (numStep) {
+        switch (stepNumber) {
             case TITLE_STEP_NUM:
                 view = createAlarmTitleStep();
                 break;
@@ -125,20 +125,6 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         }
         return view;
     }
-
-    @Override
-    public void sendData() {
-        verticalStepperForm.disableConfirmationButton();
-        verticalStepperForm.displayMaxProgress();
-
-        progressDialog = new ProgressDialog(this);
-        progressDialog.setCancelable(true);
-        progressDialog.show();
-        progressDialog.setMessage(getString(ernestoyaquello.com.verticalstepperform.R.string.vertical_form_stepper_form_sending_data_message));
-
-        executeDataSending();
-    }
-
 
     @Override
     public void onStepOpening(int stepNumber) {
@@ -158,6 +144,15 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
                 checkDays();
                 break;
         }
+    }
+
+    @Override
+    public void sendData() {
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setCancelable(true);
+        progressDialog.show();
+        progressDialog.setMessage(getString(ernestoyaquello.com.verticalstepperform.R.string.vertical_form_stepper_form_sending_data_message));
+        executeDataSending();
     }
 
     // OTHER METHODS USED TO MAKE THIS EXAMPLE WORK
