@@ -16,12 +16,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormBaseActivity;
-import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
 
 public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
 
@@ -32,7 +30,7 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
     private static final int DESCRIPTION_STEP_NUM = 1;
     private static final int TIME_STEP_NUM = 2;
     private static final int DAYS_STEP_NUM = 3;
-    private static final String[] stepsStrings = {
+    private static final String[] stepsNames = {
             "Title",
             "Description",
             "Time",
@@ -57,8 +55,7 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
 
     // Week days step
     private boolean[] weekDays;
-    private LinearLayout[] weekDaysLayouts;
-    private TextView[] weekDaysTextviews;
+    private LinearLayout daysStepContent;
     public static final String STATE_WEEK_DAYS = "week_days";
 
     // METHODS THAT HAVE TO BE IMPLEMENTED TO MAKE THE LIBRARY WORK
@@ -67,21 +64,16 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vertical_stepper_form);
-        // We need to use these lines of code to initialize the stepper form
-        verticalStepperForm = (VerticalStepperFormLayout) findViewById(R.id.vertical_stepper_form);
-        if(verticalStepperForm != null) {
-            verticalStepperForm.setSteps(stepsStrings);
-            int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
-            int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
-            verticalStepperForm.setStepNumberColor(colorPrimary);
-            verticalStepperForm.setButtonColor(colorPrimary);
-            verticalStepperForm.setButtonPressedColor(colorPrimaryDark);
-            initStepperForm();
-        }
+
+        // It is necessary to call initialiseVerticalStepperForm() in order to make the form work
+        int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
+        int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
+        initialiseVerticalStepperForm(
+                R.id.vertical_stepper_form, stepsNames, colorPrimary, colorPrimaryDark);
     }
 
     @Override
-    protected View createCustomStep(int numStep, RelativeLayout stepContent) {
+    protected View createCustomStep(int numStep) {
         // Here we generate the content view of the correspondent step and we return it so it gets
         // automatically added to the step layout (AKA stepContent)
         View view = null;
@@ -103,17 +95,18 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
     }
 
     @Override
-    protected void customStepsCheckingOnStepOpening() {
+    protected void stepsCheckingOnStepOpening() {
+        int activeStep = verticalStepperForm.getActiveStep();
         switch (activeStep) {
             case TITLE_STEP_NUM:
                 // When this step is open, we check that the title is correct
-                checkTitleStepCompletion(titleEditText.getText().toString());
+                checkTitleStep(titleEditText.getText().toString());
                 break;
             case DESCRIPTION_STEP_NUM:
             case TIME_STEP_NUM:
                 // As soon as they are open, these two steps are marked as completed because they
                 // have default values
-                setStepAsCompleted(activeStep);
+                verticalStepperForm.setStepAsCompleted(activeStep);
                 break;
             case DAYS_STEP_NUM:
                 // When this step is open, we check the days to verify that at least one is selected
@@ -154,10 +147,10 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
 
     // OTHER METHODS USED TO MAKE THIS EXAMPLE WORK
 
-    // Creation of the title step
     private View createAlarmTitleStep() {
         // This step view is generated programmatically
         titleEditText = new EditText(this);
+        titleEditText.setHint("Alarm title (mandatory)");
         titleEditText.setSingleLine(true);
         titleEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -165,17 +158,16 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                checkTitleStepCompletion(s.toString());
+                checkTitleStep(s.toString());
             }
 
             @Override
             public void afterTextChanged(Editable s) {}
         });
-        titleEditText.setHint("Alarm title (mandatory)");
         titleEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if(v.getText().toString().length() >= MIN_CHARACTERS_TITLE) {
+                if(checkTitleStep(v.getText().toString())) {
                     goToNextStep();
                 }
                 return false;
@@ -184,16 +176,20 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
         return titleEditText;
     }
 
-    // Creation of the description step
     private View createAlarmDescriptionStep() {
-        // This step view is generated programmatically
         descriptionEditText = new EditText(this);
-        descriptionEditText.setSingleLine(false);
         descriptionEditText.setHint("Alarm description (optional)");
+        descriptionEditText.setSingleLine(true);
+        descriptionEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                goToNextStep();
+                return false;
+            }
+        });
         return descriptionEditText;
     }
 
-    // Creation of the time step
     private View createAlarmTimeStep() {
         // This step view is generated by inflating a layout XML file
         LayoutInflater inflater = LayoutInflater.from(getBaseContext());
@@ -209,40 +205,140 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
         return timeStepContent;
     }
 
-    // Creation of the week days step
     private View createAlarmDaysStep() {
-        // This step view is generated by inflating a layout XML file
         LayoutInflater inflater = LayoutInflater.from(getBaseContext());
-        LinearLayout addDaysStepContent = (LinearLayout) inflater.inflate(
+        daysStepContent = (LinearLayout) inflater.inflate(
                 R.layout.step_days_of_week_layout, null, false);
+
         String[] weekDays = getResources().getStringArray(R.array.week_days);
         for(int i = 0; i < weekDays.length; i++) {
-            int id = addDaysStepContent.getResources().getIdentifier(
-                    "day_" + i, "id", getPackageName());
-            LinearLayout dayLayout = (LinearLayout) addDaysStepContent.findViewById(id);
-            final TextView dayText = (TextView) dayLayout.findViewById(R.id.day);
-            weekDaysLayouts[i] = dayLayout;
-            weekDaysTextviews[i] = dayText;
-            if(i < 5) {
-                activateDay(i, false);
+            final int index = i;
+            final LinearLayout dayLayout = getDayLayout(index);
+            if(index < 5) {
+                activateDay(index, dayLayout, false);
             } else {
-                deactivateDay(i, false);
+                deactivateDay(index, dayLayout, false);
             }
-            dayText.setText(weekDays[i]);
-            final int iFinal = i;
+
             dayLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    if(((Boolean)v.getTag())) {
-                        deactivateDay(iFinal, true);
+                    if((boolean)v.getTag()) {
+                        deactivateDay(index, dayLayout, true);
                     } else {
-                        activateDay(iFinal, true);
+                        activateDay(index, dayLayout, true);
                     }
                 }
             });
+
+            final TextView dayText = (TextView) dayLayout.findViewById(R.id.day);
+            dayText.setText(weekDays[index]);
         }
-        return addDaysStepContent;
+        return daysStepContent;
     }
+
+    @Override
+    protected void initializeActivity() {
+        super.initializeActivity();
+
+        // Time step vars
+        time = new Pair(8, 30);
+        setTimePicker(8, 30);
+
+        // Week days step vars
+        weekDays = new boolean[7];
+
+    }
+
+    private void setTimePicker(int hour, int minutes) {
+        timePicker = new TimePickerDialog(this,
+                new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        setTime(hourOfDay, minute);
+                    }
+                }, hour, minutes, true);
+    }
+
+    private boolean checkTitleStep(String title) {
+        boolean titleIsCorrect = false;
+
+        if(title.length() >= MIN_CHARACTERS_TITLE) {
+            titleIsCorrect = true;
+            setActiveStepAsCompleted();
+        } else {
+            setActiveStepAsUncompleted();
+        }
+
+        return titleIsCorrect;
+    }
+
+    private void setTime(int hour, int minutes) {
+        time = new Pair(hour, minutes);
+        String hourString = ((time.first > 9) ?
+                String.valueOf(time.first) : ("0" + time.first));
+        String minutesString = ((time.second > 9) ?
+                String.valueOf(time.second) : ("0" + time.second));
+        timeTextView.setText(hourString + ":" + minutesString);
+    }
+
+    private void activateDay(int index, LinearLayout dayLayout, boolean check) {
+        weekDays[index] = true;
+
+        dayLayout.setTag(true);
+
+        Drawable bg = ContextCompat.getDrawable(getBaseContext(),
+                ernestoyaquello.com.verticalstepperform.R.drawable.circle_step_done);
+        int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
+        bg.setColorFilter(new PorterDuffColorFilter(colorPrimary, PorterDuff.Mode.SRC_IN));
+        dayLayout.setBackground(bg);
+
+        TextView dayText = (TextView) dayLayout.findViewById(R.id.day);
+        dayText.setTextColor(Color.rgb(255, 255, 255));
+
+        if(check) {
+            checkDays();
+        }
+    }
+
+    private void deactivateDay(int index, LinearLayout dayLayout, boolean check) {
+        weekDays[index] = false;
+
+        dayLayout.setTag(false);
+
+        dayLayout.setBackgroundResource(0);
+
+        TextView dayText = (TextView) dayLayout.findViewById(R.id.day);
+        int colour = ContextCompat.getColor(getBaseContext(), R.color.colorPrimary);
+        dayText.setTextColor(colour);
+
+        if(check) {
+            checkDays();
+        }
+    }
+
+    private boolean checkDays() {
+        boolean thereIsAtLeastOneDaySelected = false;
+        for(int i = 0; i < weekDays.length && !thereIsAtLeastOneDaySelected; i++) {
+            if(weekDays[i]) {
+                verticalStepperForm.setStepAsCompleted(DAYS_STEP_NUM);
+                thereIsAtLeastOneDaySelected = true;
+            }
+        }
+        if(!thereIsAtLeastOneDaySelected) {
+            verticalStepperForm.setStepAsUncompleted(DAYS_STEP_NUM);
+        }
+
+        return thereIsAtLeastOneDaySelected;
+    }
+
+    private LinearLayout getDayLayout(int i) {
+        int id = daysStepContent.getResources().getIdentifier(
+                "day_" + i, "id", getPackageName());
+        return (LinearLayout) daysStepContent.findViewById(id);
+    }
+
+    // SAVING AND RESTORING THE STATE
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
@@ -305,108 +401,17 @@ public class NewAlarmFormActivity extends VerticalStepperFormBaseActivity {
             weekDays = savedInstanceState.getBooleanArray(STATE_WEEK_DAYS);
             if (weekDays != null) {
                 for (int i = 0; i < weekDays.length; i++) {
+                    LinearLayout dayLayout = getDayLayout(i);
                     if (weekDays[i]) {
-                        activateDay(i, false);
+                        activateDay(i, dayLayout, false);
                     } else {
-                        deactivateDay(i, false);
+                        deactivateDay(i, dayLayout, false);
                     }
                 }
             }
         }
 
         super.onRestoreInstanceState(savedInstanceState);
-    }
-
-    @Override
-    protected void setInitialVariables() {
-        super.setInitialVariables();
-
-        // Time step variables
-        time = new Pair(8, 30);
-        setTimePicker(8, 30);
-
-        // Week days step variables
-        weekDays = new boolean[7];
-        weekDaysLayouts = new LinearLayout[7];
-        weekDaysTextviews = new TextView[7];
-        for(int i = 0; i < weekDays.length; i++) {
-            if(i < 5) {
-                weekDays[i] = true;
-            } else {
-                weekDays[i] = false;
-            }
-        }
-
-    }
-
-    private void setTimePicker(int hour, int minutes) {
-        timePicker = new TimePickerDialog(this,
-                new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        setTime(hourOfDay, minute);
-                    }
-                }, hour, minutes, true);
-    }
-
-    private void checkTitleStepCompletion(String title) {
-        if(title.length() >= MIN_CHARACTERS_TITLE) {
-            setActiveStepAsCompleted();
-        } else {
-            setActiveStepAsUncompleted();
-        }
-    }
-
-    private void setTime(int hour, int minutes) {
-        time = new Pair(hour, minutes);
-        String hourString = ((time.first > 9) ?
-                String.valueOf(time.first) : ("0" + time.first));
-        String minutesString = ((time.second > 9) ?
-                String.valueOf(time.second) : ("0" + time.second));
-        timeTextView.setText(hourString + ":" + minutesString);
-    }
-
-    private void activateDay(int i, boolean check) {
-        LinearLayout dayLayout = weekDaysLayouts[i];
-        TextView dayText = weekDaysTextviews[i];
-        dayLayout.setTag(true);
-        Drawable bg = ContextCompat.getDrawable(getBaseContext(),
-                ernestoyaquello.com.verticalstepperform.R.drawable.circle_step_done);
-        bg.setColorFilter(new PorterDuffColorFilter(
-                verticalStepperForm.getStepNumberColor(), PorterDuff.Mode.SRC_IN));
-        dayLayout.setBackground(bg);
-        int color = Color.rgb(255, 255, 255);
-        dayText.setTextColor(color);
-        weekDays[i] = true;
-        if(check) {
-            checkDays();
-        }
-    }
-
-    private void deactivateDay(int i, boolean check) {
-        LinearLayout dayLayout = weekDaysLayouts[i];
-        TextView dayText = weekDaysTextviews[i];
-        dayLayout.setTag(false);
-        dayLayout.setBackgroundResource(0);
-        int colour = ContextCompat.getColor(getBaseContext(), R.color.colorPrimary);
-        dayText.setTextColor(colour);
-        weekDays[i] = false;
-        if(check) {
-            checkDays();
-        }
-    }
-
-    private void checkDays() {
-        boolean thereIsAtLeastOneDaySelected = false;
-        for(int i = 0; i < weekDays.length && !thereIsAtLeastOneDaySelected; i++) {
-            if(weekDays[i]) {
-                setStepAsCompleted(DAYS_STEP_NUM);
-                thereIsAtLeastOneDaySelected = true;
-            }
-        }
-        if(!thereIsAtLeastOneDaySelected) {
-            setStepAsUncompleted(DAYS_STEP_NUM);
-        }
     }
 
 }

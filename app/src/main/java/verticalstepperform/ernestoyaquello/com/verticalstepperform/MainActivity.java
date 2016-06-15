@@ -25,6 +25,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -33,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivityForResult(intent, NEW_ALARM);
             }
         });
+
         information = (TextView) findViewById(R.id.information);
         disclaimer = (TextView) findViewById(R.id.disclaimer);
     }
@@ -40,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onRestoreInstanceState(Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
+
         dataReceived = savedInstanceState.getBoolean(DATA_RECEIVED, false);
         if(dataReceived) {
             disclaimer.setVisibility(View.VISIBLE);
@@ -50,6 +53,8 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
+        super.onSaveInstanceState(savedInstanceState);
+
         savedInstanceState.putBoolean(DATA_RECEIVED, dataReceived);
         if (dataReceived) {
             savedInstanceState.putString(INFORMATION, information.getText().toString());
@@ -60,18 +65,20 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         if (resultCode == Activity.RESULT_OK && requestCode == NEW_ALARM && data != null) {
             if(data.hasExtra(NewAlarmFormActivity.NEW_ALARM_ADDED)
                     && data.getExtras().getBoolean(NewAlarmFormActivity.NEW_ALARM_ADDED, false)) {
+
                 // Handling the data received from the stepper form
                 dataReceived = true;
                 String title = data.getExtras().getString(NewAlarmFormActivity.STATE_TITLE);
-                String description = data.getExtras().getString(NewAlarmFormActivity.STATE_DESCRIPTION);
+                //String description = data.getExtras().getString(NewAlarmFormActivity.STATE_DESCRIPTION);
                 int hour = data.getExtras().getInt(NewAlarmFormActivity.STATE_TIME_HOUR);
                 int minutes = data.getExtras().getInt(NewAlarmFormActivity.STATE_TIME_MINUTES);
                 String time = ((hour > 9) ? hour : ("0" + hour))
                         + ":" + ((minutes > 9) ? minutes : ("0" + minutes));
-                boolean[] weekDays = data.getExtras().getBooleanArray(NewAlarmFormActivity.STATE_WEEK_DAYS);
+                //boolean[] weekDays = data.getExtras().getBooleanArray(NewAlarmFormActivity.STATE_WEEK_DAYS);
                 information.setText("Alarm \"" + title + "\" set up at " + time);
                 disclaimer.setVisibility(View.VISIBLE);
                 Snackbar.make(fab, getString(R.string.new_alarm_added), Snackbar.LENGTH_LONG).show();
