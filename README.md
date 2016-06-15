@@ -57,7 +57,7 @@ Take a look at the [example application code](https://github.com/ernestoyaquello
 This method will be called automatically by the system to generate the view of each step. You have to implement the generation of the corresponding step view and return it:
 ```java
 @Override
-protected View createCustomStep(int numStep, RelativeLayout stepContent) {
+protected View createCustomStep(int numStep) {
 	View view = null;
 	switch (numStep) {
 		case 0:
