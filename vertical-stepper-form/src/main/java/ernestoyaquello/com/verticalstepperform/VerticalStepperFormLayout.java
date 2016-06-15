@@ -68,23 +68,21 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
     public VerticalStepperFormLayout(Context context) {
         super(context);
-        this.context = context;
         init(context);
     }
 
     public VerticalStepperFormLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.context = context;
         init(context);
     }
 
     public VerticalStepperFormLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        this.context = context;
         init(context);
     }
 
     public void init(Context context) {
+        this.context = context;
         mInflater = LayoutInflater.from(context);
         mInflater.inflate(R.layout.vertical_stepper_form_layout, this, true);
     }
