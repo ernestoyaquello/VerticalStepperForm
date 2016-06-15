@@ -151,7 +151,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(true);
         progressDialog.show();
-        progressDialog.setMessage(getString(ernestoyaquello.com.verticalstepperform.R.string.vertical_form_stepper_form_sending_data_message));
+        progressDialog.setMessage(getString(R.string.vertical_form_stepper_form_sending_data_message));
         executeDataSending();
     }
 
