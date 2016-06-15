@@ -7,11 +7,11 @@ This Android library implements a [**vertical stepper form**](https://material.g
 Take a look at the [example application code](https://github.com/ernestoyaquello/vertical-stepper-form/tree/master/app/src/main/java/verticalstepperform/ernestoyaquello/com/verticalstepperform) if you wish.
 
 ## Installation and usage
-1. To include the library in your project, add it via Gradle:
+1. To include the library in your project, first add it via Gradle:
 
 	```
 	dependencies {
-		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.9.0'
+		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.9.1'
 	}
 	```
 2. Now, you have to add a ```VerticalStepperFormLayout``` view to your activity layout. This view will contain the vertical stepper form. For design purposes, it is recommended that you don't put anything else than this view in your activity layout (see the code below).
@@ -31,8 +31,8 @@ Take a look at the [example application code](https://github.com/ernestoyaquello
   </RelativeLayout>
   ```
 3. Edit your activity class to make it extend ```VerticalStepperFormBaseActivity``` (you will need to import ```ernestoyaquello.com.verticalstepperform.*```).
-4. Implement the methods ```createCustomStep()```, ```customStepsCheckingOnStepOpening()``` and ```sendData()```.
-5. Finally, you will need to write some lines in ```onCreate()``` to initialize the stepper form (remember to edit this code in order to add your own step names):
+4. Implement the methods ```createCustomStep()```, ```stepsCheckingOnStepOpening()``` and ```sendData()```.
+5. Finally, you will need to call ```initialiseVerticalStepperForm()``` in ```onCreate()``` to initialize the stepper form:
 
   ```java
   @Override
@@ -40,20 +40,12 @@ Take a look at the [example application code](https://github.com/ernestoyaquello
       super.onCreate(savedInstanceState);
       setContentView(R.layout.your_activity_layout);
       
-      // We need to add these lines of code to initialize the stepper form
-      verticalStepperForm = (VerticalStepperFormLayout) findViewById(R.id.vertical_stepper_form);
-      if(verticalStepperForm != null) {
-          // Define the names of your fields/steps
-          String[] mySteps = {"Name", "Email", "Phone Number"}; 
-          // Add the steps to the stepper form
-          verticalStepperForm.setSteps(mySteps);
-          // Set the colors
-          verticalStepperForm.setStepNumberColor(colorPrimary);
-          verticalStepperForm.setButtonColor(colorPrimary);
-          verticalStepperForm.setButtonPressedColor(colorPrimaryDark);
-          // Initialize the stepper
-          initStepperForm();
-      }
+      int stepperLayoutResourceId = R.id.vertical_stepper_form;
+      String[] mySteps = {"Name", "Email", "Phone Number"};
+      int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
+      int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
+      
+      initialiseVerticalStepperForm(stepperLayoutResourceId, mySteps, colorPrimary, colorPrimaryDark);
       
       ...
       
@@ -114,11 +106,12 @@ private View createPhoneNumberStep() {
 ```
 
 
-####customStepsCheckingOnStepOpening()
+####stepsCheckingOnStepOpening()
 This method will be called every time a step is open, so it can be used for checking conditions. By default, the button "Continue" is disabled in every step and it only shows up after certain user actions (for example, the introduction of a correct name or email):
 ```java
 @Override
-protected void customStepsCheckingOnStepOpening() {
+protected void stepsCheckingOnStepOpening() {
+	int activeStep = verticalStepperForm.getActiveStep();
 	switch (activeStep) {
 		case 0: 
 			checkName();
@@ -128,17 +121,18 @@ protected void customStepsCheckingOnStepOpening() {
 			break;
 		case 2: 
 			// As soon as the phone number step is open, we mark it as completed in order to show the "Continue"
-			// button (This field is optional, so the user can skip it without giving any information)
-			setStepAsCompleted(2); // In this case, this call is equivalent to "setActiveStepAsCompleted()"
+			// button (We do this because this field is optional, so the user can skip it without giving any info)
+			verticalStepperForm.setStepAsCompleted(2);
+			// In this case, equivalent to: verticalStepperForm.setActiveStepAsCompleted();
 			break;
 	}
 }
 
 private void checkName() {
 	if(name.length() >= MIN_CHARACTERS_NAME && name.length() <= MAX_CHARACTERS_NAME) {
-		setActiveStepAsCompleted();
+		verticalStepperForm.setActiveStepAsCompleted();
 	} else {
-		setActiveStepAsUncompleted();
+		verticalStepperForm.setActiveStepAsUncompleted();
 	}
 }
 
@@ -178,7 +172,7 @@ protected void sendData() {
 
 }
 ```
-NOTE: If you don't want to call ```finish()``` here because you don't want to close the activity after sending the data, you should dismiss the progress dialog called ```progressDialog```.
+
 
 ### Screen rotation
 This library handles screen rotation by saving and restoring the state of the form. Therefore, if you want to use ```onSaveInstanceState()``` and ```onRestoreInstanceState```, don't forget to call ```super()``` at the end:
