@@ -55,7 +55,7 @@ This Android library implements a [**vertical stepper form**](https://material.g
       VerticalStepperFormLayout.Builder.newInstance(verticalStepperForm, mySteps, this, this)
           .primaryColor(colorPrimary)
           .primaryDarkColor(colorPrimaryDark)
-          .displayBottomNavigation(true) // It is true by default, so this line is not necessary
+          .displayBottomNavigation(true) // It is true by default, so in this case this line is not necessary
           .init();
       
       ...
