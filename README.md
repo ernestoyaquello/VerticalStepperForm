@@ -9,7 +9,7 @@ This Android library implements a [**vertical stepper form**](https://material.g
 * Navigation bar on the bottom can be hidden in order to make the form follow Material Design guidelines more precisely
 * Optional error messages for each step
 * Smoother transitions
-* Tick icon is displayed on completed steps
+* Tick icon displayed on completed steps
 
 ## Installation and usage
 1. To include the library in your project, first add it via Gradle:
