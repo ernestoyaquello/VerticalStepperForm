@@ -2,14 +2,21 @@
 This Android library implements a [**vertical stepper form**](https://material.google.com/components/steppers.html) following Google Material Design guidelines.
 
 ## Demo
-![Demo picture](https://raw.githubusercontent.com/ernestoyaquello/vertical-stepper-form/master/stepper-example.gif)
+![Demo picture](http://i.imgur.com/90JCNit.gif)
+
+## What's new (version 0.9.5)
+* Easier to set up (Builder Pattern has been implemented)
+* Navigation bar on the bottom can be hidden in order to make the form follow Material Design guidelines more precisely
+* Optional error messages for each step
+* Smoother transitions
+* Tick icon is displayed on completed steps
 
 ## Installation and usage
 1. To include the library in your project, first add it via Gradle:
 
 	```
 	dependencies {
-		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.9.4'
+		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.9.5'
 	}
 	```
 2. Now, you have to add a ```VerticalStepperFormLayout``` view to your activity layout, which will contain the vertical stepper form. For design purposes, it is recommended that you don't put anything else than this view in your activity layout (see the code below).
@@ -28,7 +35,7 @@ This Android library implements a [**vertical stepper form**](https://material.g
   
   </RelativeLayout>
   ```
-3. In ```onCreate()```, you will need to find the view and call ```initialiseVerticalStepperForm()```:
+3. In ```onCreate()```, you will need to find the view and initialize the form:
 
   ```java
   @Override
@@ -42,7 +49,12 @@ This Android library implements a [**vertical stepper form**](https://material.g
       
       VerticalStepperFormLayout verticalStepperForm = 
           (VerticalStepperFormLayout) findViewById(R.id.vertical_stepper_form);
-      verticalStepperForm.initialiseVerticalStepperForm(mySteps, colorPrimary, colorPrimaryDark, this, this);
+          
+      VerticalStepperFormLayout.Builder.newInstance(verticalStepperForm, mySteps, this, this)
+          .primaryColor(colorPrimary)
+          .primaryDarkColor(colorPrimaryDark)
+          .displayBottomNavigation(true)
+          .init();
       
       ...
       
@@ -130,10 +142,12 @@ public void onStepOpening(int stepNumber) {
 }
 
 private void checkName() {
-	if(name.length() >= MIN_CHARACTERS_NAME && name.length() <= MAX_CHARACTERS_NAME) {
+	if(name.length() >= 3 && name.length() <= 40) {
 		verticalStepperForm.setActiveStepAsCompleted();
 	} else {
-		verticalStepperForm.setActiveStepAsUncompleted();
+		// This error message is optional (use null if you don't want to display an error message)
+		String errorMessage = "The name must have between 3 and 40 characters";
+		verticalStepperForm.setActiveStepAsUncompleted(errorMessage);
 	}
 }
 
