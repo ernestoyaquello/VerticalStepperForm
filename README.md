@@ -48,8 +48,7 @@ This Android library implements a [**vertical stepper form**](https://material.g
       int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
       
       // Finding the view
-      VerticalStepperFormLayout verticalStepperForm = 
-          (VerticalStepperFormLayout) findViewById(R.id.vertical_stepper_form);
+      verticalStepperForm = (VerticalStepperFormLayout) findViewById(R.id.vertical_stepper_form);
           
       // Setting up and initializing the form
       VerticalStepperFormLayout.Builder.newInstance(verticalStepperForm, mySteps, this, this)
