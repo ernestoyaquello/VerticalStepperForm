@@ -90,16 +90,10 @@ public View createStepContentView(int stepNumber) {
 
 private View createNameStep() {
 	// Here we generate programmatically the view that will be added by the system to the step content layout
-	EditText name = new EditText(this);
+	name = new EditText(this);
 	name.setSingleLine(true);
 	name.setHint("Your name");
-	name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-		@Override
-		public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-			...
-			return false;
-		}
-	});
+	...
 	return name;
 }
 
@@ -107,7 +101,7 @@ private View createEmailStep() {
 	// In this case we generate the view by inflating a XML file
 	LayoutInflater inflater = LayoutInflater.from(getBaseContext());
 	LinearLayout emailLayoutContent = (LinearLayout) inflater.inflate(R.layout.email_step_layout, null, false);
-	EditText email = (EditText) emailLayoutContent.findViewById(R.id.email);
+	email = (EditText) emailLayoutContent.findViewById(R.id.email);
 	...
 	return emailLayoutContent;
 }
