@@ -38,6 +38,9 @@ This Android library implements a [**vertical stepper form**](https://material.g
 3. In ```onCreate()```, you will need to find the view and initialize the form:
 
   ```java
+  private VerticalStepperFormLayout verticalStepperForm;
+  ...
+  
   @Override
   protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
