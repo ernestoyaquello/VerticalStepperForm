@@ -6,7 +6,7 @@
     android:layout_marginLeft="8dp"
     android:layout_marginStart="8dp">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_marginTop="6dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -20,16 +20,30 @@
             android:layout_height="28dp"
             android:background="@drawable/circle_step_done"
             android:layout_marginRight="12dp"
-            android:layout_marginEnd="12dp">
+            android:layout_marginEnd="12dp"
+            android:orientation="vertical"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true">
+
             <TextView
                 android:id="@+id/step_number"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:textColor="#ffffff"
                 android:gravity="center"
-                android:layout_gravity="center_vertical"
                 android:textSize="16sp"/>
+
         </LinearLayout>
+
+        <ImageView
+            android:id="@+id/step_done"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:src="@drawable/ic_done"
+            android:layout_alignLeft="@id/circle"
+            android:layout_alignStart="@id/circle"
+            android:layout_alignTop="@id/circle"
+            android:visibility="invisible"/>
 
         <TextView
             android:id="@+id/step_title"
@@ -37,9 +51,11 @@
             android:layout_height="28dp"
             android:gravity="center_vertical"
             android:textColor="#212121"
-            android:textSize="17sp" />
+            android:textSize="17sp"
+            android:layout_toRightOf="@id/circle"
+            android:layout_toEndOf="@id/circle"/>
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <LinearLayout
         android:layout_marginTop="12dp"
@@ -59,14 +75,49 @@
             android:id="@+id/vertical_line">
         </LinearLayout>
 
-        <RelativeLayout
-            android:id="@+id/step_content"
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
-            <!-- Step content -->
+            <LinearLayout
+                android:id="@+id/error_container"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:visibility="gone"
+                android:layout_gravity="center_vertical">
 
-        </RelativeLayout>
+                <ImageView
+                    android:id="@+id/error_icon"
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/ic_error"
+                    android:layout_marginRight="4dp"
+                    android:layout_marginEnd="4dp"/>
+
+                <TextView
+                    android:id="@+id/error_message"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="16sp"
+                    android:textColor="#af1212"/>
+
+            </LinearLayout>
+
+            <RelativeLayout
+                android:id="@+id/step_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingTop="1dp">
+
+                <!-- Step content -->
+
+            </RelativeLayout>
+
+        </LinearLayout>
+
+
 
     </LinearLayout>
 

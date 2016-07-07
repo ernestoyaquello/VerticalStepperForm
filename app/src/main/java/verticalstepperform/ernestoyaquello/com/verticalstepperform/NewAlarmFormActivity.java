@@ -73,7 +73,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
     private void initializeActivity() {
 
         // Time step vars
-        time = new Pair(8, 30);
+        time = new Pair<>(8, 30);
         setTimePicker(8, 30);
 
         // Week days step vars
@@ -82,23 +82,15 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         // Vertical Stepper form vars
         int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
         int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
-        String[] stepsNames = {
-                "Title",
-                "Description",
-                "Time",
-                "Week schedule"
-        };
+        String[] stepsNames = getResources().getStringArray(R.array.steps_names);
 
         // Here we find and initialize the form
         verticalStepperForm = (VerticalStepperFormLayout) findViewById(R.id.vertical_stepper_form);
-        if(verticalStepperForm != null) {
-            verticalStepperForm.initialiseVerticalStepperForm(
-                    stepsNames,
-                    colorPrimary,
-                    colorPrimaryDark,
-                    this,
-                    this);
-        }
+        VerticalStepperFormLayout.Builder.newInstance(verticalStepperForm, stepsNames, this, this)
+                .primaryColor(colorPrimary)
+                .primaryDarkColor(colorPrimaryDark)
+                .displayBottomNavigation(true)
+                .init();
 
     }
 
@@ -188,7 +180,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
     private View createAlarmTitleStep() {
         // This step view is generated programmatically
         titleEditText = new EditText(this);
-        titleEditText.setHint("Alarm title (mandatory)");
+        titleEditText.setHint(R.string.form_hint_title);
         titleEditText.setSingleLine(true);
         titleEditText.addTextChangedListener(new TextWatcher() {
             @Override
@@ -216,7 +208,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
 
     private View createAlarmDescriptionStep() {
         descriptionEditText = new EditText(this);
-        descriptionEditText.setHint("Alarm description (optional)");
+        descriptionEditText.setHint(R.string.form_hint_description);
         descriptionEditText.setSingleLine(true);
         descriptionEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
@@ -290,21 +282,24 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
 
         if(title.length() >= MIN_CHARACTERS_TITLE) {
             titleIsCorrect = true;
-            verticalStepperForm.setActiveStepAsCompleted();
+            verticalStepperForm.setStepAsCompleted(TITLE_STEP_NUM);
         } else {
-            verticalStepperForm.setActiveStepAsUncompleted();
+            String titleErrorString = getResources().getString(R.string.error_title_min_characters);
+            String titleError = String.format(titleErrorString, MIN_CHARACTERS_TITLE);
+            verticalStepperForm.setStepAsUncompleted(TITLE_STEP_NUM, titleError);
         }
 
         return titleIsCorrect;
     }
 
     private void setTime(int hour, int minutes) {
-        time = new Pair(hour, minutes);
+        time = new Pair<>(hour, minutes);
         String hourString = ((time.first > 9) ?
                 String.valueOf(time.first) : ("0" + time.first));
         String minutesString = ((time.second > 9) ?
                 String.valueOf(time.second) : ("0" + time.second));
-        timeTextView.setText(hourString + ":" + minutesString);
+        String time = hourString + ":" + minutesString;
+        timeTextView.setText(time);
     }
 
     private void activateDay(int index, LinearLayout dayLayout, boolean check) {
@@ -351,7 +346,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
             }
         }
         if(!thereIsAtLeastOneDaySelected) {
-            verticalStepperForm.setStepAsUncompleted(DAYS_STEP_NUM);
+            verticalStepperForm.setStepAsUncompleted(DAYS_STEP_NUM, null);
         }
 
         return thereIsAtLeastOneDaySelected;
@@ -366,7 +361,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
     // CONFIRMATION DIALOG WHEN USER TRIES TO LEAVE WITHOUT SUBMITTING
 
     private void confirmBack() {
-        if(verticalStepperForm.isStepCompleted(0)) {
+        if(confirmBack && verticalStepperForm.isAnyStepCompleted()) {
             BackConfirmationFragment backConfirmation = new BackConfirmationFragment();
             backConfirmation.setOnConfirmBack(new DialogInterface.OnClickListener() {
                 @Override
@@ -406,12 +401,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
 
     @Override
     public void onBackPressed(){
-        if(confirmBack) {
-            confirmBack();
-        } else {
-            confirmBack = true;
-            super.onBackPressed();
-        }
+        confirmBack();
     }
 
     @Override
@@ -476,7 +466,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
                 && savedInstanceState.containsKey(STATE_TIME_MINUTES)) {
             int hour = savedInstanceState.getInt(STATE_TIME_HOUR);
             int minutes = savedInstanceState.getInt(STATE_TIME_MINUTES);
-            time = new Pair(hour, minutes);
+            time = new Pair<>(hour, minutes);
             setTime(hour, minutes);
             if(timePicker == null) {
                 setTimePicker(hour, minutes);

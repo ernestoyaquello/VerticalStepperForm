@@ -5,6 +5,7 @@ import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.Transformation;
 
+// Source: http://stackoverflow.com/a/13381228/3891038
 public class Animations {
     public static void slideDown(final View v) {
         if(v.getVisibility() != View.VISIBLE) {

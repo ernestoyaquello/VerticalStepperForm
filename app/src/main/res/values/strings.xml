@@ -2,6 +2,17 @@
     <string name="app_name">Vertical Stepper Form Example</string>
     <string name="add_alarm">Add New Alarm</string>
     <string name="new_alarm_added">New alarm added successfully</string>
+    <string name="form_hint_title">Alarm title (required)</string>
+    <string name="form_hint_description">Alarm description (optional)</string>
+    <string name="error_title_min_characters">At least %1$d characters</string>
+    <string name="main_activity_explanation">Click the button to try it!</string>
+    <string name="main_activity_explanation_disclaimer">This app DOES NOT set up alarms for real!</string>
+    <string-array name="steps_names">
+        <item>Title</item>
+        <item>Description</item>
+        <item>Time</item>
+        <item>Week schedule</item>
+    </string-array>
     <string-array name="week_days">
         <item>M</item>
         <item>T</item>
@@ -12,11 +23,10 @@
         <item>S</item>
     </string-array>
 
-    <!-- We can overwrite the values of the library strings in order to customize them -->
+    <!-- We can overwrite the values of the library's strings in order to customize them -->
     <string name="vertical_form_stepper_form_discard_question">Discard alarm?</string>
     <string name="vertical_form_stepper_form_info_will_be_lost">All the information about this new alarm will be lost</string>
     <string name="vertical_form_stepper_form_confirm_button">Add alarm</string>
     <string name="vertical_form_stepper_form_sending_data_message">Adding new alarm…</string>
-    <string name="main_activity_explanation">Click the button to try it!</string>
-    <string name="main_activity_explanation_disclaimer">This app DOES NOT set up alarms for real!</string>
+
 </resources>
