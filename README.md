@@ -2,7 +2,7 @@
 This Android library implements a [**vertical stepper form**](https://material.google.com/components/steppers.html) following Google Material Design guidelines.
 
 ## Demo
-![Demo picture](http://i.imgur.com/90JCNit.gif)
+![Demo picture](http://i.imgur.com/p4nR1U9.gif)
 
 ## What's new (version 0.9.5)
 * Easier to set up (Builder Pattern has been implemented)
