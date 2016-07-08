@@ -6,6 +6,7 @@ import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
@@ -15,6 +16,7 @@ import android.support.v7.widget.AppCompatImageButton;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageButton;
@@ -104,7 +106,8 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     /**
-     * @deprecated Use setActiveStepAsUncompleted(String errorMessage) instead
+     * @deprecated
+     * Use setActiveStepAsUncompleted(String errorMessage) instead
      */
     @Deprecated
     public void setActiveStepAsUncompleted() {
@@ -124,21 +127,17 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         TextView stepNumberTextView = (TextView) stepHeader.findViewById(R.id.step_number);
         LinearLayout errorContainer = (LinearLayout) stepLayout.findViewById(R.id.error_container);
         TextView errorTextView = (TextView) errorContainer.findViewById(R.id.error_message);
+        AppCompatButton nextButton = (AppCompatButton) stepLayout.findViewById(R.id.next_step);
 
         stepHeader.setAlpha(1);
+
+        nextButton.setClickable(true);
+        nextButton.setAlpha(1);
 
         if (stepNumber != activeStep) {
             stepDone.setVisibility(View.VISIBLE);
             stepNumberTextView.setVisibility(View.INVISIBLE);
-        }
-
-        if (stepNumber == activeStep) {
-            LinearLayout buttons = (LinearLayout)
-                    stepLayout.findViewById(R.id.next_step_button_container);
-
-            //buttons.setVisibility(View.VISIBLE);
-            Animations.slideDown(buttons);
-
+        } else {
             if (stepNumber != numberOfSteps) {
                 enableNextButtonInBottomNavigationLayout();
             } else {
@@ -154,7 +153,8 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     /**
-     * @deprecated Use setStepAsUncompleted(int stepNumber, String errorMessage) instead
+     * @deprecated
+     * Use setStepAsUncompleted(int stepNumber, String errorMessage) instead
      */
     @Deprecated
     public void setStepAsUncompleted(int stepNumber) {
@@ -168,13 +168,13 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
         ImageView stepDone = (ImageView) stepHeader.findViewById(R.id.step_done);
         TextView stepNumberTextView = (TextView) stepHeader.findViewById(R.id.step_number);
-        LinearLayout buttons = (LinearLayout)
-                stepLayout.findViewById(R.id.next_step_button_container);
+        AppCompatButton nextButton = (AppCompatButton) stepLayout.findViewById(R.id.next_step);
 
         stepDone.setVisibility(View.INVISIBLE);
         stepNumberTextView.setVisibility(View.VISIBLE);
-        //buttons.setVisibility(View.GONE);
-        Animations.slideUp(buttons);
+
+        nextButton.setClickable(false);
+        nextButton.setAlpha(alphaOfDisabledElements);
 
         if (stepNumber == activeStep) {
             disableNextButtonInBottomNavigationLayout();
@@ -224,26 +224,27 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     public void goToNextStep() {
-        goToStep(activeStep + 1, true, false);
+        goToStep(activeStep + 1, false);
     }
 
     public void goToPreviousStep() {
-        goToStep(activeStep - 1, true, false);
+        goToStep(activeStep - 1, false);
     }
 
-    public void goToStep(int newStepNumber, boolean smoothScroll, boolean restoration) {
-        if (activeStep != newStepNumber || restoration) {
+    public void goToStep(int stepNumber, boolean restoration) {
+        if (activeStep != stepNumber || restoration) {
             hideSoftKeyboard();
             boolean previousStepsAreCompleted =
-                    arePreviousStepsCompleted(newStepNumber);
-            if (newStepNumber == 0 || previousStepsAreCompleted) {
-                openStep(newStepNumber, smoothScroll, restoration);
+                    arePreviousStepsCompleted(stepNumber);
+            if (stepNumber == 0 || previousStepsAreCompleted) {
+                openStep(stepNumber, restoration);
             }
         }
     }
 
     /**
-     * @deprecated Builder should be used instead
+     * @deprecated
+     * Builder should be used instead
      */
     @Deprecated
     public void initialiseVerticalStepperForm(String[] stepsNames,
@@ -268,7 +269,8 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     /**
-     * @deprecated Builder should be used instead
+     * @deprecated
+     * Builder should be used instead
      */
     @Deprecated
     public void initialiseVerticalStepperForm(String[] stepsNames,
@@ -344,6 +346,26 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         if (!displayBottomNavigation) {
             hideBottomNavigation();
         }
+        goToStep(0, true);
+
+        setObserverForKeyboard();
+    }
+
+    // http://stackoverflow.com/questions/2150078/how-to-check-visibility-of-software-keyboard-in-android
+    protected void setObserverForKeyboard() {
+        content.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                Rect r = new Rect();
+                //r will be populated with the coordinates of your view that area still visible.
+                content.getWindowVisibleDisplayFrame(r);
+
+                int heightDiff = content.getRootView().getHeight() - (r.bottom - r.top);
+                if (heightDiff > 100) { // if more than 100 pixels, it is probably a keyboard...
+                    scrollToActiveStep(true);
+                }
+            }
+        });
     }
 
     protected void hideBottomNavigation() {
@@ -369,9 +391,6 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         } else {
             setUpStepLayoutAsConfirmationStepLayout(stepLayout);
         }
-        if (stepNumber > 0) {
-            disableStepLayout(stepNumber, false);
-        }
         addStepToContent(stepLayout);
     }
 
@@ -381,12 +400,13 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
     protected void setUpStepLayoutAsConfirmationStepLayout(LinearLayout stepLayout) {
         LinearLayout stepLeftLine = (LinearLayout) stepLayout.findViewById(R.id.vertical_line);
+        confirmationButton = (AppCompatButton) stepLayout.findViewById(R.id.next_step);
+
         stepLeftLine.setVisibility(View.INVISIBLE);
 
-        LinearLayout buttons = (LinearLayout) stepLayout.findViewById(R.id.next_step_button_container);
-        buttons.setVisibility(View.GONE);
+        confirmationButton.setClickable(false);
+        confirmationButton.setAlpha(alphaOfDisabledElements);
 
-        confirmationButton = (AppCompatButton) buttons.findViewById(R.id.next_step);
         confirmationButton.setText(R.string.vertical_form_stepper_form_confirm_button);
         confirmationButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -427,7 +447,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         stepHeader.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToStep(stepNumber, true, false);
+                goToStep(stepNumber, false);
             }
         });
 
@@ -437,7 +457,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToStep((stepNumber + 1), true, false);
+                goToStep((stepNumber + 1), false);
             }
         });
 
@@ -451,8 +471,9 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         return (LinearLayout) inflater.inflate(R.layout.step_layout, content, false);
     }
 
-    protected void openStep(int stepNumber, boolean smoothScroll, boolean restoration) {
+    protected void openStep(int stepNumber, boolean restoration) {
         if (stepNumber >= 0 && stepNumber <= numberOfSteps) {
+            activeStep = stepNumber;
 
             if (stepNumber == 0) {
                 disablePreviousButtonInBottomNavigationLayout();
@@ -466,11 +487,15 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
                 disableNextButtonInBottomNavigationLayout();
             }
 
-            disableActiveStepLayout(!restoration);
+            for(int i = 0; i <= numberOfSteps; i++) {
+                if(i != stepNumber) {
+                    disableStepLayout(i, !restoration);
+                } else {
+                    enableStepLayout(i, !restoration);
+                }
+            }
 
-            activeStep = stepNumber;
-            enableActiveStepLayout(true);
-            scrollToActiveStep(smoothScroll);
+            scrollToActiveStep(!restoration);
 
             if (stepNumber == numberOfSteps) {
                 setStepAsCompleted(stepNumber);
@@ -509,16 +534,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         bottomNavigation = (RelativeLayout) findViewById(R.id.bottom_navigation);
     }
 
-    protected void enableActiveStepLayout(boolean smoothieEnabling) {
-        enableStepLayout(activeStep, smoothieEnabling);
-    }
-
-    protected void disableActiveStepLayout(boolean smoothieDisabling) {
-        disableStepLayout(activeStep, smoothieDisabling);
-    }
-
     protected void disableStepLayout(int stepNumber, boolean smoothieDisabling) {
-
         LinearLayout stepLayout = stepLayouts.get(stepNumber);
         RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
         ImageView stepDone = (ImageView) stepHeader.findViewById(R.id.step_done);
@@ -546,29 +562,27 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     protected void enableStepLayout(int stepNumber, boolean smoothieEnabling) {
-
         LinearLayout stepLayout = stepLayouts.get(stepNumber);
+        RelativeLayout stepContent = (RelativeLayout) stepLayout.findViewById(R.id.step_content);
         RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
         ImageView stepDone = (ImageView) stepHeader.findViewById(R.id.step_done);
         TextView stepNumberTextView = (TextView) stepHeader.findViewById(R.id.step_number);
         LinearLayout button = (LinearLayout) stepLayout.findViewById(R.id.next_step_button_container);
-        RelativeLayout stepContent = (RelativeLayout) stepLayout.findViewById(R.id.step_content);
 
         stepHeader.setAlpha(1);
 
         if (smoothieEnabling) {
             Animations.slideDown(stepContent);
+            Animations.slideDown(button);
         } else {
             stepContent.setVisibility(View.VISIBLE);
+            button.setVisibility(View.VISIBLE);
         }
 
         if (completedSteps[stepNumber] && activeStep != stepNumber) {
-            //button.setVisibility(View.VISIBLE);
-            Animations.slideDown(button);
             stepDone.setVisibility(View.VISIBLE);
             stepNumberTextView.setVisibility(View.INVISIBLE);
         } else {
-            button.setVisibility(View.GONE);
             stepDone.setVisibility(View.INVISIBLE);
             stepNumberTextView.setVisibility(View.VISIBLE);
         }
@@ -663,12 +677,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     protected void restoreFormState() {
-        for (int i = 0; i < completedSteps.length; i++) {
-            if (completedSteps[i]) {
-                disableStepLayout(i, false);
-            }
-        }
-        goToStep(activeStep, false, true);
+        goToStep(activeStep, true);
         displayCurrentProgress();
     }
 
@@ -741,6 +750,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     public static class Builder {
+
         // Required parameters
         protected VerticalStepperFormLayout verticalStepperFormLayout;
         protected String[] steps;
