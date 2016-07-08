@@ -4,12 +4,19 @@ This Android library implements a [**vertical stepper form**](https://material.g
 ## Demo
 ![Demo picture](https://raw.githubusercontent.com/ernestoyaquello/vertical-stepper-form/master/stepper-example.gif)
 
+## What's new (version 0.9.5)
+* Easier to set up (Builder Pattern has been implemented)
+* Navigation bar on the bottom can be hidden in order to make the form follow Material Design guidelines more precisely
+* Optional error messages for each step
+* Smoother transitions
+* Tick icon displayed on completed steps
+
 ## Installation and usage
 1. To include the library in your project, first add it via Gradle:
 
 	```
 	dependencies {
-		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.9.4'
+		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.9.5'
 	}
 	```
 2. Now, you have to add a ```VerticalStepperFormLayout``` view to your activity layout, which will contain the vertical stepper form. For design purposes, it is recommended that you don't put anything else than this view in your activity layout (see the code below).
@@ -28,9 +35,12 @@ This Android library implements a [**vertical stepper form**](https://material.g
   
   </RelativeLayout>
   ```
-3. In ```onCreate()```, you will need to find the view and call ```initialiseVerticalStepperForm()```:
+3. In ```onCreate()```, you will need to find the view and initialize the form:
 
   ```java
+  private VerticalStepperFormLayout verticalStepperForm;
+  ...
+  
   @Override
   protected void onCreate(Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
@@ -40,9 +50,15 @@ This Android library implements a [**vertical stepper form**](https://material.g
       int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
       int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
       
-      VerticalStepperFormLayout verticalStepperForm = 
-          (VerticalStepperFormLayout) findViewById(R.id.vertical_stepper_form);
-      verticalStepperForm.initialiseVerticalStepperForm(mySteps, colorPrimary, colorPrimaryDark, this, this);
+      // Finding the view
+      verticalStepperForm = (VerticalStepperFormLayout) findViewById(R.id.vertical_stepper_form);
+          
+      // Setting up and initializing the form
+      VerticalStepperFormLayout.Builder.newInstance(verticalStepperForm, mySteps, this, this)
+          .primaryColor(colorPrimary)
+          .primaryDarkColor(colorPrimaryDark)
+          .displayBottomNavigation(true) // It is true by default, so in this case this line is not necessary
+          .init();
       
       ...
       
@@ -76,16 +92,10 @@ public View createStepContentView(int stepNumber) {
 
 private View createNameStep() {
 	// Here we generate programmatically the view that will be added by the system to the step content layout
-	EditText name = new EditText(this);
+	name = new EditText(this);
 	name.setSingleLine(true);
 	name.setHint("Your name");
-	name.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-		@Override
-		public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-			...
-			return false;
-		}
-	});
+	...
 	return name;
 }
 
@@ -93,7 +103,7 @@ private View createEmailStep() {
 	// In this case we generate the view by inflating a XML file
 	LayoutInflater inflater = LayoutInflater.from(getBaseContext());
 	LinearLayout emailLayoutContent = (LinearLayout) inflater.inflate(R.layout.email_step_layout, null, false);
-	EditText email = (EditText) emailLayoutContent.findViewById(R.id.email);
+	email = (EditText) emailLayoutContent.findViewById(R.id.email);
 	...
 	return emailLayoutContent;
 }
@@ -130,10 +140,12 @@ public void onStepOpening(int stepNumber) {
 }
 
 private void checkName() {
-	if(name.length() >= MIN_CHARACTERS_NAME && name.length() <= MAX_CHARACTERS_NAME) {
+	if(name.length() >= 3 && name.length() <= 40) {
 		verticalStepperForm.setActiveStepAsCompleted();
 	} else {
-		verticalStepperForm.setActiveStepAsUncompleted();
+		// This error message is optional (use null if you don't want to display an error message)
+		String errorMessage = "The name must have between 3 and 40 characters";
+		verticalStepperForm.setActiveStepAsUncompleted(errorMessage);
 	}
 }
 
