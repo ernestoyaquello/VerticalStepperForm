@@ -4,19 +4,20 @@ This Android library implements a [**vertical stepper form**](https://material.g
 ## Demo
 ![Demo picture](https://raw.githubusercontent.com/ernestoyaquello/vertical-stepper-form/master/stepper-example.gif)
 
-## What's new (version 0.9.7)
+## What's new (version 0.9.8)
 * Easier to set up (Builder Pattern has been implemented)
 * Navigation bar on the bottom can be hidden in order to make the form follow Material Design guidelines more precisely
 * Optional error messages for each step
 * Smoother transitions
 * Tick icon displayed on completed steps
+* Documentation of the most important methods
 
 ## Installation and usage
 1. To include the library in your project, first add it via Gradle:
 
 	```
 	dependencies {
-		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.9.7'
+		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.9.8'
 	}
 	```
 2. Now, you have to add a ```VerticalStepperFormLayout``` view to your activity layout, which will contain the vertical stepper form. For design purposes, it is recommended that you don't put anything else than this view in your activity layout (see the code below).
