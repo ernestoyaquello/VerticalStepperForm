@@ -301,11 +301,10 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
      * @param activity activity where the form is
      *
      * @deprecated use {@link Builder#newInstance(VerticalStepperFormLayout, String[], VerticalStepperForm, Activity)} instead like this:
-     * <blockquote>
-     * <pre>
-     * VerticalStepperFormLayout.Builder.newInstance(verticalStepperFormLayout, stepsNames, verticalStepperForm, activity)
-     *     .primaryColor(colorPrimary)
-     *     .primaryDarkColor(colorPrimaryDark)
+     * <blockquote><pre>
+     * VerticalStepperFormLayout.Builder.newInstance(verticalStepperFormLayout, stepsNames, verticalStepperForm, activity)<br>
+     *     .primaryColor(colorPrimary)<br>
+     *     .primaryDarkColor(colorPrimaryDark)<br>
      *     .init();
      * </pre></blockquote>
      */
@@ -344,15 +343,14 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
      * @param activity activity where the form is
      *
      * @deprecated use {@link Builder#newInstance(VerticalStepperFormLayout, String[], VerticalStepperForm, Activity)} instead like this:
-     * <blockquote>
-     * <pre>
-     * VerticalStepperFormLayout.Builder.newInstance(verticalStepperFormLayout, stepsNames, verticalStepperForm, activity)
-     *     .buttonBackgroundColor(buttonBackgroundColor)
-     *     .buttonTextColor(buttonTextColor)
-     *     .buttonPressedBackgroundColor(buttonPressedBackgroundColor)
-     *     .buttonPressedTextColor(buttonPressedTextColor)
-     *     .stepNumberBackgroundColor(stepNumberBackgroundColor)
-     *     .stepNumberTextColor(stepNumberTextColor)
+     * <blockquote><pre>
+     * VerticalStepperFormLayout.Builder.newInstance(verticalStepperFormLayout, stepsNames, verticalStepperForm, activity)<br>
+     *     .buttonBackgroundColor(buttonBackgroundColor)<br>
+     *     .buttonTextColor(buttonTextColor)<br>
+     *     .buttonPressedBackgroundColor(buttonPressedBackgroundColor)<br>
+     *     .buttonPressedTextColor(buttonPressedTextColor)<br>
+     *     .stepNumberBackgroundColor(stepNumberBackgroundColor)<br>
+     *     .stepNumberTextColor(stepNumberTextColor)<br>
      *     .init();
      * </pre></blockquote>
      */

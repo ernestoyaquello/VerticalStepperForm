@@ -13,7 +13,7 @@ ext {
     siteUrl = 'https://github.com/ernestoyaquello/vertical-stepper-form'
     gitUrl = 'https://github.com/ernestoyaquello/vertical-stepper-form.git'
 
-    libraryVersion = '0.9.6'
+    libraryVersion = '0.9.8'
 
     developerId = 'ernestoyaquello'
     developerName = 'Julio Ernesto'
