@@ -95,6 +95,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
     }
 
     // METHODS THAT HAVE TO BE IMPLEMENTED TO MAKE THE LIBRARY WORK
+    // (Implementation of the interface "VerticalStepperForm")
 
     @Override
     public View createStepContentView(int stepNumber) {
@@ -130,6 +131,8 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
                 // As soon as they are open, these two steps are marked as completed because they
                 // have default values
                 verticalStepperForm.setStepAsCompleted(stepNumber);
+                // In this case, the instruction above is equivalent to:
+                // verticalStepperForm.setActiveStepAsCompleted();
                 break;
             case DAYS_STEP_NUM:
                 // When this step is open, we check the days to verify that at least one is selected
@@ -282,11 +285,17 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
 
         if(title.length() >= MIN_CHARACTERS_TITLE) {
             titleIsCorrect = true;
-            verticalStepperForm.setStepAsCompleted(TITLE_STEP_NUM);
+
+            verticalStepperForm.setActiveStepAsCompleted();
+            // Equivalent to: verticalStepperForm.setStepAsCompleted(TITLE_STEP_NUM);
+
         } else {
             String titleErrorString = getResources().getString(R.string.error_title_min_characters);
             String titleError = String.format(titleErrorString, MIN_CHARACTERS_TITLE);
-            verticalStepperForm.setStepAsUncompleted(TITLE_STEP_NUM, titleError);
+
+            verticalStepperForm.setActiveStepAsUncompleted(titleError);
+            // Equivalent to: verticalStepperForm.setStepAsUncompleted(TITLE_STEP_NUM, titleError);
+
         }
 
         return titleIsCorrect;

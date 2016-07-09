@@ -2,9 +2,6 @@ package ernestoyaquello.com.verticalstepperform.interfaces;
 
 import android.view.View;
 
-/**
- * This interface should be implemented by the activity
- */
 public interface VerticalStepperForm {
 
     /**
@@ -17,6 +14,7 @@ public interface VerticalStepperForm {
 
     /**
      * This method will be called every time a certain step is open
+     * @param stepNumber the number of the step
      */
     void onStepOpening(int stepNumber);
 

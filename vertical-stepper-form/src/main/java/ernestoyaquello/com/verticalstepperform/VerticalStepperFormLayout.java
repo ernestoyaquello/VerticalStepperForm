@@ -97,27 +97,33 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         mInflater.inflate(R.layout.vertical_stepper_form_layout, this, true);
     }
 
+    /**
+     * Returns the active step number
+     * @return the active step number (counting from 0)
+     */
     public int getActiveStepNumber() {
         return activeStep;
     }
 
+    /**
+     * Set the active step as completed
+     */
     public void setActiveStepAsCompleted() {
         setStepAsCompleted(activeStep);
     }
 
     /**
-     * @deprecated
-     * Use setActiveStepAsUncompleted(String errorMessage) instead
+     * Set the active step as not completed
+     * @param errorMessage Error message that will be displayed (null for no message)
      */
-    @Deprecated
-    public void setActiveStepAsUncompleted() {
-        setStepAsUncompleted(activeStep, null);
-    }
-
     public void setActiveStepAsUncompleted(String errorMessage) {
         setStepAsUncompleted(activeStep, errorMessage);
     }
 
+    /**
+     * Set the step as completed
+     * @param stepNumber the step number (counting from 0)
+     */
     public void setStepAsCompleted(int stepNumber) {
         completedSteps[stepNumber] = true;
 
@@ -153,14 +159,10 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     /**
-     * @deprecated
-     * Use setStepAsUncompleted(int stepNumber, String errorMessage) instead
+     * Set the step as not completed
+     * @param stepNumber the step number (counting from 0)
+     * @param errorMessage Error message that will be displayed (null for no message)
      */
-    @Deprecated
-    public void setStepAsUncompleted(int stepNumber) {
-        setStepAsUncompleted(stepNumber, null);
-    }
-
     public void setStepAsUncompleted(int stepNumber, String errorMessage) {
         completedSteps[stepNumber] = false;
 
@@ -198,14 +200,27 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         displayCurrentProgress();
     }
 
+    /**
+     * Determines whether the active step is completed or not
+     * @return true if the active step is completed; false otherwise
+     */
     public boolean isActiveStepCompleted() {
         return isStepCompleted(activeStep);
     }
 
+    /**
+     * Determines whether the given step is completed or not
+     * @param stepNumber the step number (counting from 0)
+     * @return true if the step is completed, false otherwise
+     */
     public boolean isStepCompleted(int stepNumber) {
         return completedSteps[stepNumber];
     }
 
+    /**
+     * Determines if any step has been completed
+     * @return true if at least 1 step has been completed; false otherwise
+     */
     public boolean isAnyStepCompleted() {
         for (boolean completedStep : completedSteps) {
             if (completedStep) {
@@ -215,6 +230,11 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         return false;
     }
 
+    /**
+     * Determines if the steps that are previous to the given one are completed
+     * @param stepNumber the selected step number (counting from 0)
+     * @return true if all the previous steps have been completed; false otherwise
+     */
     public boolean arePreviousStepsCompleted(int stepNumber) {
         boolean previousStepsAreCompleted = true;
         for (int i = (stepNumber - 1); i >= 0 && previousStepsAreCompleted; i--) {
@@ -223,14 +243,25 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         return previousStepsAreCompleted;
     }
 
+    /**
+     * Go to the next step
+     */
     public void goToNextStep() {
         goToStep(activeStep + 1, false);
     }
 
+    /**
+     * Go to the previous step
+     */
     public void goToPreviousStep() {
         goToStep(activeStep - 1, false);
     }
 
+    /**
+     * Go to the selected step
+     * @param stepNumber the selected step number (counting from 0)
+     * @param restoration true if the method has been called to restore the form; false otherwise
+     */
     public void goToStep(int stepNumber, boolean restoration) {
         if (activeStep != stepNumber || restoration) {
             hideSoftKeyboard();
@@ -243,8 +274,40 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     /**
-     * @deprecated
-     * Builder should be used instead
+     * Set the active step as not completed
+     * @deprecated use {@link #setActiveStepAsUncompleted(String)} instead
+     */
+    @Deprecated
+    public void setActiveStepAsUncompleted() {
+        setStepAsUncompleted(activeStep, null);
+    }
+
+    /**
+     * Set the selected step as not completed
+     * @param stepNumber the step number (counting from 0)
+     * @deprecated use {@link #setStepAsUncompleted(int, String)} instead
+     */
+    @Deprecated
+    public void setStepAsUncompleted(int stepNumber) {
+        setStepAsUncompleted(stepNumber, null);
+    }
+
+    /**
+     * Set up and initialize the form
+     * @param stepsNames names of the steps
+     * @param colorPrimary primary color
+     * @param colorPrimaryDark primary color (dark)
+     * @param verticalStepperForm instance that implements the interface "VerticalStepperForm"
+     * @param activity activity where the form is
+     *
+     * @deprecated use {@link Builder#newInstance(VerticalStepperFormLayout, String[], VerticalStepperForm, Activity)} instead like this:
+     * <blockquote>
+     * <pre>
+     * VerticalStepperFormLayout.Builder.newInstance(verticalStepperFormLayout, stepsNames, verticalStepperForm, activity)
+     *     .primaryColor(colorPrimary)
+     *     .primaryDarkColor(colorPrimaryDark)
+     *     .init();
+     * </pre></blockquote>
      */
     @Deprecated
     public void initialiseVerticalStepperForm(String[] stepsNames,
@@ -269,8 +332,29 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     /**
-     * @deprecated
-     * Builder should be used instead
+     * Set up and initialize the form
+     * @param stepsNames names of the steps
+     * @param buttonBackgroundColor background colour of the buttons
+     * @param buttonTextColor text color of the buttons
+     * @param buttonPressedBackgroundColor background color of the buttons when clicked
+     * @param buttonPressedTextColor text color of the buttons when clicked
+     * @param stepNumberBackgroundColor background color of the left circles
+     * @param stepNumberTextColor text color of the left circles
+     * @param verticalStepperForm instance that implements the interface "VerticalStepperForm"
+     * @param activity activity where the form is
+     *
+     * @deprecated use {@link Builder#newInstance(VerticalStepperFormLayout, String[], VerticalStepperForm, Activity)} instead like this:
+     * <blockquote>
+     * <pre>
+     * VerticalStepperFormLayout.Builder.newInstance(verticalStepperFormLayout, stepsNames, verticalStepperForm, activity)
+     *     .buttonBackgroundColor(buttonBackgroundColor)
+     *     .buttonTextColor(buttonTextColor)
+     *     .buttonPressedBackgroundColor(buttonPressedBackgroundColor)
+     *     .buttonPressedTextColor(buttonPressedTextColor)
+     *     .stepNumberBackgroundColor(stepNumberBackgroundColor)
+     *     .stepNumberTextColor(stepNumberTextColor)
+     *     .init();
+     * </pre></blockquote>
      */
     @Deprecated
     public void initialiseVerticalStepperForm(String[] stepsNames,
@@ -779,70 +863,137 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
             this.activity = activity;
         }
 
+        /**
+         * Generates an instance of the builder that will set up and initialize the form (after
+         * setting up the form it is mandatory to initialize it calling init())
+         * @param stepperLayout the form layout
+         * @param stepNames a String array with the names of the steps
+         * @param stepperImplementation The instance that implements "VerticalStepperForm" interface
+         * @param activity The activity where the form is
+         * @return an instance of the builder
+         */
         public static Builder newInstance(VerticalStepperFormLayout stepperLayout,
-                                          String[] steps,
+                                          String[] stepNames,
                                           VerticalStepperForm stepperImplementation,
                                           Activity activity) {
 
-            return new Builder(stepperLayout, steps, stepperImplementation, activity);
+            return new Builder(stepperLayout, stepNames, stepperImplementation, activity);
         }
 
+        /**
+         * Set the primary color (background color of the left circles and buttons)
+         * @param colorPrimary primary color
+         * @return the builder instance
+         */
         public Builder primaryColor(int colorPrimary) {
             this.stepNumberBackgroundColor = colorPrimary;
             this.buttonBackgroundColor = colorPrimary;
             return this;
         }
 
+        /**
+         * Set the dark primary color (background color of the buttons when clicked)
+         * @param colorPrimaryDark primary color (dark)
+         * @return the builder instance
+         */
         public Builder primaryDarkColor(int colorPrimaryDark) {
             this.buttonPressedBackgroundColor = colorPrimaryDark;
             return this;
         }
 
+        /**
+         * Set the background color of the left circles
+         * @param stepNumberBackgroundColor background color of the left circles
+         * @return the builder instance
+         */
         public Builder stepNumberBackgroundColor(int stepNumberBackgroundColor) {
             this.stepNumberBackgroundColor = stepNumberBackgroundColor;
             return this;
         }
 
+        /**
+         * Set the background colour of the buttons
+         * @param buttonBackgroundColor background color of the buttons
+         * @return the builder instance
+         */
         public Builder buttonBackgroundColor(int buttonBackgroundColor) {
             this.buttonBackgroundColor = buttonBackgroundColor;
             return this;
         }
 
+        /**
+         * Set the background color of the buttons when clicked
+         * @param buttonPressedBackgroundColor background color of the buttons when clicked
+         * @return the builder instance
+         */
         public Builder buttonPressedBackgroundColor(int buttonPressedBackgroundColor) {
             this.buttonPressedBackgroundColor = buttonPressedBackgroundColor;
             return this;
         }
 
+        /**
+         * Set the text color of the left circles
+         * @param stepNumberTextColor text color of the left circles
+         * @return the builder instance
+         */
         public Builder stepNumberTextColor(int stepNumberTextColor) {
             this.stepNumberTextColor = stepNumberTextColor;
             return this;
         }
 
+        /**
+         * Set the text color of the buttons
+         * @param buttonTextColor text color of the buttons
+         * @return the builder instance
+         */
         public Builder buttonTextColor(int buttonTextColor) {
             this.buttonTextColor = buttonTextColor;
             return this;
         }
 
+        /**
+         * Set the text color of the buttons when clicked
+         * @param buttonPressedTextColor text color of the buttons when clicked
+         * @return the builder instance
+         */
         public Builder buttonPressedTextColor(int buttonPressedTextColor) {
             this.buttonPressedTextColor = buttonPressedTextColor;
             return this;
         }
 
+        /**
+         * Set the error message color
+         * @param errorMessageTextColor error message color
+         * @return the builder instance
+         */
         public Builder errorMessageTextColor(int errorMessageTextColor) {
             this.errorMessageTextColor = errorMessageTextColor;
             return this;
         }
 
-        public Builder displayBottomNavigation(boolean display) {
-            this.displayBottomNavigation = display;
+        /**
+         * Set whether or not the bottom navigation bar will be displayed
+         * @param displayBottomNavigationBar true to display it; false otherwise
+         * @return the builder instance
+         */
+        public Builder displayBottomNavigation(boolean displayBottomNavigationBar) {
+            this.displayBottomNavigation = displayBottomNavigationBar;
             return this;
         }
 
+        /**
+         * Set the alpha level of disabled elements
+         * @param alpha alpha level of disabled elements (between 0 and 1)
+         * @return the builder instance
+         */
         public Builder alphaOfDisabledElements(float alpha) {
             this.alphaOfDisabledElements = alpha;
             return this;
         }
 
+        /**
+         * Set up the form and initialize it
+         */
         public void init() {
             verticalStepperFormLayout.initialiseVerticalStepperForm(this);
         }
