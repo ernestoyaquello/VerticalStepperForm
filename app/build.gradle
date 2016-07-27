@@ -18,5 +18,4 @@ dependencies {
     compile project(':vertical-stepper-form')
     compile 'com.android.support:appcompat-v7:24.0.0'
     compile 'com.android.support:design:24.0.0'
-    compile 'com.google.android.gms:play-services-appindexing:9.2.0'
 }
