@@ -320,6 +320,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.buttonTextColor = Color.rgb(255, 255, 255);
         this.buttonPressedTextColor = Color.rgb(255, 255, 255);
         this.stepNumberTextColor = Color.rgb(255, 255, 255);
+        this.stepTitleTextColor = Color.rgb(33, 33, 33);
         this.stepNumberBackgroundColor = colorPrimary;
         this.buttonBackgroundColor = colorPrimary;
         this.buttonPressedBackgroundColor = colorPrimaryDark;
@@ -371,6 +372,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.buttonPressedBackgroundColor = buttonPressedBackgroundColor;
         this.buttonPressedTextColor = buttonPressedTextColor;
         this.stepNumberBackgroundColor = stepNumberBackgroundColor;
+        this.stepTitleTextColor = Color.rgb(33, 33, 33);
         this.stepNumberTextColor = stepNumberTextColor;
         this.errorMessageTextColor = Color.rgb(175, 18, 18);
         this.displayBottomNavigation = true;
@@ -973,12 +975,12 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         }
 
         /**
-         * Setthe text color of the step title
-         * @param setTitleTextColor the color of the step title
+         * Set the text color of the step title
+         * @param stepTitleTextColor the color of the step title
          * @return this builder instance
          */
-        public Builder setTitleTextColor(int setTitleTextColor) {
-            this.stepTitleTextColor = setTitleTextColor;
+        public Builder stepTitleTextColor(int stepTitleTextColor) {
+            this.stepTitleTextColor = stepTitleTextColor;
             return this;
         }
 
