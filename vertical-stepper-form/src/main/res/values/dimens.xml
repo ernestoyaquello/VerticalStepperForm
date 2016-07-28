@@ -14,6 +14,7 @@
     <dimen name="vertical_stepper_circle_size">28dp</dimen>
     <dimen name="vertical_stepper_circle_text_size">16sp</dimen>
     <dimen name="vertical_stepper_title_text_size">17sp</dimen>
+    <dimen name="vertical_stepper_subtitle_text_size">12sp</dimen>
     <dimen name="vertical_stepper_vertical_line_thickness">2dp</dimen>
 
 </resources>

@@ -56,6 +56,17 @@
             android:layout_toRightOf="@id/circle"
             android:layout_toEndOf="@id/circle"/>
 
+        <TextView
+            android:id="@+id/step_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignLeft="@id/step_title"
+            android:layout_alignStart="@id/step_title"
+            android:layout_below="@id/step_title"
+            android:textSize="@dimen/vertical_stepper_subtitle_text_size"
+            android:textColor="#A2A2A2"
+            android:visibility="gone"/>
+
     </RelativeLayout>
 
     <LinearLayout
