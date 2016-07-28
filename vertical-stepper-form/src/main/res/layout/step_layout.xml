@@ -49,7 +49,7 @@
         <TextView
             android:id="@+id/step_title"
             android:layout_width="match_parent"
-            android:layout_height="28dp"
+            android:layout_height="@dimen/vertical_stepper_circle_size"
             android:gravity="center_vertical"
             android:textColor="#212121"
             android:textSize="@dimen/vertical_stepper_title_text_size"

@@ -137,7 +137,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
         stepHeader.setAlpha(1);
 
-        nextButton.setClickable(true);
+        nextButton.setEnabled(true);
         nextButton.setAlpha(1);
 
         if (stepNumber != activeStep) {
@@ -175,7 +175,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         stepDone.setVisibility(View.INVISIBLE);
         stepNumberTextView.setVisibility(View.VISIBLE);
 
-        nextButton.setClickable(false);
+        nextButton.setEnabled(false);
         nextButton.setAlpha(alphaOfDisabledElements);
 
         if (stepNumber == activeStep) {
@@ -486,8 +486,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
         stepLeftLine.setVisibility(View.INVISIBLE);
 
-        confirmationButton.setClickable(false);
-        confirmationButton.setAlpha(alphaOfDisabledElements);
+        disableConfirmationButton();
 
         confirmationButton.setText(R.string.vertical_form_stepper_form_confirm_button);
         confirmationButton.setOnClickListener(new OnClickListener() {
@@ -715,12 +714,12 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
     protected void enableBottomButtonNavigation(ImageButton button) {
         button.setAlpha(1f);
-        button.setClickable(true);
+        button.setEnabled(true);
     }
 
     protected void disableBottomButtonNavigation(ImageButton button) {
         button.setAlpha(alphaOfDisabledElements);
-        button.setClickable(false);
+        button.setEnabled(false);
     }
 
     protected void setProgress(int progress) {
@@ -730,7 +729,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     protected void disableConfirmationButton() {
-        confirmationButton.setClickable(false);
+        confirmationButton.setEnabled(false);
         confirmationButton.setAlpha(alphaOfDisabledElements);
     }
 
