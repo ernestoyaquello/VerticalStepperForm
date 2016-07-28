@@ -49,6 +49,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected int buttonPressedTextColor;
     protected int errorMessageTextColor;
     protected boolean displayBottomNavigation;
+    protected boolean materialDesignInDisabledSteps;
 
     // Views
     protected LayoutInflater mInflater;
@@ -135,7 +136,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         TextView errorTextView = (TextView) errorContainer.findViewById(R.id.error_message);
         AppCompatButton nextButton = (AppCompatButton) stepLayout.findViewById(R.id.next_step);
 
-        stepHeader.setAlpha(1);
+        enableStepHeader(stepLayout);
 
         nextButton.setEnabled(true);
         nextButton.setAlpha(1);
@@ -181,7 +182,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         if (stepNumber == activeStep) {
             disableNextButtonInBottomNavigationLayout();
         } else {
-            stepHeader.setAlpha(alphaOfDisabledElements);
+            disableStepHeader(stepLayout);
         }
 
         if (stepNumber < numberOfSteps) {
@@ -323,6 +324,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.buttonPressedBackgroundColor = colorPrimaryDark;
         this.errorMessageTextColor = Color.rgb(175, 18, 18);
         this.displayBottomNavigation = true;
+        this.materialDesignInDisabledSteps = false;
 
         this.verticalStepperFormImplementation = verticalStepperForm;
         this.activity = activity;
@@ -371,6 +373,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.stepNumberTextColor = stepNumberTextColor;
         this.errorMessageTextColor = Color.rgb(175, 18, 18);
         this.displayBottomNavigation = true;
+        this.materialDesignInDisabledSteps = false;
 
         this.verticalStepperFormImplementation = verticalStepperForm;
         this.activity = activity;
@@ -392,6 +395,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.buttonPressedTextColor = builder.buttonPressedTextColor;
         this.errorMessageTextColor = builder.errorMessageTextColor;
         this.displayBottomNavigation = builder.displayBottomNavigation;
+        this.materialDesignInDisabledSteps = builder.materialDesignInDisabledSteps;
 
         initStepperForm(builder.steps);
     }
@@ -632,11 +636,11 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         }
 
         if (!completedSteps[stepNumber]) {
-            stepHeader.setAlpha(alphaOfDisabledElements);
+            disableStepHeader(stepLayout);
             stepDone.setVisibility(View.INVISIBLE);
             stepNumberTextView.setVisibility(View.VISIBLE);
         } else {
-            stepHeader.setAlpha(1);
+            enableStepHeader(stepLayout);
             stepDone.setVisibility(View.VISIBLE);
             stepNumberTextView.setVisibility(View.INVISIBLE);
         }
@@ -650,7 +654,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         TextView stepNumberTextView = (TextView) stepHeader.findViewById(R.id.step_number);
         LinearLayout button = (LinearLayout) stepLayout.findViewById(R.id.next_step_button_container);
 
-        stepHeader.setAlpha(1);
+        enableStepHeader(stepLayout);
 
         if (smoothieEnabling) {
             Animations.slideDown(stepContent);
@@ -666,6 +670,24 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         } else {
             stepDone.setVisibility(View.INVISIBLE);
             stepNumberTextView.setVisibility(View.VISIBLE);
+        }
+    }
+
+    protected void enableStepHeader(LinearLayout stepLayout) {
+        if(!materialDesignInDisabledSteps) {
+            RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
+            stepHeader.setAlpha(1);
+        } else {
+            changeCircleBackgroundColor(stepLayout, buttonBackgroundColor);
+        }
+    }
+
+    protected void disableStepHeader(LinearLayout stepLayout) {
+        if(!materialDesignInDisabledSteps) {
+            RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
+            stepHeader.setAlpha(alphaOfDisabledElements);
+        } else {
+            changeCircleBackgroundColor(stepLayout, Color.rgb(176, 176, 176));
         }
     }
 
@@ -762,6 +784,13 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         displayCurrentProgress();
     }
 
+    protected void changeCircleBackgroundColor(LinearLayout stepLayout, int color) {
+        LinearLayout circle = (LinearLayout) stepLayout.findViewById(R.id.circle);
+        Drawable bg = ContextCompat.getDrawable(context, R.drawable.circle_step_done);
+        bg.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));
+        circle.setBackground(bg);
+    }
+
     protected void setButtonColor(AppCompatButton button, int buttonColor, int buttonTextColor,
                                   int buttonPressedColor, int buttonPressedTextColor) {
         int[][] states = new int[][]{
@@ -848,6 +877,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         protected int buttonPressedTextColor = Color.rgb(255, 255, 255);
         protected int errorMessageTextColor = Color.rgb(175, 18, 18);
         protected boolean displayBottomNavigation = true;
+        protected boolean materialDesignInDisabledSteps = false;
 
         protected Builder(VerticalStepperFormLayout stepperLayout,
                           String[] steps,
@@ -975,6 +1005,16 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
          */
         public Builder displayBottomNavigation(boolean displayBottomNavigationBar) {
             this.displayBottomNavigation = displayBottomNavigationBar;
+            return this;
+        }
+
+        /**
+         * Set whether or not the disabled steps will have a Material Design look
+         * @param materialDesignInDisabledSteps true to use Material Design for disabled steps; false otherwise
+         * @return the builder instance
+         */
+        public Builder materialDesignInDisabledSteps(boolean materialDesignInDisabledSteps) {
+            this.materialDesignInDisabledSteps = materialDesignInDisabledSteps;
             return this;
         }
 
