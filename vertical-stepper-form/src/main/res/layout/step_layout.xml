@@ -16,8 +16,8 @@
 
         <LinearLayout
             android:id="@+id/circle"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="@dimen/vertical_stepper_circle_size"
+            android:layout_height="@dimen/vertical_stepper_circle_size"
             android:background="@drawable/circle_step_done"
             android:layout_marginRight="12dp"
             android:layout_marginEnd="12dp"
@@ -31,15 +31,16 @@
                 android:layout_height="match_parent"
                 android:textColor="#ffffff"
                 android:gravity="center"
-                android:textSize="16sp"/>
+                android:textSize="@dimen/vertical_stepper_circle_text_size"/>
 
         </LinearLayout>
 
         <ImageView
             android:id="@+id/step_done"
-            android:layout_width="28dp"
-            android:layout_height="28dp"
+            android:layout_width="@dimen/vertical_stepper_circle_size"
+            android:layout_height="@dimen/vertical_stepper_circle_size"
             android:src="@drawable/ic_done"
+            android:scaleType="center"
             android:layout_alignLeft="@id/circle"
             android:layout_alignStart="@id/circle"
             android:layout_alignTop="@id/circle"
@@ -51,7 +52,7 @@
             android:layout_height="28dp"
             android:gravity="center_vertical"
             android:textColor="#212121"
-            android:textSize="17sp"
+            android:textSize="@dimen/vertical_stepper_title_text_size"
             android:layout_toRightOf="@id/circle"
             android:layout_toEndOf="@id/circle"/>
 
