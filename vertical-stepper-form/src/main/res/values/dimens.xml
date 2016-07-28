@@ -8,12 +8,15 @@
             vertical_stepper_circle_size: 24dp
             vertical_stepper_circle_text_size: 12dp
             vertical_stepper_title_text_size: 14dp
+            vertical_stepper_subtitle_text_size: 12sp
             vertical_stepper_vertical_line_thickness: 1dp
         (The current dimensions are different to keep backward compatibility in this library)
     -->
     <dimen name="vertical_stepper_circle_size">28dp</dimen>
     <dimen name="vertical_stepper_circle_text_size">16sp</dimen>
     <dimen name="vertical_stepper_title_text_size">17sp</dimen>
+    <dimen name="vertical_stepper_subtitle_text_size">14sp</dimen>
+    <dimen name="vertical_stepper_vertical_error_message_text_size">16sp</dimen>
     <dimen name="vertical_stepper_vertical_line_thickness">2dp</dimen>
 
 </resources>

@@ -56,10 +56,41 @@
             android:layout_toRightOf="@id/circle"
             android:layout_toEndOf="@id/circle"/>
 
+        <TextView
+            android:id="@+id/step_subtitle"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/step_title"
+            android:layout_marginLeft="40dp"
+            android:layout_marginStart="40dp"
+            android:textSize="@dimen/vertical_stepper_subtitle_text_size"
+            android:textColor="#A2A2A2"
+            android:paddingBottom="12dp"
+            android:visibility="gone"/>
+
+        <LinearLayout
+            android:id="@+id/vertical_line_subtitle"
+            android:layout_width="@dimen/vertical_stepper_vertical_line_thickness"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentLeft="true"
+            android:layout_below="@id/step_title"
+            android:layout_marginLeft="12dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginRight="26dp"
+            android:layout_marginEnd="26dp"
+            android:layout_alignTop="@id/step_subtitle"
+            android:layout_alignBottom="@id/step_subtitle"
+            android:layout_height="match_parent"
+            android:background="#e0e0e0"
+            android:layout_marginTop="8dp"
+            android:orientation="vertical">
+        </LinearLayout>
+
     </RelativeLayout>
 
     <LinearLayout
-        android:layout_marginTop="12dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -68,8 +99,8 @@
             android:layout_width="@dimen/vertical_stepper_vertical_line_thickness"
             android:layout_marginLeft="12dp"
             android:layout_marginStart="12dp"
-            android:layout_marginRight="24dp"
-            android:layout_marginEnd="24dp"
+            android:layout_marginRight="26dp"
+            android:layout_marginEnd="26dp"
             android:layout_height="match_parent"
             android:background="#e0e0e0"
             android:orientation="vertical"
@@ -101,7 +132,7 @@
                     android:id="@+id/error_message"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="16sp"
+                    android:textSize="@dimen/vertical_stepper_vertical_error_message_text_size"
                     android:textColor="#af1212"/>
 
             </LinearLayout>
@@ -131,8 +162,8 @@
             android:layout_width="@dimen/vertical_stepper_vertical_line_thickness"
             android:layout_marginLeft="12dp"
             android:layout_marginStart="12dp"
-            android:layout_marginRight="24dp"
-            android:layout_marginEnd="24dp"
+            android:layout_marginRight="26dp"
+            android:layout_marginEnd="26dp"
             android:layout_height="match_parent"
             android:background="#e0e0e0">
         </LinearLayout>
