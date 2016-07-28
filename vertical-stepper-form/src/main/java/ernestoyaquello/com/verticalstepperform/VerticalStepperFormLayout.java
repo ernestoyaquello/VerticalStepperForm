@@ -45,6 +45,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected int buttonBackgroundColor;
     protected int buttonPressedBackgroundColor;
     protected int stepNumberTextColor;
+    protected int stepSubTitleTextColor;
     protected int buttonTextColor;
     protected int buttonPressedTextColor;
     protected int errorMessageTextColor;
@@ -64,6 +65,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
     // Data
     protected List<String> steps;
+    protected List<String> subTitles;
 
     // Logic
     protected int activeStep = 0;
@@ -391,11 +393,13 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.buttonBackgroundColor = builder.buttonBackgroundColor;
         this.buttonPressedBackgroundColor = builder.buttonPressedBackgroundColor;
         this.stepNumberTextColor = builder.stepNumberTextColor;
+        this.stepSubTitleTextColor = builder.stepSubTitleTextColor;
         this.buttonTextColor = builder.buttonTextColor;
         this.buttonPressedTextColor = builder.buttonPressedTextColor;
         this.errorMessageTextColor = builder.errorMessageTextColor;
         this.displayBottomNavigation = builder.displayBottomNavigation;
         this.materialDesignInDisabledSteps = builder.materialDesignInDisabledSteps;
+        this.subTitles = builder.subTitles;
 
         initStepperForm(builder.steps);
     }
@@ -515,6 +519,13 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
         TextView stepTitle = (TextView) stepLayout.findViewById(R.id.step_title);
         stepTitle.setText(steps.get(stepNumber));
+
+        if (subTitles != null) {
+            TextView stepSubTitle = (TextView) stepLayout.findViewById(R.id.step_subtitle);
+            stepSubTitle.setVisibility(VISIBLE);
+            stepSubTitle.setText(subTitles.get(stepNumber));
+            stepSubTitle.setTextColor(stepSubTitleTextColor);
+        }
 
         TextView stepNumberTextView = (TextView) stepLayout.findViewById(R.id.step_number);
         stepNumberTextView.setText(String.valueOf(stepNumber + 1));
@@ -873,11 +884,13 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         protected int buttonBackgroundColor = Color.rgb(63, 81, 181);
         protected int buttonPressedBackgroundColor = Color.rgb(48, 63, 159);
         protected int stepNumberTextColor = Color.rgb(255, 255, 255);
+        protected int stepSubTitleTextColor = Color.rgb(162, 162, 162);
         protected int buttonTextColor = Color.rgb(255, 255, 255);
         protected int buttonPressedTextColor = Color.rgb(255, 255, 255);
         protected int errorMessageTextColor = Color.rgb(175, 18, 18);
         protected boolean displayBottomNavigation = true;
         protected boolean materialDesignInDisabledSteps = false;
+        protected List<String> subTitles;
 
         protected Builder(VerticalStepperFormLayout stepperLayout,
                           String[] steps,
@@ -968,6 +981,11 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
             return this;
         }
 
+        public Builder stepSubTitleTextColor(int stepSubTitleTextColor) {
+            this.stepSubTitleTextColor = stepSubTitleTextColor;
+            return this;
+        }
+
         /**
          * Set the text color of the buttons
          * @param buttonTextColor text color of the buttons
@@ -1025,6 +1043,16 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
          */
         public Builder alphaOfDisabledElements(float alpha) {
             this.alphaOfDisabledElements = alpha;
+            return this;
+        }
+
+        /**
+         * Set the sub titles displayed in each step
+         * @param subTitles the subtitles
+         * @return this builder instance
+         */
+        public Builder subTitles(String[] subTitles) {
+            this.subTitles = Arrays.asList(subTitles);
             return this;
         }
 
