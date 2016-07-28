@@ -190,7 +190,8 @@ public void onRestoreInstanceState(Bundle savedInstanceState) {
 Check out the [example application code](https://github.com/ernestoyaquello/vertical-stepper-form/tree/master/app/src/main/java/verticalstepperform/ernestoyaquello/com/verticalstepperform).
 
 ## Contribution
-Feel free to contribute to this library and help to improve it :)
+Feel free to contribute to this library and help to improve it!
+Special thanks to  [Csaba Kozák](https://github.com/WonderCsabo) for his collaboration :) 
 
 ## License
 ```
