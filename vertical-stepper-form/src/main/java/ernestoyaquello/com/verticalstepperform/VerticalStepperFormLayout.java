@@ -45,6 +45,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected int buttonBackgroundColor;
     protected int buttonPressedBackgroundColor;
     protected int stepNumberTextColor;
+    protected int stepTitleTextColor;
     protected int buttonTextColor;
     protected int buttonPressedTextColor;
     protected int errorMessageTextColor;
@@ -388,6 +389,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.buttonBackgroundColor = builder.buttonBackgroundColor;
         this.buttonPressedBackgroundColor = builder.buttonPressedBackgroundColor;
         this.stepNumberTextColor = builder.stepNumberTextColor;
+        this.stepTitleTextColor = builder.stepTitleTextColor;
         this.buttonTextColor = builder.buttonTextColor;
         this.buttonPressedTextColor = builder.buttonPressedTextColor;
         this.errorMessageTextColor = builder.errorMessageTextColor;
@@ -511,6 +513,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
         TextView stepTitle = (TextView) stepLayout.findViewById(R.id.step_title);
         stepTitle.setText(steps.get(stepNumber));
+        stepTitle.setTextColor(stepTitleTextColor);
 
         TextView stepNumberTextView = (TextView) stepLayout.findViewById(R.id.step_number);
         stepNumberTextView.setText(String.valueOf(stepNumber + 1));
@@ -844,6 +847,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         protected int buttonBackgroundColor = Color.rgb(63, 81, 181);
         protected int buttonPressedBackgroundColor = Color.rgb(48, 63, 159);
         protected int stepNumberTextColor = Color.rgb(255, 255, 255);
+        protected int stepTitleTextColor = Color.rgb(33, 33, 33);
         protected int buttonTextColor = Color.rgb(255, 255, 255);
         protected int buttonPressedTextColor = Color.rgb(255, 255, 255);
         protected int errorMessageTextColor = Color.rgb(175, 18, 18);
@@ -935,6 +939,16 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
          */
         public Builder stepNumberTextColor(int stepNumberTextColor) {
             this.stepNumberTextColor = stepNumberTextColor;
+            return this;
+        }
+
+        /**
+         * Setthe text color of the step title
+         * @param setTitleTextColor the color of the step title
+         * @return this builder instance
+         */
+        public Builder setTitleTextColor(int setTitleTextColor) {
+            this.stepTitleTextColor = setTitleTextColor;
             return this;
         }
 
