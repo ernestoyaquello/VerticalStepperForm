@@ -674,21 +674,11 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     protected void enableStepHeader(LinearLayout stepLayout) {
-        if(!materialDesignInDisabledSteps) {
-            RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
-            stepHeader.setAlpha(1);
-        } else {
-            changeCircleBackgroundColor(stepLayout, buttonBackgroundColor);
-        }
+        setHeaderAppearance(stepLayout, 1, buttonBackgroundColor);
     }
 
     protected void disableStepHeader(LinearLayout stepLayout) {
-        if(!materialDesignInDisabledSteps) {
-            RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
-            stepHeader.setAlpha(alphaOfDisabledElements);
-        } else {
-            changeCircleBackgroundColor(stepLayout, Color.rgb(176, 176, 176));
-        }
+        setHeaderAppearance(stepLayout, alphaOfDisabledElements, Color.rgb(176, 176, 176));
     }
 
     protected void displayCurrentProgress() {
@@ -784,7 +774,17 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         displayCurrentProgress();
     }
 
-    protected void changeCircleBackgroundColor(LinearLayout stepLayout, int color) {
+    protected void setHeaderAppearance(LinearLayout stepLayout, float alpha,
+                                       int stepCircleBackgroundColor) {
+        if(!materialDesignInDisabledSteps) {
+            RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
+            stepHeader.setAlpha(alpha);
+        } else {
+            setStepCircleBackgroundColor(stepLayout, stepCircleBackgroundColor);
+        }
+    }
+
+    protected void setStepCircleBackgroundColor(LinearLayout stepLayout, int color) {
         LinearLayout circle = (LinearLayout) stepLayout.findViewById(R.id.circle);
         Drawable bg = ContextCompat.getDrawable(context, R.drawable.circle_step_done);
         bg.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));
