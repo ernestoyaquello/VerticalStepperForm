@@ -192,7 +192,7 @@ Check out the [example application code](https://github.com/ernestoyaquello/vert
 ## Contribution
 Feel free to contribute to this library and help to improve it!
 
-Special thanks to  [Csaba Kozák](https://github.com/WonderCsabo) for his collaboration :) 
+Special thanks to  [**Csaba Kozák**](https://github.com/WonderCsabo) for his collaboration :) 
 
 ## License
 ```
