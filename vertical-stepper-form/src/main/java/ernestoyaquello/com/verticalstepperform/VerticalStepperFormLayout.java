@@ -52,6 +52,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected int errorMessageTextColor;
     protected boolean displayBottomNavigation;
     protected boolean materialDesignInDisabledSteps;
+    protected boolean showLineWhenCollapsed;
 
     // Views
     protected LayoutInflater mInflater;
@@ -405,6 +406,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.errorMessageTextColor = builder.errorMessageTextColor;
         this.displayBottomNavigation = builder.displayBottomNavigation;
         this.materialDesignInDisabledSteps = builder.materialDesignInDisabledSteps;
+        this.showLineWhenCollapsed = builder.showLineWhenCollapsed;
 
         initStepperForm(builder.steps, builder.stepsSubtitles);
     }
@@ -573,6 +575,12 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
             }
         });
 
+
+        if (showLineWhenCollapsed && stepNumber < numberOfSteps) {
+            View bottomLine = stepLayout.findViewById(R.id.bottom_vertical_line);
+            bottomLine.setVisibility(VISIBLE);
+        }
+
         stepLayouts.add(stepLayout);
 
         return stepLayout;
@@ -689,6 +697,11 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         } else {
             stepContent.setVisibility(View.VISIBLE);
             button.setVisibility(View.VISIBLE);
+        }
+
+        if (showLineWhenCollapsed) {
+            MarginLayoutParams layoutParams = (MarginLayoutParams) button.getLayoutParams();
+            layoutParams.bottomMargin = 0;
         }
 
         if (completedSteps[stepNumber] && activeStep != stepNumber) {
@@ -924,6 +937,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         protected int errorMessageTextColor = Color.rgb(175, 18, 18);
         protected boolean displayBottomNavigation = true;
         protected boolean materialDesignInDisabledSteps = false;
+        protected boolean showLineWhenCollapsed = false;
 
         protected Builder(VerticalStepperFormLayout stepperLayout,
                           String[] steps,
@@ -1091,6 +1105,16 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
          */
         public Builder materialDesignInDisabledSteps(boolean materialDesignInDisabledSteps) {
             this.materialDesignInDisabledSteps = materialDesignInDisabledSteps;
+            return this;
+        }
+
+        /**
+         * Show the line between steps even if it is collapsed per the Material Design
+         * @param showLineWhenCollapsed show the line between collapsed steps
+         * @return this builder instance
+         */
+        public Builder showLineWhenCollapsed(boolean showLineWhenCollapsed) {
+            this.showLineWhenCollapsed = showLineWhenCollapsed;
             return this;
         }
 
