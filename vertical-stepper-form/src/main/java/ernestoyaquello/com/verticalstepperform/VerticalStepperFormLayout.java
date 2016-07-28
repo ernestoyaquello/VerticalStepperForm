@@ -48,6 +48,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected int buttonTextColor;
     protected int buttonPressedTextColor;
     protected int errorMessageTextColor;
+    protected int doneCircleDrawableResid;
     protected boolean displayBottomNavigation;
 
     // Views
@@ -391,6 +392,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.buttonTextColor = builder.buttonTextColor;
         this.buttonPressedTextColor = builder.buttonPressedTextColor;
         this.errorMessageTextColor = builder.errorMessageTextColor;
+        this.doneCircleDrawableResid = builder.doneCircleDrawableResId;
         this.displayBottomNavigation = builder.displayBottomNavigation;
 
         initStepperForm(builder.steps);
@@ -519,6 +521,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
         ImageView stepDoneImageView = (ImageView) stepLayout.findViewById(R.id.step_done);
         stepDoneImageView.setColorFilter(stepNumberTextColor);
+        stepDoneImageView.setImageResource(doneCircleDrawableResid);
 
         TextView errorMessage = (TextView) stepLayout.findViewById(R.id.error_message);
         ImageView errorIcon = (ImageView) stepLayout.findViewById(R.id.error_icon);
@@ -848,6 +851,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         protected int buttonTextColor = Color.rgb(255, 255, 255);
         protected int buttonPressedTextColor = Color.rgb(255, 255, 255);
         protected int errorMessageTextColor = Color.rgb(175, 18, 18);
+        protected int doneCircleDrawableResId = R.drawable.ic_done;
         protected boolean displayBottomNavigation = true;
 
         protected Builder(VerticalStepperFormLayout stepperLayout,
@@ -986,6 +990,17 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
          */
         public Builder alphaOfDisabledElements(float alpha) {
             this.alphaOfDisabledElements = alpha;
+            return this;
+        }
+
+        /**
+         * Set the drawable in the circle for the completed steps.
+         *
+         * @param doneCircleDrawableResId the drawable resource id
+         * @return the builder instance
+         */
+        public Builder doneCircleDrawableResId(int doneCircleDrawableResId) {
+            this.doneCircleDrawableResId = doneCircleDrawableResId;
             return this;
         }
 
