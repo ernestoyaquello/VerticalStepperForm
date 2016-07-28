@@ -63,6 +63,8 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected ScrollView stepsScrollView;
     protected List<LinearLayout> stepLayouts;
     protected List<View> stepContentViews;
+    protected List<TextView> stepsTitlesViews;
+    protected List<TextView> stepsSubtitlesViews;
     protected AppCompatButton confirmationButton;
     protected ProgressBar progressBar;
     protected AppCompatImageButton previousStepButton, nextStepButton;
@@ -106,11 +108,62 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     /**
+     * Returns the title of a step
+     * @param stepNumber The step number (counting from 0)
+     * @return the title string
+     */
+    public String getStepTitle(int stepNumber) {
+        return steps.get(stepNumber);
+    }
+
+    /**
+     * Returns the subtitle of a step
+     * @param stepNumber The step number (counting from 0)
+     * @return the subtitle string
+     */
+    public String getStepsSubtitles(int stepNumber) {
+        if(stepsSubtitles != null) {
+            return stepsSubtitles.get(stepNumber);
+        }
+        return null;
+    }
+
+    /**
      * Returns the active step number
      * @return the active step number (counting from 0)
      */
     public int getActiveStepNumber() {
         return activeStep;
+    }
+
+    /**
+     * Set the title of certain step
+     * @param stepNumber The step number (counting from 0)
+     * @param title New title of the step
+     */
+    public void setStepTitle(int stepNumber, String title) {
+        if(title != null && !title.equals("")) {
+            steps.set(stepNumber, title);
+            TextView titleView = stepsTitlesViews.get(stepNumber);
+            if (titleView != null) {
+                titleView.setText(title);
+            }
+        }
+    }
+
+    /**
+     * Set the subtitle of certain step
+     * @param stepNumber The step number (counting from 0)
+     * @param subtitle New subtitle of the step
+     */
+    public void setStepSubtitle(int stepNumber, String subtitle) {
+        if(stepsSubtitles != null && subtitle != null && !subtitle.equals("")) {
+            stepsSubtitles.set(stepNumber, subtitle);
+            TextView subtitleView = stepsSubtitlesViews.get(stepNumber);
+            if (subtitleView != null) {
+                subtitleView.setText(subtitle);
+            }
+        }
     }
 
     /**
@@ -454,6 +507,8 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     protected void initializeForm() {
+        stepsTitlesViews = new ArrayList<>();
+        stepsSubtitlesViews = new ArrayList<>();
         setUpSteps();
         if (!displayBottomNavigation) {
             hideBottomNavigation();
@@ -544,16 +599,19 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         TextView stepTitle = (TextView) stepLayout.findViewById(R.id.step_title);
         stepTitle.setText(steps.get(stepNumber));
         stepTitle.setTextColor(stepTitleTextColor);
+        stepsTitlesViews.add(stepNumber, stepTitle);
 
+        TextView stepSubtitle = null;
         if(stepsSubtitles != null && stepNumber < stepsSubtitles.size()) {
             String subtitle = stepsSubtitles.get(stepNumber);
             if(subtitle != null && !subtitle.equals("")) {
-                TextView stepSubtitle = (TextView) stepLayout.findViewById(R.id.step_subtitle);
+                stepSubtitle = (TextView) stepLayout.findViewById(R.id.step_subtitle);
                 stepSubtitle.setText(subtitle);
                 stepSubtitle.setTextColor(stepSubtitleTextColor);
                 stepSubtitle.setVisibility(View.VISIBLE);
             }
         }
+        stepsSubtitlesViews.add(stepNumber, stepSubtitle);
 
         TextView stepNumberTextView = (TextView) stepLayout.findViewById(R.id.step_number);
         stepNumberTextView.setText(String.valueOf(stepNumber + 1));
