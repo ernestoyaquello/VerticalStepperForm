@@ -41,6 +41,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
     // Style
     protected float alphaOfDisabledElements;
+    protected int colorOfDisabledCircle;
     protected int stepNumberBackgroundColor;
     protected int buttonBackgroundColor;
     protected int buttonPressedBackgroundColor;
@@ -182,6 +183,12 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
             disableNextButtonInBottomNavigationLayout();
         } else {
             stepHeader.setAlpha(alphaOfDisabledElements);
+
+            LinearLayout circle = (LinearLayout) stepLayout.findViewById(R.id.circle);
+            Drawable bg = ContextCompat.getDrawable(context, R.drawable.circle_step_done);
+            bg.setColorFilter(new PorterDuffColorFilter(
+                    colorOfDisabledCircle, PorterDuff.Mode.SRC_IN));
+            circle.setBackground(bg);
         }
 
         if (stepNumber < numberOfSteps) {
@@ -384,6 +391,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.activity = builder.activity;
 
         this.alphaOfDisabledElements = builder.alphaOfDisabledElements;
+        this.colorOfDisabledCircle = builder.colorOfDisabledCircle;
         this.stepNumberBackgroundColor = builder.stepNumberBackgroundColor;
         this.buttonBackgroundColor = builder.buttonBackgroundColor;
         this.buttonPressedBackgroundColor = builder.buttonPressedBackgroundColor;
@@ -631,26 +639,41 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
             stepContent.setVisibility(View.GONE);
         }
 
+        LinearLayout circle = (LinearLayout) stepLayout.findViewById(R.id.circle);
+        Drawable bg = ContextCompat.getDrawable(context, R.drawable.circle_step_done);
+
         if (!completedSteps[stepNumber]) {
             stepHeader.setAlpha(alphaOfDisabledElements);
             stepDone.setVisibility(View.INVISIBLE);
             stepNumberTextView.setVisibility(View.VISIBLE);
+            bg.setColorFilter(new PorterDuffColorFilter(
+                    colorOfDisabledCircle, PorterDuff.Mode.SRC_IN));
         } else {
             stepHeader.setAlpha(1);
             stepDone.setVisibility(View.VISIBLE);
             stepNumberTextView.setVisibility(View.INVISIBLE);
+            bg.setColorFilter(new PorterDuffColorFilter(
+                    stepNumberBackgroundColor, PorterDuff.Mode.SRC_IN));
         }
+
+        circle.setBackground(bg);
     }
 
     protected void enableStepLayout(int stepNumber, boolean smoothieEnabling) {
         LinearLayout stepLayout = stepLayouts.get(stepNumber);
         RelativeLayout stepContent = (RelativeLayout) stepLayout.findViewById(R.id.step_content);
         RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
+        LinearLayout circle = (LinearLayout) stepLayout.findViewById(R.id.circle);
         ImageView stepDone = (ImageView) stepHeader.findViewById(R.id.step_done);
         TextView stepNumberTextView = (TextView) stepHeader.findViewById(R.id.step_number);
         LinearLayout button = (LinearLayout) stepLayout.findViewById(R.id.next_step_button_container);
 
         stepHeader.setAlpha(1);
+
+        Drawable bg = ContextCompat.getDrawable(context, R.drawable.circle_step_done);
+        bg.setColorFilter(new PorterDuffColorFilter(
+                stepNumberBackgroundColor, PorterDuff.Mode.SRC_IN));
+        circle.setBackground(bg);
 
         if (smoothieEnabling) {
             Animations.slideDown(stepContent);
@@ -840,6 +863,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
         // Optional parameters
         protected float alphaOfDisabledElements = 0.25f;
+        protected int colorOfDisabledCircle = Color.rgb(63, 81, 181);
         protected int stepNumberBackgroundColor = Color.rgb(63, 81, 181);
         protected int buttonBackgroundColor = Color.rgb(63, 81, 181);
         protected int buttonPressedBackgroundColor = Color.rgb(48, 63, 159);
@@ -985,6 +1009,16 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
          */
         public Builder alphaOfDisabledElements(float alpha) {
             this.alphaOfDisabledElements = alpha;
+            return this;
+        }
+
+        /**
+         * Set the the color on the circle on disabled steps
+         * @param colorOfDisabledCircle the color on disabled steps
+         * @return the builder instance
+         */
+        public Builder colorOfDisabledCircle(int colorOfDisabledCircle) {
+            this.colorOfDisabledCircle = colorOfDisabledCircle;
             return this;
         }
 
