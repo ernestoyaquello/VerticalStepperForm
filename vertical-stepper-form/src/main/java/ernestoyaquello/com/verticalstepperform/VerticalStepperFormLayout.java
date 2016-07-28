@@ -52,6 +52,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected int errorMessageTextColor;
     protected boolean displayBottomNavigation;
     protected boolean materialDesignInDisabledSteps;
+    protected boolean hideKeyboard;
 
     // Views
     protected LayoutInflater mInflater;
@@ -268,7 +269,9 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
      */
     public void goToStep(int stepNumber, boolean restoration) {
         if (activeStep != stepNumber || restoration) {
-            hideSoftKeyboard();
+            if(hideKeyboard) {
+                hideSoftKeyboard();
+            }
             boolean previousStepsAreCompleted =
                     arePreviousStepsCompleted(stepNumber);
             if (stepNumber == 0 || previousStepsAreCompleted) {
@@ -330,6 +333,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.errorMessageTextColor = Color.rgb(175, 18, 18);
         this.displayBottomNavigation = true;
         this.materialDesignInDisabledSteps = false;
+        this.hideKeyboard = true;
 
         this.verticalStepperFormImplementation = verticalStepperForm;
         this.activity = activity;
@@ -381,6 +385,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.errorMessageTextColor = Color.rgb(175, 18, 18);
         this.displayBottomNavigation = true;
         this.materialDesignInDisabledSteps = false;
+        this.hideKeyboard = true;
 
         this.verticalStepperFormImplementation = verticalStepperForm;
         this.activity = activity;
@@ -405,6 +410,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.errorMessageTextColor = builder.errorMessageTextColor;
         this.displayBottomNavigation = builder.displayBottomNavigation;
         this.materialDesignInDisabledSteps = builder.materialDesignInDisabledSteps;
+        this.hideKeyboard = builder.hideKeyboard;
 
         initStepperForm(builder.steps, builder.stepsSubtitles);
     }
@@ -924,6 +930,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         protected int errorMessageTextColor = Color.rgb(175, 18, 18);
         protected boolean displayBottomNavigation = true;
         protected boolean materialDesignInDisabledSteps = false;
+        protected boolean hideKeyboard = true;
 
         protected Builder(VerticalStepperFormLayout stepperLayout,
                           String[] steps,
@@ -1091,6 +1098,16 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
          */
         public Builder materialDesignInDisabledSteps(boolean materialDesignInDisabledSteps) {
             this.materialDesignInDisabledSteps = materialDesignInDisabledSteps;
+            return this;
+        }
+
+        /**
+         * specify whether or not the keyboard should be hidden at the beginning
+         * @param hideKeyboard true to hide the keyboard; false to not hide it
+         * @return the builder instance
+         */
+        public Builder hideKeyboard(boolean hideKeyboard) {
+            this.hideKeyboard = hideKeyboard;
             return this;
         }
 
