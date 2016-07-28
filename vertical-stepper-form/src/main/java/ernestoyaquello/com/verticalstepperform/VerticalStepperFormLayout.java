@@ -3,6 +3,7 @@ package ernestoyaquello.com.verticalstepperform;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
+import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -14,6 +15,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatImageButton;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewTreeObserver;
@@ -53,6 +55,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected boolean displayBottomNavigation;
     protected boolean materialDesignInDisabledSteps;
     protected boolean hideKeyboard;
+    protected boolean showVerticalLineWhenStepsAreCollapsed;
 
     // Views
     protected LayoutInflater mInflater;
@@ -334,6 +337,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.displayBottomNavigation = true;
         this.materialDesignInDisabledSteps = false;
         this.hideKeyboard = true;
+        this.showVerticalLineWhenStepsAreCollapsed = false;
 
         this.verticalStepperFormImplementation = verticalStepperForm;
         this.activity = activity;
@@ -386,6 +390,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.displayBottomNavigation = true;
         this.materialDesignInDisabledSteps = false;
         this.hideKeyboard = true;
+        this.showVerticalLineWhenStepsAreCollapsed = false;
 
         this.verticalStepperFormImplementation = verticalStepperForm;
         this.activity = activity;
@@ -411,6 +416,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.displayBottomNavigation = builder.displayBottomNavigation;
         this.materialDesignInDisabledSteps = builder.materialDesignInDisabledSteps;
         this.hideKeyboard = builder.hideKeyboard;
+        this.showVerticalLineWhenStepsAreCollapsed = builder.showVerticalLineWhenStepsAreCollapsed;
 
         initStepperForm(builder.steps, builder.stepsSubtitles);
     }
@@ -677,6 +683,9 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
             stepDone.setVisibility(View.VISIBLE);
             stepNumberTextView.setVisibility(View.INVISIBLE);
         }
+
+        showVerticalLineInCollapsedStepIfNecessary(stepLayout);
+
     }
 
     protected void enableStepLayout(int stepNumber, boolean smoothieEnabling) {
@@ -704,6 +713,9 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
             stepDone.setVisibility(View.INVISIBLE);
             stepNumberTextView.setVisibility(View.VISIBLE);
         }
+
+        hideVerticalLineInCollapsedStepIfNecessary(stepLayout);
+
     }
 
     protected void enableStepHeader(LinearLayout stepLayout) {
@@ -712,6 +724,20 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
     protected void disableStepHeader(LinearLayout stepLayout) {
         setHeaderAppearance(stepLayout, alphaOfDisabledElements, Color.rgb(176, 176, 176));
+    }
+
+    protected void showVerticalLineInCollapsedStepIfNecessary(LinearLayout stepLayout) {
+        // The height of the line will be 16dp when the subtitle textview is gone
+        if(showVerticalLineWhenStepsAreCollapsed) {
+            setVerticalLineNearSubtitleHeightWhenSubtitleIsGone(stepLayout, 16);
+        }
+    }
+
+    protected void hideVerticalLineInCollapsedStepIfNecessary(LinearLayout stepLayout) {
+        // The height of the line will be 0 when the subtitle text is being shown
+        if(showVerticalLineWhenStepsAreCollapsed) {
+            setVerticalLineNearSubtitleHeightWhenSubtitleIsGone(stepLayout, 0);
+        }
     }
 
     protected void displayCurrentProgress() {
@@ -807,6 +833,23 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         displayCurrentProgress();
     }
 
+    protected int convertDpToPixel(float dp){
+        Resources resources = context.getResources();
+        DisplayMetrics metrics = resources.getDisplayMetrics();
+        float px = dp * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
+        return (int)px;
+    }
+
+    protected void setVerticalLineNearSubtitleHeightWhenSubtitleIsGone(LinearLayout stepLayout, int height) {
+        TextView stepSubtitle = (TextView) stepLayout.findViewById(R.id.step_subtitle);
+        if (stepSubtitle.getVisibility() == View.GONE) {
+            LinearLayout stepLeftLine = (LinearLayout) stepLayout.findViewById(R.id.vertical_line_subtitle);
+            LayoutParams params = (LayoutParams) stepLeftLine.getLayoutParams();
+            params.height = convertDpToPixel(height);
+            stepLeftLine.setLayoutParams(params);
+        }
+    }
+
     protected void setHeaderAppearance(LinearLayout stepLayout, float alpha,
                                        int stepCircleBackgroundColor) {
         if(!materialDesignInDisabledSteps) {
@@ -827,7 +870,6 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
                     subtitle.setVisibility(View.GONE);
                 }
             }
-
         } else {
             setStepCircleBackgroundColor(stepLayout, stepCircleBackgroundColor);
         }
@@ -931,6 +973,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         protected boolean displayBottomNavigation = true;
         protected boolean materialDesignInDisabledSteps = false;
         protected boolean hideKeyboard = true;
+        protected boolean showVerticalLineWhenStepsAreCollapsed = false;
 
         protected Builder(VerticalStepperFormLayout stepperLayout,
                           String[] steps,
@@ -1102,12 +1145,22 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         }
 
         /**
-         * specify whether or not the keyboard should be hidden at the beginning
+         * Specify whether or not the keyboard should be hidden at the beginning
          * @param hideKeyboard true to hide the keyboard; false to not hide it
          * @return the builder instance
          */
         public Builder hideKeyboard(boolean hideKeyboard) {
             this.hideKeyboard = hideKeyboard;
+            return this;
+        }
+
+        /**
+         * Specify whether or not the vertical lines should be displayed when steps are collapsed
+         * @param showVerticalLineWhenStepsAreCollapsed true to show the lines; false to not
+         * @return the builder instance
+         */
+        public Builder showVerticalLineWhenStepsAreCollapsed(boolean showVerticalLineWhenStepsAreCollapsed) {
+            this.showVerticalLineWhenStepsAreCollapsed = showVerticalLineWhenStepsAreCollapsed;
             return this;
         }
 

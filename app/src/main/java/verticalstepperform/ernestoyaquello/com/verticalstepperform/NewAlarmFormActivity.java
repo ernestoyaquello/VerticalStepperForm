@@ -89,7 +89,8 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         verticalStepperForm = (VerticalStepperFormLayout) findViewById(R.id.vertical_stepper_form);
         VerticalStepperFormLayout.Builder.newInstance(verticalStepperForm, stepsTitles, this, this)
                 //.stepsSubtitles(stepsSubtitles)
-                //.materialDesignInDisabledSteps(true)
+                //.materialDesignInDisabledSteps(true) // false by default
+                //.showVerticalLineWhenStepsAreCollapsed(true) // false by default
                 .primaryColor(colorPrimary)
                 .primaryDarkColor(colorPrimaryDark)
                 .displayBottomNavigation(true)
