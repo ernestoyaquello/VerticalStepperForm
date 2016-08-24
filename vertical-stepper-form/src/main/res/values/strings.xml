@@ -1,5 +1,4 @@
 <resources>
-    <string name="app_name">Vertical Stepper Form</string>
     <string name="vertical_form_stepper_form_continue">Continue</string>
     <string name="vertical_form_stepper_form_discard_question">Discard data?</string>
     <string name="vertical_form_stepper_form_info_will_be_lost">All the information you have given will be lost</string>
