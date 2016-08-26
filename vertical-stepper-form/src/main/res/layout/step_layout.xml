@@ -183,6 +183,16 @@
                 android:layout_marginRight="8dp"
                 android:layout_marginEnd="8dp"/>
 
+            <android.support.v7.widget.AppCompatButton
+                android:id="@+id/last_step_second_option"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/vertical_form_stepper_form_continue"
+                android:textColor="#FFFFFF"
+                android:layout_marginRight="8dp"
+                android:layout_marginEnd="8dp"
+                android:visibility="gone"/>
+
         </LinearLayout>
 
     </LinearLayout>

@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperForm;
+import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperSecondButton;
 import ernestoyaquello.com.verticalstepperform.utils.Animations;
 
 /**
@@ -56,6 +57,10 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected boolean materialDesignInDisabledSteps;
     protected boolean hideKeyboard;
     protected boolean showVerticalLineWhenStepsAreCollapsed;
+    protected String lastStepTitle;
+    protected String lastStepButtonTitle;
+    protected String lastStepSecondButtonTitle;
+    protected VerticalStepperSecondButton lastStepSecondButtonListener;
 
     // Views
     protected LayoutInflater mInflater;
@@ -154,14 +159,22 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     /**
      * Set the subtitle of certain step
      * @param stepNumber The step number (counting from 0)
-     * @param subtitle New subtitle of the step
+     * @param subtitle New subtitle of the step. Null to remove subtitle
      */
     public void setStepSubtitle(int stepNumber, String subtitle) {
-        if(stepsSubtitles != null && subtitle != null && !subtitle.equals("")) {
+        if(stepsSubtitles != null) {
+            while (stepsSubtitles.size() <= stepNumber) {
+                stepsSubtitles.add(null);
+            }
+
             stepsSubtitles.set(stepNumber, subtitle);
             TextView subtitleView = stepsSubtitlesViews.get(stepNumber);
-            if (subtitleView != null) {
+
+            if (subtitle != null && !subtitle.equals("")) {
                 subtitleView.setText(subtitle);
+                subtitleView.setVisibility(VISIBLE);
+            } else {
+                subtitleView.setVisibility(GONE);
             }
         }
     }
@@ -470,6 +483,10 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.materialDesignInDisabledSteps = builder.materialDesignInDisabledSteps;
         this.hideKeyboard = builder.hideKeyboard;
         this.showVerticalLineWhenStepsAreCollapsed = builder.showVerticalLineWhenStepsAreCollapsed;
+        this.lastStepTitle = builder.lastStepTitle;
+        this.lastStepButtonTitle = builder.lastStepButtonTitle;
+        this.lastStepSecondButtonTitle = builder.lastStepSecondButtonTitle;
+        this.lastStepSecondButtonListener = builder.lastStepSecondButtonListener;
 
         initStepperForm(builder.steps, builder.stepsSubtitles);
     }
@@ -494,7 +511,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         if(stepsSubtitles != null) {
             this.stepsSubtitles = new ArrayList<>(Arrays.asList(stepsSubtitles));
         } else {
-            this.stepsSubtitles = null;
+            this.stepsSubtitles = new ArrayList<>();
         }
         numberOfSteps = steps.length;
         setAuxVars();
@@ -575,13 +592,32 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
         disableConfirmationButton();
 
-        confirmationButton.setText(R.string.vertical_form_stepper_form_confirm_button);
+        if (lastStepButtonTitle != null) {
+            confirmationButton.setText(lastStepButtonTitle);
+        } else {
+            confirmationButton.setText(R.string.vertical_form_stepper_form_confirm_button);
+        }
         confirmationButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-                prepareSendingAndSend();
+                prepareSendingAndSend(true);
             }
         });
+
+        if (lastStepSecondButtonTitle != null) {
+            AppCompatButton secondConfirmationButton = (AppCompatButton) stepLayout.findViewById(R.id.last_step_second_option);
+            secondConfirmationButton.setText(lastStepSecondButtonTitle);
+            secondConfirmationButton.setVisibility(VISIBLE);
+            setButtonColor(secondConfirmationButton,
+                    buttonBackgroundColor, buttonTextColor, buttonPressedBackgroundColor, buttonPressedTextColor);
+
+            secondConfirmationButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    prepareSendingAndSend(false);
+                }
+            });
+        }
 
         // Some content could be added to the final step inside stepContent layout
         // RelativeLayout stepContent = (RelativeLayout) stepLayout.findViewById(R.id.step_content);
@@ -601,13 +637,13 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         stepTitle.setTextColor(stepTitleTextColor);
         stepsTitlesViews.add(stepNumber, stepTitle);
 
-        TextView stepSubtitle = null;
+        TextView stepSubtitle = (TextView) stepLayout.findViewById(R.id.step_subtitle);
+        stepSubtitle.setTextColor(stepSubtitleTextColor);
+
         if(stepsSubtitles != null && stepNumber < stepsSubtitles.size()) {
             String subtitle = stepsSubtitles.get(stepNumber);
             if(subtitle != null && !subtitle.equals("")) {
-                stepSubtitle = (TextView) stepLayout.findViewById(R.id.step_subtitle);
                 stepSubtitle.setText(subtitle);
-                stepSubtitle.setTextColor(stepSubtitleTextColor);
                 stepSubtitle.setVisibility(View.VISIBLE);
             }
         }
@@ -821,7 +857,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     protected void addConfirmationStepToStepsList() {
-        String confirmationStepText = context.getString(R.string.vertical_form_stepper_form_last_step);
+        String confirmationStepText = lastStepTitle == null ? context.getString(R.string.vertical_form_stepper_form_last_step) : lastStepTitle;
         steps.add(confirmationStepText);
     }
 
@@ -871,11 +907,16 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         }
     }
 
-    protected void prepareSendingAndSend() {
+    protected void prepareSendingAndSend(boolean isLeftButton) {
         displayDoneIconInConfirmationStep();
         disableConfirmationButton();
         displayMaxProgress();
-        verticalStepperFormImplementation.sendData();
+
+        if (isLeftButton) {
+            verticalStepperFormImplementation.sendData();
+        } else {
+            lastStepSecondButtonListener.onClickSecondButton();
+        }
     }
 
     protected void displayDoneIconInConfirmationStep() {
@@ -1032,6 +1073,10 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         protected boolean materialDesignInDisabledSteps = false;
         protected boolean hideKeyboard = true;
         protected boolean showVerticalLineWhenStepsAreCollapsed = false;
+        protected String lastStepTitle;
+        protected String lastStepButtonTitle;
+        protected String lastStepSecondButtonTitle;
+        protected VerticalStepperSecondButton lastStepSecondButtonListener;
 
         protected Builder(VerticalStepperFormLayout stepperLayout,
                           String[] steps,
@@ -1229,6 +1274,29 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
          */
         public Builder alphaOfDisabledElements(float alpha) {
             this.alphaOfDisabledElements = alpha;
+            return this;
+        }
+
+        /**
+         * Change title of step and button
+         * @param stepTitle Title of last step
+         * @param buttonTitle Title of button of last step
+         * @return the builder instance
+         */
+        public Builder setupLastStep(String stepTitle, String buttonTitle) {
+            this.lastStepTitle = stepTitle;
+            this.lastStepButtonTitle = buttonTitle;
+            return this;
+        }
+
+        /**
+         * Adds a second button to last step
+         * @param buttonTitle Title of the new button
+         * @return the builder instance
+         */
+        public Builder addSecondButtonLastStep(String buttonTitle, VerticalStepperSecondButton buttonListener) {
+            this.lastStepSecondButtonTitle = buttonTitle;
+            this.lastStepSecondButtonListener = buttonListener;
             return this;
         }
 
