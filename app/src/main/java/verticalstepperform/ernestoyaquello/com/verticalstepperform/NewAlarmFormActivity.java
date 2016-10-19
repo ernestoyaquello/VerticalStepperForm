@@ -94,6 +94,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
                 .primaryColor(colorPrimary)
                 .primaryDarkColor(colorPrimaryDark)
                 .displayBottomNavigation(true)
+                .submitText("Let's go")
                 .init();
 
     }
