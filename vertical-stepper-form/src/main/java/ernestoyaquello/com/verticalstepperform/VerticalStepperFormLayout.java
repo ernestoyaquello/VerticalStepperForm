@@ -56,6 +56,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected boolean materialDesignInDisabledSteps;
     protected boolean hideKeyboard;
     protected boolean showVerticalLineWhenStepsAreCollapsed;
+    protected boolean isNonLinear;
 
     // Views
     protected LayoutInflater mInflater;
@@ -337,6 +338,20 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     /**
+     * Go to the selected step regardless of whether previous steps are completed
+     * @param stepNumber the selected step number (counting from 0)
+     * @param restoration true if the method has been called to restore the form; false otherwise
+     */
+    public void goToStepNonLinear(int stepNumber, boolean restoration) {
+        if (activeStep != stepNumber || restoration) {
+            if(hideKeyboard) {
+                hideSoftKeyboard();
+            }
+            openStep(stepNumber, restoration);
+        }
+    }
+
+    /**
      * Set the active step as not completed
      * @deprecated use {@link #setActiveStepAsUncompleted(String)} instead
      */
@@ -469,6 +484,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.displayBottomNavigation = builder.displayBottomNavigation;
         this.materialDesignInDisabledSteps = builder.materialDesignInDisabledSteps;
         this.hideKeyboard = builder.hideKeyboard;
+        this.isNonLinear = builder.isNonLinear;
         this.showVerticalLineWhenStepsAreCollapsed = builder.showVerticalLineWhenStepsAreCollapsed;
 
         initStepperForm(builder.steps, builder.stepsSubtitles);
@@ -629,7 +645,11 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         stepHeader.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToStep(stepNumber, false);
+                if(isNonLinear) {
+                    goToStepNonLinear(stepNumber, false);
+                } else {
+                    goToStep(stepNumber, false);
+                }
             }
         });
 
@@ -1031,6 +1051,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         protected boolean displayBottomNavigation = true;
         protected boolean materialDesignInDisabledSteps = false;
         protected boolean hideKeyboard = true;
+        protected boolean isNonLinear = true;
         protected boolean showVerticalLineWhenStepsAreCollapsed = false;
 
         protected Builder(VerticalStepperFormLayout stepperLayout,
@@ -1209,6 +1230,17 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
          */
         public Builder hideKeyboard(boolean hideKeyboard) {
             this.hideKeyboard = hideKeyboard;
+            return this;
+        }
+
+        /**
+         * Specify whether or not the form should be nonlinear meaning user can jump to other
+         * steps without previous steps being completed
+         * @param isNonLinear true to be nonlinear; false to not
+         * @return the builder instance
+         */
+        public Builder makeNonLinear(boolean isNonLinear) {
+            this.isNonLinear = isNonLinear;
             return this;
         }
 
