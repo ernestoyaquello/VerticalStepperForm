@@ -35,6 +35,7 @@ import java.util.List;
 
 import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperForm;
 import ernestoyaquello.com.verticalstepperform.utils.Animations;
+import ernestoyaquello.com.verticalstepperform.utils.ViewCompat;
 
 /**
  * Custom layout that implements a vertical stepper form
@@ -594,7 +595,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         Drawable bg = ContextCompat.getDrawable(context, R.drawable.circle_step_done);
         bg.setColorFilter(new PorterDuffColorFilter(
                 stepNumberBackgroundColor, PorterDuff.Mode.SRC_IN));
-        circle.setBackground(bg);
+        ViewCompat.setBackground(circle, bg);
 
         TextView stepTitle = (TextView) stepLayout.findViewById(R.id.step_title);
         stepTitle.setText(steps.get(stepNumber));
@@ -937,7 +938,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         LinearLayout circle = (LinearLayout) stepLayout.findViewById(R.id.circle);
         Drawable bg = ContextCompat.getDrawable(context, R.drawable.circle_step_done);
         bg.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));
-        circle.setBackground(bg);
+        ViewCompat.setBackground(circle, bg);
     }
 
     protected void setButtonColor(AppCompatButton button, int buttonColor, int buttonTextColor,

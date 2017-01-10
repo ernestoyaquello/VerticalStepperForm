@@ -26,6 +26,7 @@ import android.widget.TimePicker;
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
 import ernestoyaquello.com.verticalstepperform.fragments.BackConfirmationFragment;
 import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperForm;
+import ernestoyaquello.com.verticalstepperform.utils.ViewCompat;
 
 public class NewAlarmFormActivity extends AppCompatActivity implements VerticalStepperForm {
 
@@ -324,7 +325,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
                 ernestoyaquello.com.verticalstepperform.R.drawable.circle_step_done);
         int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
         bg.setColorFilter(new PorterDuffColorFilter(colorPrimary, PorterDuff.Mode.SRC_IN));
-        dayLayout.setBackground(bg);
+        ViewCompat.setBackground(dayLayout, bg);
 
         TextView dayText = (TextView) dayLayout.findViewById(R.id.day);
         dayText.setTextColor(Color.rgb(255, 255, 255));
