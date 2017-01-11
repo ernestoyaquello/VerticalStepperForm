@@ -170,6 +170,27 @@ private void checkEmail() {
 ```
 NOTE: You can also use this method to trigger some actions whenever a certain step is open.
 
+####onContinue()
+This method will be called for a step when its continue button is pressed, It can be used to validate the data on that step. Returning true will continue to next step and false will stay on same step with an error message "Validation Errors":
+```java
+@Override
+public void onContinue(int stepNumber) {
+		if(stepNumber == 0) {
+    	    //This will continue to next step or stay on same if name doesn't validate with an error message "Validation Errors".
+    		return validateName();
+    	} else {
+    		//This will continue to next step
+    	    return true;
+    	}
+}
+
+private void validateName() {
+    //if name exists in db, its a duplicate, return false;
+	return !name.existsInDb();
+}
+
+```
+
 ####sendData()
 In this method you have to implement the sending of the data.
 

@@ -639,7 +639,10 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToStep((stepNumber + 1), false);
+                if (verticalStepperFormImplementation.onContinue(stepNumber))
+                    goToStep((stepNumber + 1), false);
+                else
+                    setStepAsUncompleted(stepNumber, "Validation Errors");
             }
         });
 

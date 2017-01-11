@@ -22,6 +22,7 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
 import ernestoyaquello.com.verticalstepperform.fragments.BackConfirmationFragment;
@@ -143,6 +144,14 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
                 checkDays();
                 break;
         }
+    }
+
+    @Override
+    public boolean onContinue(int stepNumber) {
+        //You can further do some calculations or validate the user input
+        //and return true or false to go next or stay on same step accordingly
+        Toast.makeText(this, "Validation Done Step : "+stepNumber, Toast.LENGTH_SHORT).show();
+        return true;
     }
 
     @Override
