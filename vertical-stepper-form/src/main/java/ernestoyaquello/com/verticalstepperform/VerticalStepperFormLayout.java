@@ -516,6 +516,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         goToStep(0, true);
 
         setObserverForKeyboard();
+        registerListeners();
     }
 
     // http://stackoverflow.com/questions/2150078/how-to-check-visibility-of-software-keyboard-in-android
@@ -970,7 +971,6 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         super.onFinishInflate();
 
         findViews();
-        registerListeners();
     }
 
     @Override
