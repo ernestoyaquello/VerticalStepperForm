@@ -119,6 +119,9 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
             case DAYS_STEP_NUM:
                 view = createAlarmDaysStep();
                 break;
+            case 4:
+                view = createFinalStep();
+                break;
         }
         return view;
     }
@@ -272,6 +275,13 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
             dayText.setText(weekDays[index]);
         }
         return daysStepContent;
+    }
+
+    private View createFinalStep() {
+        TextView tv = new TextView(this);
+
+        tv.setText("Final step abstract");
+        return tv;
     }
 
     private void setTimePicker(int hour, int minutes) {

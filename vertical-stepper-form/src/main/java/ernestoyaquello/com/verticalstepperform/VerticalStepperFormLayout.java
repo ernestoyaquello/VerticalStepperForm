@@ -63,6 +63,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected ScrollView stepsScrollView;
     protected List<LinearLayout> stepLayouts;
     protected List<View> stepContentViews;
+    protected View finalStepContentViews = null;
     protected List<TextView> stepsTitlesViews;
     protected List<TextView> stepsSubtitlesViews;
     protected AppCompatButton confirmationButton;
@@ -484,6 +485,9 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         }
         stepContentViews = stepContentLayouts;
 
+        // Check id has confirmtion view
+        finalStepContentViews = verticalStepperFormImplementation.createStepContentView(numberOfSteps);
+
         initializeForm();
 
         verticalStepperFormImplementation.onStepOpening(activeStep);
@@ -584,7 +588,10 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         });
 
         // Some content could be added to the final step inside stepContent layout
-        // RelativeLayout stepContent = (RelativeLayout) stepLayout.findViewById(R.id.step_content);
+        if (finalStepContentViews != null) {
+            RelativeLayout stepContent = (RelativeLayout) stepLayout.findViewById(R.id.step_content);
+            stepContent.addView(finalStepContentViews);
+        }
     }
 
     protected LinearLayout createStepLayout(final int stepNumber) {
