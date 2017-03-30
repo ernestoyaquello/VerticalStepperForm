@@ -140,6 +140,8 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
                 verticalStepperForm.setStepAsCompleted(stepNumber);
                 // In this case, the instruction above is equivalent to:
                 // verticalStepperForm.setActiveStepAsCompleted();
+
+                verticalStepperForm.setStepSubtitle(0, "ciao");
                 break;
             case DAYS_STEP_NUM:
                 // When this step is open, we check the days to verify that at least one is selected

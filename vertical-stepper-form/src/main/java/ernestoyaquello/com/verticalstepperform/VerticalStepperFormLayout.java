@@ -14,6 +14,7 @@ import android.os.Parcelable;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatImageButton;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -65,7 +66,6 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected List<View> stepContentViews;
     protected View finalStepContentViews = null;
     protected List<TextView> stepsTitlesViews;
-    protected List<TextView> stepsSubtitlesViews;
     protected AppCompatButton confirmationButton;
     protected ProgressBar progressBar;
     protected AppCompatImageButton previousStepButton, nextStepButton;
@@ -158,12 +158,19 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
      * @param subtitle New subtitle of the step
      */
     public void setStepSubtitle(int stepNumber, String subtitle) {
-        if(stepsSubtitles != null && subtitle != null && !subtitle.equals("")) {
+        if (stepsSubtitles != null){
             stepsSubtitles.set(stepNumber, subtitle);
-            TextView subtitleView = stepsSubtitlesViews.get(stepNumber);
-            if (subtitleView != null) {
-                subtitleView.setText(subtitle);
-            }
+        }
+
+        View stepView = stepLayouts.get(stepNumber);
+        TextView subtitleView = (TextView) stepView.findViewById(R.id.step_subtitle);
+
+        if (!TextUtils.isEmpty(subtitle)) {
+            subtitleView.setText(subtitle);
+            subtitleView.setTextColor(stepSubtitleTextColor);
+            subtitleView.setVisibility(View.VISIBLE);
+        }else {
+            subtitleView.setVisibility(View.GONE);
         }
     }
 
@@ -512,7 +519,6 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
     protected void initializeForm() {
         stepsTitlesViews = new ArrayList<>();
-        stepsSubtitlesViews = new ArrayList<>();
         setUpSteps();
         if (!displayBottomNavigation) {
             hideBottomNavigation();
@@ -618,7 +624,6 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
                 stepSubtitle.setVisibility(View.VISIBLE);
             }
         }
-        stepsSubtitlesViews.add(stepNumber, stepSubtitle);
 
         TextView stepNumberTextView = (TextView) stepLayout.findViewById(R.id.step_number);
         stepNumberTextView.setText(String.valueOf(stepNumber + 1));
