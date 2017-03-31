@@ -1,6 +1,7 @@
 # Vertical Stepper Form Library
 This Android library implements a [**vertical stepper form**](https://material.google.com/components/steppers.html) following Google Material Design guidelines.
-#####Disclaimer
+
+##### Disclaimer
 > There may be slight differences between the official Material Design specifications and the implementation of this library.
 
 ## Demo
@@ -84,8 +85,8 @@ This Android library implements a [**vertical stepper form**](https://material.g
 4. Finally, edit your activity class to make it implement ```VerticalStepperForm```. Then, implement the methods ```createStepContentView()```, ```onStepOpening()``` and ```sendData()```.
 
 
-###Implementing the methods
-####createStepContentView()
+### Implementing the methods
+#### createStepContentView()
 This method will be called automatically by the system to generate the view of the content of each step. You have to implement the generation of the corresponding step view and return it:
 ```java
 @Override
@@ -132,7 +133,7 @@ private View createPhoneNumberStep() {
 ```
 
 
-####onStepOpening()
+#### onStepOpening()
 This method will be called every time a step is open, so it can be used for checking conditions. It is noteworthy that the button "Continue" is disabled by default in every step, so it will only show up after certain user actions (for example, after the introduction of a correct name or email):
 ```java
 @Override
@@ -170,7 +171,7 @@ private void checkEmail() {
 ```
 NOTE: You can also use this method to trigger some actions whenever a certain step is open.
 
-####sendData()
+#### sendData()
 In this method you have to implement the sending of the data.
 
 ### Screen rotation
