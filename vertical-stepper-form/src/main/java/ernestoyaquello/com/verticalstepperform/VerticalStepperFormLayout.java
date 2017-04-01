@@ -597,6 +597,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         if (finalStepContentViews != null) {
             RelativeLayout stepContent = (RelativeLayout) stepLayout.findViewById(R.id.step_content);
             stepContent.addView(finalStepContentViews);
+            stepLeftLine.setVisibility(View.VISIBLE);
         }
     }
 

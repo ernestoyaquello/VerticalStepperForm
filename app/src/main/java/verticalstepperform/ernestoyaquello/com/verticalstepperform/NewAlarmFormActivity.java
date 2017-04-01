@@ -13,6 +13,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.util.Pair;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.Html;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -282,7 +283,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
     private View createFinalStep() {
         TextView tv = new TextView(this);
 
-        tv.setText("Final step abstract");
+        tv.setText(Html.fromHtml("Final step abstract<br>NuovaLinea"));
         return tv;
     }
 
