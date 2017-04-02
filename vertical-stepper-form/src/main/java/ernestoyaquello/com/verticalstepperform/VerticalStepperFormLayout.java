@@ -664,6 +664,12 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if(isNonLinear) {
+                    goToStepNonLinear((stepNumber + 1), false);
+                } else {
+                    goToStep((stepNumber + 1), false);
+                }
+
                 goToStep((stepNumber + 1), false);
             }
         });
