@@ -35,6 +35,7 @@ import java.util.List;
 
 import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperForm;
 import ernestoyaquello.com.verticalstepperform.utils.Animations;
+import ru.dimorinny.floatingtextbutton.FloatingTextButton;
 
 /**
  * Custom layout that implements a vertical stepper form
@@ -67,7 +68,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected List<View> stepContentViews;
     protected List<TextView> stepsTitlesViews;
     protected List<TextView> stepsSubtitlesViews;
-    protected AppCompatButton confirmationButton;
+    protected FloatingTextButton confirmationButton;
     protected ProgressBar progressBar;
     protected AppCompatImageButton previousStepButton, nextStepButton;
     protected RelativeLayout bottomNavigation;
@@ -196,7 +197,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         TextView stepNumberTextView = (TextView) stepHeader.findViewById(R.id.step_number);
         LinearLayout errorContainer = (LinearLayout) stepLayout.findViewById(R.id.error_container);
         TextView errorTextView = (TextView) errorContainer.findViewById(R.id.error_message);
-        AppCompatButton nextButton = (AppCompatButton) stepLayout.findViewById(R.id.next_step);
+        FloatingTextButton nextButton = (FloatingTextButton) stepLayout.findViewById(R.id.next_step);
 
         enableStepHeader(stepLayout);
 
@@ -233,8 +234,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
         ImageView stepDone = (ImageView) stepHeader.findViewById(R.id.step_done);
         TextView stepNumberTextView = (TextView) stepHeader.findViewById(R.id.step_number);
-        AppCompatButton nextButton = (AppCompatButton) stepLayout.findViewById(R.id.next_step);
-
+        FloatingTextButton nextButton = (FloatingTextButton) stepLayout.findViewById(R.id.next_step);
         stepDone.setVisibility(View.INVISIBLE);
         stepNumberTextView.setVisibility(View.VISIBLE);
 
@@ -588,14 +588,14 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected void setUpStepLayoutAsConfirmationStepLayout(LinearLayout stepLayout) {
         LinearLayout stepLeftLine = (LinearLayout) stepLayout.findViewById(R.id.vertical_line);
         LinearLayout stepLeftLine2 = (LinearLayout) stepLayout.findViewById(R.id.vertical_line_subtitle);
-        confirmationButton = (AppCompatButton) stepLayout.findViewById(R.id.next_step);
+        confirmationButton = (FloatingTextButton) stepLayout.findViewById(R.id.next_step);
 
         stepLeftLine.setVisibility(View.INVISIBLE);
         stepLeftLine2.setVisibility(View.INVISIBLE);
 
         disableConfirmationButton();
 
-        confirmationButton.setText( submitText);
+        confirmationButton.setTitle( submitText);
 
         confirmationButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -658,9 +658,9 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
             }
         });
 
-        AppCompatButton nextButton = (AppCompatButton) stepLayout.findViewById(R.id.next_step);
-        setButtonColor(nextButton,
-                buttonBackgroundColor, buttonTextColor, buttonPressedBackgroundColor, buttonPressedTextColor);
+        FloatingTextButton nextButton = (FloatingTextButton) stepLayout.findViewById(R.id.next_step);
+        nextButton.setBackgroundColor(buttonBackgroundColor);
+        nextButton.setTitleColor(buttonTextColor);
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

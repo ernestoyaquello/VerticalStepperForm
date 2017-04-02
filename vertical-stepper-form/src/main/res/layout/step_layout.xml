@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout  xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:layout_marginLeft="8dp"
     android:layout_marginStart="8dp">
@@ -174,12 +175,14 @@
             android:orientation="horizontal"
             android:layout_marginTop="12dp">
 
-            <android.support.v7.widget.AppCompatButton
+            <ru.dimorinny.floatingtextbutton.FloatingTextButton
                 android:id="@+id/next_step"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/vertical_form_stepper_form_continue"
-                android:textColor="#FFFFFF"
+                app:floating_title="@string/vertical_form_stepper_form_continue"
+                app:floating_title_color="#FFFFFF"
+                android:foreground="?attr/selectableItemBackground"
+                android:clickable="true"
                 android:layout_marginRight="8dp"
                 android:layout_marginEnd="8dp"/>
 
