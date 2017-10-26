@@ -56,6 +56,9 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected boolean materialDesignInDisabledSteps;
     protected boolean hideKeyboard;
     protected boolean showVerticalLineWhenStepsAreCollapsed;
+    protected boolean confirmationStepEnabled;
+    protected boolean defaultNextButtonsEnabled;
+
 
     // Views
     protected LayoutInflater mInflater;
@@ -391,6 +394,8 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.materialDesignInDisabledSteps = false;
         this.hideKeyboard = true;
         this.showVerticalLineWhenStepsAreCollapsed = false;
+        this.defaultNextButtonsEnabled = true;
+        this.confirmationStepEnabled = true;
 
         this.verticalStepperFormImplementation = verticalStepperForm;
         this.activity = activity;
@@ -443,7 +448,8 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.displayBottomNavigation = true;
         this.materialDesignInDisabledSteps = false;
         this.hideKeyboard = true;
-        this.showVerticalLineWhenStepsAreCollapsed = false;
+        this.showVerticalLineWhenStepsAreCollapsed = false;this.defaultNextButtonsEnabled = true;
+        this.confirmationStepEnabled = true;
 
         this.verticalStepperFormImplementation = verticalStepperForm;
         this.activity = activity;
@@ -470,6 +476,8 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.materialDesignInDisabledSteps = builder.materialDesignInDisabledSteps;
         this.hideKeyboard = builder.hideKeyboard;
         this.showVerticalLineWhenStepsAreCollapsed = builder.showVerticalLineWhenStepsAreCollapsed;
+        this.defaultNextButtonsEnabled = builder.defaultNextButtonsEnabled;
+        this.confirmationStepEnabled = builder.confirmationStepEnabled;
 
         initStepperForm(builder.steps, builder.stepsSubtitles);
     }
@@ -498,7 +506,9 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         }
         numberOfSteps = steps.length;
         setAuxVars();
-        addConfirmationStepToStepsList();
+        if (confirmationStepEnabled) {
+            addConfirmationStepToStepsList();
+        }
     }
 
     protected void registerListeners() {
@@ -633,15 +643,17 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
             }
         });
 
-        AppCompatButton nextButton = (AppCompatButton) stepLayout.findViewById(R.id.next_step);
-        setButtonColor(nextButton,
+        if (defaultNextButtonsEnabled) {
+            AppCompatButton nextButton = (AppCompatButton) stepLayout.findViewById(R.id.next_step);
+            setButtonColor(nextButton,
                 buttonBackgroundColor, buttonTextColor, buttonPressedBackgroundColor, buttonPressedTextColor);
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToStep((stepNumber + 1), false);
-            }
-        });
+            nextButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    goToStep((stepNumber + 1), false);
+                }
+            });
+        }
 
         stepLayouts.add(stepLayout);
 
@@ -1032,6 +1044,8 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         protected boolean materialDesignInDisabledSteps = false;
         protected boolean hideKeyboard = true;
         protected boolean showVerticalLineWhenStepsAreCollapsed = false;
+        protected boolean confirmationStepEnabled = true;
+        protected boolean defaultNextButtonsEnabled = true;
 
         protected Builder(VerticalStepperFormLayout stepperLayout,
                           String[] steps,
@@ -1229,6 +1243,32 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
          */
         public Builder alphaOfDisabledElements(float alpha) {
             this.alphaOfDisabledElements = alpha;
+            return this;
+        }
+
+        /**
+         * Specify whether an additional, last step to confirm and send data should be rendered.
+         * Defaults to true
+         *
+         * @param enabled true to add the confirmation step
+         * @return the builder instance
+         */
+        public Builder confirmationStepEnabled(boolean enabled) {
+            this.confirmationStepEnabled = enabled;
+            return this;
+        }
+
+        /**
+         * Specify whether to include a button with each step to navigate to the next step
+         *
+         * Defaults to true. Can be set to false if step views have their own next step navigation
+         * controls
+         *
+         * @param enabled true to include the next button
+         * @return the builder instance
+         */
+        public Builder defaultNextButtonsEnabled(boolean enabled) {
+            this.defaultNextButtonsEnabled = enabled;
             return this;
         }
 
