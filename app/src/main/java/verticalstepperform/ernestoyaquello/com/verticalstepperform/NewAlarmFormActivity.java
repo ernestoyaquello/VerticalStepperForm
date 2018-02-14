@@ -23,6 +23,9 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
 import ernestoyaquello.com.verticalstepperform.fragments.BackConfirmationFragment;
 import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperForm;
@@ -62,6 +65,8 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
     private ProgressDialog progressDialog;
     private VerticalStepperFormLayout verticalStepperForm;
 
+    VerticalStepperFormLayout.Builder builder;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,19 +87,19 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         // Vertical Stepper form vars
         int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
         int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
-        String[] stepsTitles = getResources().getStringArray(R.array.steps_titles);
+        String[] stepsTitles = getResources().getStringArray(R.array.steps_titles_night);
         //String[] stepsSubtitles = getResources().getStringArray(R.array.steps_subtitles);
 
         // Here we find and initialize the form
         verticalStepperForm = (VerticalStepperFormLayout) findViewById(R.id.vertical_stepper_form);
-        VerticalStepperFormLayout.Builder.newInstance(verticalStepperForm, stepsTitles, this, this)
+        builder = VerticalStepperFormLayout.Builder.newInstance(verticalStepperForm, stepsTitles, this, this)
                 //.stepsSubtitles(stepsSubtitles)
                 //.materialDesignInDisabledSteps(true) // false by default
                 //.showVerticalLineWhenStepsAreCollapsed(true) // false by default
                 .primaryColor(colorPrimary)
                 .primaryDarkColor(colorPrimaryDark)
-                .displayBottomNavigation(true)
-                .init();
+                .displayBottomNavigation(true);
+        builder.init();
 
     }
 
@@ -313,6 +318,8 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
                 String.valueOf(time.second) : ("0" + time.second));
         String time = hourString + ":" + minutesString;
         timeTextView.setText(time);
+
+        updateSectionsOnContinue();
     }
 
     private void activateDay(int index, LinearLayout dayLayout, boolean check) {
@@ -505,6 +512,17 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
 
         // The call to super method must be at the end here
         super.onRestoreInstanceState(savedInstanceState);
+    }
+
+    private void updateSectionsOnContinue() {
+
+        int timeValue = Integer.valueOf(timeTextView.getText().toString().split(":")[0]);
+        if (timeValue <= 8 || timeValue >= 21) {
+            verticalStepperForm.setStepAsEnabled(DAYS_STEP_NUM);
+        } else {
+            verticalStepperForm.setStepAsDisabled(DAYS_STEP_NUM);
+        }
+
     }
 
 }

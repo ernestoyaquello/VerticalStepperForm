@@ -18,6 +18,7 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -31,6 +32,9 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 
 import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperForm;
@@ -86,6 +90,8 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected Context context;
     protected Activity activity;
 
+    protected HashMap<Integer, Boolean> stepEnabledMap = new HashMap<>();
+
     public VerticalStepperFormLayout(Context context) {
         super(context);
         init(context);
@@ -107,11 +113,14 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         mInflater.inflate(R.layout.vertical_stepper_form_layout, this, true);
     }
 
+
     /**
      * Returns the title of a step
      * @param stepNumber The step number (counting from 0)
      * @return the title string
      */
+
+
     public String getStepTitle(int stepNumber) {
         return steps.get(stepNumber);
     }
@@ -331,7 +340,12 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
             boolean previousStepsAreCompleted =
                     arePreviousStepsCompleted(stepNumber);
             if (stepNumber == 0 || previousStepsAreCompleted) {
-                openStep(stepNumber, restoration);
+                if (stepEnabledMap.get(stepNumber)) {
+                    openStep(stepNumber, restoration);
+                } else {
+                    goToStep(stepNumber + 1, restoration);
+                }
+
             }
         }
     }
@@ -476,6 +490,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
     protected void initStepperForm(String[] stepsTitles, String[] stepsSubtitles) {
         setSteps(stepsTitles, stepsSubtitles);
+        setStepsMapInitially();
 
         List<View> stepContentLayouts = new ArrayList<>();
         for (int i = 0; i < numberOfSteps; i++) {
@@ -487,6 +502,12 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         initializeForm();
 
         verticalStepperFormImplementation.onStepOpening(activeStep);
+    }
+
+    private void setStepsMapInitially() {
+        for (int i = 0; i <= numberOfSteps; i++) {
+            stepEnabledMap.put(i, true);
+        }
     }
 
     protected void setSteps(String[] steps, String[] stepsSubtitles) {
@@ -554,11 +575,34 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         if (stepNumber < numberOfSteps) {
             // The content of the step is the corresponding custom view previously created
             RelativeLayout stepContent = (RelativeLayout) stepLayout.findViewById(R.id.step_content);
+
             stepContent.addView(stepContentViews.get(stepNumber));
+
         } else {
             setUpStepLayoutAsConfirmationStepLayout(stepLayout);
         }
         addStepToContent(stepLayout);
+    }
+
+    public void setStepAsDisabled(int stepNumber) {
+
+        View view = content.findViewWithTag(stepNumber);
+        view.setAlpha(0.5f);
+        view.setEnabled(false);
+
+        setStepAsCompleted(stepNumber);
+        stepEnabledMap.put(stepNumber, false);
+
+    }
+
+    public void setStepAsEnabled(int stepNumber) {
+
+        View view = content.findViewWithTag(stepNumber);
+        view.setAlpha(1.0f);
+        view.setEnabled(true);
+
+        setStepAsUncompleted(stepNumber, "");
+        stepEnabledMap.put(stepNumber, true);
     }
 
     protected void addStepToContent(LinearLayout stepLayout) {
@@ -588,7 +632,10 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     protected LinearLayout createStepLayout(final int stepNumber) {
+
         LinearLayout stepLayout = generateStepLayout();
+
+        stepLayout.setTag(stepNumber);
 
         LinearLayout circle = (LinearLayout) stepLayout.findViewById(R.id.circle);
         Drawable bg = ContextCompat.getDrawable(context, R.drawable.circle_step_done);
@@ -716,7 +763,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         bottomNavigation = (RelativeLayout) findViewById(R.id.bottom_navigation);
     }
 
-    protected void disableStepLayout(int stepNumber, boolean smoothieDisabling) {
+    public void disableStepLayout(int stepNumber, boolean smoothieDisabling) {
         LinearLayout stepLayout = stepLayouts.get(stepNumber);
         RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
         ImageView stepDone = (ImageView) stepHeader.findViewById(R.id.step_done);
@@ -746,7 +793,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
     }
 
-    protected void enableStepLayout(int stepNumber, boolean smoothieEnabling) {
+    public void enableStepLayout(int stepNumber, boolean smoothieEnabling) {
         LinearLayout stepLayout = stepLayouts.get(stepNumber);
         RelativeLayout stepContent = (RelativeLayout) stepLayout.findViewById(R.id.step_content);
         RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
