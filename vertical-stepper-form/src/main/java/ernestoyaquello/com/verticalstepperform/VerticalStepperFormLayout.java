@@ -18,6 +18,8 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -553,7 +555,12 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         LinearLayout stepLayout = createStepLayout(stepNumber);
         if (stepNumber < numberOfSteps) {
             // The content of the step is the corresponding custom view previously created
-            RelativeLayout stepContent = (RelativeLayout) stepLayout.findViewById(R.id.step_content);
+
+            RelativeLayout stepContent = stepLayout.findViewById(R.id.step_content);
+            ViewParent viewParent = stepContentViews.get(stepNumber).getParent();
+            // Check if it has a view parent.
+            if(viewParent != null)
+                ((ViewGroup) viewParent).removeView(stepContentViews.get(stepNumber));
             stepContent.addView(stepContentViews.get(stepNumber));
         } else {
             setUpStepLayoutAsConfirmationStepLayout(stepLayout);
