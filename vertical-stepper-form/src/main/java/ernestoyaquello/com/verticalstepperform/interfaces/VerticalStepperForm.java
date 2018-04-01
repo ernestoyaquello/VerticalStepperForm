@@ -23,4 +23,11 @@ public interface VerticalStepperForm {
      */
     void sendData();
 
+    /**
+     * This method will be called when the button for a step is clicked.
+     * This method is not called for the final 'confirm data' step.
+     * @param fromStepNumber the number of the step we are leaving
+     */
+    void onClickNextStep(int fromStepNumber);
+
 }
