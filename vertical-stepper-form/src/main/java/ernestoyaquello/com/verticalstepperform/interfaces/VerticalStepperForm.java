@@ -26,7 +26,7 @@ public interface VerticalStepperForm {
     /**
      * This method will be called when the button for a step is clicked.
      * This method is not called for the final 'confirm data' step.
-     * @param fromStepNumber the number of the step we are leaving
+     * @param fromStepNumber the number of the step we are leaving; Uses a zero-based index
      */
     void onClickNextStep(int fromStepNumber);
 

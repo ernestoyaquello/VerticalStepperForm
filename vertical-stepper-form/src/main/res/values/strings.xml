@@ -9,7 +9,4 @@
     <string name="vertical_form_stepper_form_last_step">Confirmation</string>
     <string name="vertical_form_stepper_form_sending_data_message">Sending data…</string>
     <string name="vertical_form_stepper_form_current_step_uncompleted_alert">Please complete the current field before continue</string>
-
-    <string name="vertical_form_stepper_form_down_previous">down_previous</string>
-    <string name="vertical_form_stepper_form_down_next">down_next</string>
 </resources>

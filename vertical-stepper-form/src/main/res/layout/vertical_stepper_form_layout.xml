@@ -16,7 +16,6 @@
         <android.support.v7.widget.AppCompatImageButton
             style="?android:attr/borderlessButtonStyle"
             android:id="@+id/down_previous"
-            android:tag="@string/vertical_form_stepper_form_down_previous"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/previous_step"
@@ -34,7 +33,6 @@
         <android.support.v7.widget.AppCompatImageButton
             style="?android:attr/borderlessButtonStyle"
             android:id="@+id/down_next"
-            android:tag="@string/vertical_form_stepper_form_down_next"
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:src="@drawable/next_step"

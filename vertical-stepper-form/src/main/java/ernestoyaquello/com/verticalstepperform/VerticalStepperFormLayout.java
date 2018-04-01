@@ -20,6 +20,7 @@ import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatImageButton;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -44,7 +45,7 @@ import ernestoyaquello.com.verticalstepperform.utils.Animations;
 /**
  * Custom layout that implements a vertical stepper form
  */
-public class VerticalStepperFormLayout extends RelativeLayout implements View.OnClickListener {
+public class VerticalStepperFormLayout extends RelativeLayout {
 
     // Style
     protected float alphaOfDisabledElements;
@@ -95,6 +96,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     // Context
     protected Context context;
     protected Activity activity;
+    protected NavigationClickListener navListener;
 
     public VerticalStepperFormLayout(Context context) {
         super(context);
@@ -113,8 +115,13 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
     protected void init(Context context) {
         this.context = context;
+        navListener = onCreateNavListener();
         mInflater = LayoutInflater.from(context);
         mInflater.inflate(R.layout.vertical_stepper_form_layout, this, true);
+    }
+
+    protected NavigationClickListener onCreateNavListener() {
+        return new NavigationClickListener(this);
     }
 
     /**
@@ -554,8 +561,10 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     protected void registerListeners() {
-        previousStepButton.setOnClickListener(this);
-        nextStepButton.setOnClickListener(this);
+        previousStepButton.setTag(NavigationClickListener.ACTION_PREVIOUS);
+        previousStepButton.setOnClickListener(navListener);
+        nextStepButton.setTag(NavigationClickListener.ACTION_NEXT);
+        nextStepButton.setOnClickListener(navListener);
     }
 
     protected void initializeForm() {
@@ -641,12 +650,8 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         } else {
             confirmationButton.setText(R.string.vertical_form_stepper_form_confirm_button);
         }
-        confirmationButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                prepareSendingAndSend();
-            }
-        });
+        confirmationButton.setTag(NavigationClickListener.ACTION_COMPLETE_FORM);
+        confirmationButton.setOnClickListener(navListener);
 
         // Some content could be added to the final step inside stepContent layout
         // RelativeLayout stepContent = (RelativeLayout) stepLayout.findViewById(R.id.step_content);
@@ -668,7 +673,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         stepsTitlesViews.add(stepNumber, stepTitle);
 
         TextView stepSubtitle = null;
-        if(stepsSubtitles != null && stepNumber < stepsSubtitles.size()) {
+        if (stepsSubtitles != null && stepNumber < stepsSubtitles.size()) {
             String subtitle = stepsSubtitles.get(stepNumber);
             if(subtitle != null && !subtitle.equals("")) {
                 stepSubtitle = (TextView) stepLayout.findViewById(R.id.step_subtitle);
@@ -692,12 +697,8 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         errorIcon.setColorFilter(errorMessageTextColor);
 
         RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
-        stepHeader.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToStep(stepNumber, false);
-            }
-        });
+        stepHeader.setTag(stepNumber);
+        stepHeader.setOnClickListener(navListener);
 
         createNextButton(inflater, stepNumber, stepLayout);
 
@@ -706,6 +707,9 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         return stepLayout;
     }
 
+    /**
+     * Create the next-step "continue" button for an individual step
+     */
     protected void createNextButton(@NonNull LayoutInflater inflater, final int stepNumber, @NonNull LinearLayout stepLayout) {
         AppCompatButton nextButton;
         if (customButtonLayout == -1) {
@@ -716,15 +720,8 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
             nextButton = (AppCompatButton) v.findViewById(customButtonId);
         }
         setButtonColor(nextButton, buttonBackgroundColor, buttonTextColor, buttonPressedBackgroundColor, buttonPressedTextColor);
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (verticalStepperFormImplementation != null) {
-                    verticalStepperFormImplementation.onClickNextStep(stepNumber);
-                }
-                goToStep((stepNumber + 1), false);
-            }
-        });
+        nextButton.setTag(NavigationClickListener.ACTION_NEXT);
+        nextButton.setOnClickListener(navListener);
         if (nextStepButtonTexts != null && nextStepButtonTexts.size() > stepNumber && nextStepButtonTexts.get(stepNumber) != null) {
             nextButton.setText(nextStepButtonTexts.get(stepNumber));
         }
@@ -738,6 +735,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected void openStep(int stepNumber, boolean restoration) {
         if (stepNumber >= 0 && stepNumber <= numberOfSteps) {
             activeStep = stepNumber;
+            Log.d(getClass().getSimpleName(), "Opened step " + activeStep);
 
             if (stepNumber == 0) {
                 disablePreviousButtonInBottomNavigationLayout();
@@ -1056,19 +1054,6 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     @Override
-    public void onClick(View v) {
-        String previousNavigationButtonTag =
-                context.getString(R.string.vertical_form_stepper_form_down_previous);
-        if (v.getTag().equals(previousNavigationButtonTag)) {
-            goToPreviousStep();
-        } else {
-            if (isActiveStepCompleted()) {
-                goToNextStep();
-            }
-        }
-    }
-
-    @Override
     public Parcelable onSaveInstanceState() {
         Bundle bundle = new Bundle();
         bundle.putParcelable("superState", super.onSaveInstanceState());
@@ -1356,6 +1341,65 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
          */
         public void init() {
             verticalStepperFormLayout.initialiseVerticalStepperForm(this);
+        }
+
+    }
+
+    public static class NavigationClickListener implements View.OnClickListener {
+
+        public static final int ACTION_NEXT = -4;
+        public static final int ACTION_PREVIOUS = -6;
+        public static final int ACTION_COMPLETE_FORM = -8;
+
+        private final VerticalStepperFormLayout vsf;
+
+        public NavigationClickListener(VerticalStepperFormLayout vsf) {
+            this.vsf = vsf;
+        }
+
+        @Override
+        public void onClick(View view) {
+            int integ = (int) view.getTag();
+            switch (integ) {
+                case ACTION_COMPLETE_FORM:
+                    onCompleteForm();
+                    break;
+                case ACTION_PREVIOUS:
+                    onDoPrev();
+                    break;
+                case ACTION_NEXT:
+                    onDoNext();
+                    break;
+                default:
+                    onDoJump(integ);
+            }
+
+        }
+
+        protected int getCurrentStep() {
+            return vsf.activeStep;
+        }
+
+        protected void onCompleteForm() {
+            vsf.prepareSendingAndSend();
+        }
+
+        protected void onDoPrev() {
+            vsf.goToPreviousStep();
+        }
+
+        protected void onDoJump(int toStep) {
+            vsf.goToStep(toStep, false);
+        }
+
+        protected void onDoNext() {
+            if (vsf.verticalStepperFormImplementation != null) {
+                vsf.verticalStepperFormImplementation.onClickNextStep(getCurrentStep());
+            }
+            //goToStep((stepNumber + 1), false);
+            if (vsf.isActiveStepCompleted()) {
+                vsf.goToNextStep();
+            }
         }
 
     }
