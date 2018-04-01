@@ -530,6 +530,10 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
                 nextStepButtonTexts.add(stepsButtonTexts[i]);
             }
         }
+        //Add a text to replace "Confirm Data", if we have it in the array
+        if (stepsButtonTexts != null && stepsButtonTexts.length > numberOfSteps) {
+            nextStepButtonTexts.add(stepsButtonTexts[numberOfSteps]);
+        }
         stepContentViews = stepContentLayouts;
 
         initializeForm();
@@ -632,7 +636,11 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
         disableConfirmationButton();
 
-        confirmationButton.setText(R.string.vertical_form_stepper_form_confirm_button);
+        if (nextStepButtonTexts != null && nextStepButtonTexts.size() > numberOfSteps && nextStepButtonTexts.get(numberOfSteps) != null) {
+            confirmationButton.setText(nextStepButtonTexts.get(numberOfSteps));
+        } else {
+            confirmationButton.setText(R.string.vertical_form_stepper_form_confirm_button);
+        }
         confirmationButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {

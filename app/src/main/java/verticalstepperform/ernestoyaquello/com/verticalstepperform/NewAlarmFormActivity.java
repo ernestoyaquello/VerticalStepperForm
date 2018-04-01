@@ -154,6 +154,11 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         executeDataSending();
     }
 
+    @Override
+    public void onClickNextStep(int fromStepNumber) {
+
+    }
+
     // OTHER METHODS USED TO MAKE THIS EXAMPLE WORK
 
     private void executeDataSending() {
