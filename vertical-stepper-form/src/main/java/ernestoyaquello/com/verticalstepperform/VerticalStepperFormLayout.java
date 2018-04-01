@@ -11,6 +11,9 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.IdRes;
+import android.support.annotation.LayoutRes;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatImageButton;
@@ -18,6 +21,7 @@ import android.util.AttributeSet;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -52,10 +56,13 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected int buttonTextColor;
     protected int buttonPressedTextColor;
     protected int errorMessageTextColor;
+    protected int bottomNavigationBackgroundColor;
     protected boolean displayBottomNavigation;
     protected boolean materialDesignInDisabledSteps;
     protected boolean hideKeyboard;
     protected boolean showVerticalLineWhenStepsAreCollapsed;
+    protected @LayoutRes int customButtonLayout;
+    protected @IdRes int customButtonId;
 
     // Views
     protected LayoutInflater mInflater;
@@ -181,6 +188,10 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         setStepAsUncompleted(activeStep, errorMessage);
     }
 
+    private AppCompatButton getNextStepButton(@NonNull LinearLayout stepLayout) {
+        return  (AppCompatButton) stepLayout.findViewById(customButtonLayout != -1 && customButtonId != -1? customButtonId : R.id.next_step);
+    }
+
     /**
      * Set the step as completed
      * @param stepNumber the step number (counting from 0)
@@ -194,7 +205,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         TextView stepNumberTextView = (TextView) stepHeader.findViewById(R.id.step_number);
         LinearLayout errorContainer = (LinearLayout) stepLayout.findViewById(R.id.error_container);
         TextView errorTextView = (TextView) errorContainer.findViewById(R.id.error_message);
-        AppCompatButton nextButton = (AppCompatButton) stepLayout.findViewById(R.id.next_step);
+        AppCompatButton nextButton = getNextStepButton(stepLayout);
 
         enableStepHeader(stepLayout);
 
@@ -231,7 +242,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
         ImageView stepDone = (ImageView) stepHeader.findViewById(R.id.step_done);
         TextView stepNumberTextView = (TextView) stepHeader.findViewById(R.id.step_number);
-        AppCompatButton nextButton = (AppCompatButton) stepLayout.findViewById(R.id.next_step);
+        AppCompatButton nextButton = getNextStepButton(stepLayout);
 
         stepDone.setVisibility(View.INVISIBLE);
         stepNumberTextView.setVisibility(View.VISIBLE);
@@ -452,10 +463,11 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     protected void initialiseVerticalStepperForm(Builder builder) {
-
+        this.customButtonLayout = builder.customButtonLayout;
+        this.customButtonId = builder.customButtonId;
         this.verticalStepperFormImplementation = builder.verticalStepperFormImplementation;
         this.activity = builder.activity;
-
+        this.bottomNavigationBackgroundColor = builder.bottomNavigationBackgroundColor;
         this.alphaOfDisabledElements = builder.alphaOfDisabledElements;
         this.stepNumberBackgroundColor = builder.stepNumberBackgroundColor;
         this.buttonBackgroundColor = builder.buttonBackgroundColor;
@@ -470,7 +482,6 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.materialDesignInDisabledSteps = builder.materialDesignInDisabledSteps;
         this.hideKeyboard = builder.hideKeyboard;
         this.showVerticalLineWhenStepsAreCollapsed = builder.showVerticalLineWhenStepsAreCollapsed;
-
         initStepperForm(builder.steps, builder.stepsSubtitles);
     }
 
@@ -510,7 +521,9 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         stepsTitlesViews = new ArrayList<>();
         stepsSubtitlesViews = new ArrayList<>();
         setUpSteps();
-        if (!displayBottomNavigation) {
+        if (displayBottomNavigation) {
+            styleBottomNavigation();
+        } else {
             hideBottomNavigation();
         }
         goToStep(0, true);
@@ -537,6 +550,12 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
     protected void hideBottomNavigation() {
         bottomNavigation.setVisibility(View.GONE);
+    }
+
+    protected void styleBottomNavigation() {
+        if (bottomNavigationBackgroundColor != -1) {
+            bottomNavigation.setBackgroundColor(bottomNavigationBackgroundColor);
+        }
     }
 
     protected void setUpSteps() {
@@ -568,7 +587,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected void setUpStepLayoutAsConfirmationStepLayout(LinearLayout stepLayout) {
         LinearLayout stepLeftLine = (LinearLayout) stepLayout.findViewById(R.id.vertical_line);
         LinearLayout stepLeftLine2 = (LinearLayout) stepLayout.findViewById(R.id.vertical_line_subtitle);
-        confirmationButton = (AppCompatButton) stepLayout.findViewById(R.id.next_step);
+        confirmationButton = getNextStepButton(stepLayout);
 
         stepLeftLine.setVisibility(View.INVISIBLE);
         stepLeftLine2.setVisibility(View.INVISIBLE);
@@ -588,7 +607,8 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     protected LinearLayout createStepLayout(final int stepNumber) {
-        LinearLayout stepLayout = generateStepLayout();
+        LayoutInflater inflater = LayoutInflater.from(context);
+        LinearLayout stepLayout = generateStepLayout(inflater);
 
         LinearLayout circle = (LinearLayout) stepLayout.findViewById(R.id.circle);
         Drawable bg = ContextCompat.getDrawable(context, R.drawable.circle_step_done);
@@ -633,23 +653,32 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
             }
         });
 
-        AppCompatButton nextButton = (AppCompatButton) stepLayout.findViewById(R.id.next_step);
-        setButtonColor(nextButton,
-                buttonBackgroundColor, buttonTextColor, buttonPressedBackgroundColor, buttonPressedTextColor);
-        nextButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToStep((stepNumber + 1), false);
-            }
-        });
+        createNextButton(inflater, stepNumber, stepLayout);
 
         stepLayouts.add(stepLayout);
 
         return stepLayout;
     }
 
-    protected LinearLayout generateStepLayout() {
-        LayoutInflater inflater = LayoutInflater.from(context);
+    protected void createNextButton(@NonNull LayoutInflater inflater, final int stepNumber, @NonNull LinearLayout stepLayout) {
+        AppCompatButton nextButton;
+        if (customButtonLayout == -1) {
+            View v = inflater.inflate(R.layout.step_layout_next_button, (ViewGroup) stepLayout.findViewById(R.id.next_step_button_insert), true);
+            nextButton = (AppCompatButton) v.findViewById(R.id.next_step);
+        } else {
+            View v = inflater.inflate(customButtonLayout, (ViewGroup) stepLayout.findViewById(R.id.next_step_button_insert), true);
+            nextButton = (AppCompatButton) v.findViewById(customButtonId);
+        }
+        setButtonColor(nextButton, buttonBackgroundColor, buttonTextColor, buttonPressedBackgroundColor, buttonPressedTextColor);
+        nextButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                goToStep((stepNumber + 1), false);
+            }
+        });
+    }
+
+    protected LinearLayout generateStepLayout(@NonNull LayoutInflater inflater) {
         return (LinearLayout) inflater.inflate(R.layout.step_layout, content, false);
     }
 
@@ -1028,16 +1057,18 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         protected int buttonTextColor = Color.rgb(255, 255, 255);
         protected int buttonPressedTextColor = Color.rgb(255, 255, 255);
         protected int errorMessageTextColor = Color.rgb(175, 18, 18);
+        protected int bottomNavigationBackgroundColor = -1;
         protected boolean displayBottomNavigation = true;
         protected boolean materialDesignInDisabledSteps = false;
         protected boolean hideKeyboard = true;
         protected boolean showVerticalLineWhenStepsAreCollapsed = false;
+        protected @LayoutRes int customButtonLayout = -1;
+        protected @IdRes int customButtonId = -1;
 
         protected Builder(VerticalStepperFormLayout stepperLayout,
                           String[] steps,
                           VerticalStepperForm stepperImplementation,
                           Activity activity) {
-
             this.verticalStepperFormLayout = stepperLayout;
             this.steps = steps;
             this.verticalStepperFormImplementation = stepperImplementation;
@@ -1093,6 +1124,16 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         }
 
         /**
+         * Set the color of the bottom navigation bar
+         * @param color backgroudn color
+         * @return the builder instance
+         */
+        public Builder bottomNavBackgroundColor(int color) {
+            this.bottomNavigationBackgroundColor = color;
+            return this;
+        }
+
+        /**
          * Set the background color of the left circles
          * @param stepNumberBackgroundColor background color of the left circles
          * @return the builder instance
@@ -1119,6 +1160,20 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
          */
         public Builder buttonPressedBackgroundColor(int buttonPressedBackgroundColor) {
             this.buttonPressedBackgroundColor = buttonPressedBackgroundColor;
+            return this;
+        }
+
+        /**
+         * Use a custom view in place of the usual "Continue" buttons
+         * @param customLayoutRes a resource for a custom layout file
+         * @param appCompatButtonId because the custom layout can be a compound view, you must specify
+         *                       the id of the AppCompatButton to apply the click listener to.
+         *                       Any colours set in the builder will also be applied.
+         * @return the builder instance
+         */
+        public Builder buttonCustomLayout(@LayoutRes int customLayoutRes, @IdRes int appCompatButtonId) {
+            this.customButtonLayout = customLayoutRes;
+            this.customButtonId = appCompatButtonId;
             return this;
         }
 
