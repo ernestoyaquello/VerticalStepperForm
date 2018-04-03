@@ -21,7 +21,6 @@ import android.support.v7.widget.AppCompatButton;
 import android.support.v7.widget.AppCompatImageButton;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -46,6 +45,7 @@ import ernestoyaquello.com.verticalstepperform.utils.Animations;
 /**
  * Custom layout that implements a vertical stepper form
  */
+@SuppressWarnings("unused")
 public class VerticalStepperFormLayout extends RelativeLayout {
 
     // Style
@@ -265,12 +265,11 @@ public class VerticalStepperFormLayout extends RelativeLayout {
         TextView stepNumberTextView = (TextView) stepHeader.findViewById(R.id.step_number);
         LinearLayout errorContainer = (LinearLayout) stepLayout.findViewById(R.id.error_container);
         TextView errorTextView = (TextView) errorContainer.findViewById(R.id.error_message);
-        AppCompatButton nextButton = getNextStepButton(stepLayout);
+
 
         enableStepHeader(stepLayout);
 
-        nextButton.setEnabled(true);
-        nextButton.setAlpha(1);
+        setStepNextButtonAsCompleted(stepLayout);
 
         if (stepNumber != activeStep) {
             stepDone.setVisibility(View.VISIBLE);
@@ -288,6 +287,23 @@ public class VerticalStepperFormLayout extends RelativeLayout {
         Animations.slideUp(errorContainer);
 
         displayCurrentProgress();
+    }
+
+    /**
+     * Enable the button for current step without clearing anything else
+     */
+    public void setActiveNextStepButtonAsCompleted() {
+        setStepNextButtonAsCompleted(activeStep);
+    }
+
+    protected void setStepNextButtonAsCompleted(int stepNumber) {
+        setStepNextButtonAsCompleted(stepLayouts.get(stepNumber));
+    }
+
+    protected void setStepNextButtonAsCompleted(LinearLayout stepLayout) {
+        AppCompatButton nextButton = getNextStepButton(stepLayout);
+        nextButton.setEnabled(true);
+        nextButton.setAlpha(1);
     }
 
     /**
@@ -685,9 +701,13 @@ public class VerticalStepperFormLayout extends RelativeLayout {
 
         LinearLayout circle = (LinearLayout) stepLayout.findViewById(R.id.circle);
         Drawable bg = ContextCompat.getDrawable(context, R.drawable.circle_step_done);
-        bg.setColorFilter(new PorterDuffColorFilter(
-                stepNumberBackgroundColor, PorterDuff.Mode.SRC_IN));
-        circle.setBackground(bg);
+        if (bg != null) {
+            bg.setColorFilter(new PorterDuffColorFilter(
+                    stepNumberBackgroundColor, PorterDuff.Mode.SRC_IN));
+            circle.setBackground(bg);
+        } else {
+            circle.setBackgroundResource(R.drawable.circle_step_done);
+        }
 
         TextView stepTitle = (TextView) stepLayout.findViewById(R.id.step_title);
         stepTitle.setText(steps.get(stepNumber));
@@ -781,7 +801,7 @@ public class VerticalStepperFormLayout extends RelativeLayout {
 
             scrollToActiveStep(!restoration);
 
-            if (stepNumber == numberOfSteps) {
+            if (isValidateOnButtonPress || stepNumber == numberOfSteps) {
                 setStepAsCompleted(stepNumber);
             }
 
@@ -969,7 +989,9 @@ public class VerticalStepperFormLayout extends RelativeLayout {
         View view = activity.getCurrentFocus();
         if (view != null) {
             InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            if (imm != null) {
+                imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            }
         }
     }
 
@@ -1038,7 +1060,11 @@ public class VerticalStepperFormLayout extends RelativeLayout {
     protected void setStepCircleBackgroundColor(LinearLayout stepLayout, int color) {
         LinearLayout circle = (LinearLayout) stepLayout.findViewById(R.id.circle);
         Drawable bg = ContextCompat.getDrawable(context, R.drawable.circle_step_done);
-        bg.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));
+        if (bg != null) {
+            bg.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));
+        } else {
+            circle.setBackgroundResource(R.drawable.circle_step_done);
+        }
         circle.setBackground(bg);
     }
 
@@ -1097,6 +1123,7 @@ public class VerticalStepperFormLayout extends RelativeLayout {
         super.onRestoreInstanceState(state);
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class Builder {
 
         // Required parameters
@@ -1367,6 +1394,7 @@ public class VerticalStepperFormLayout extends RelativeLayout {
 
     }
 
+    @SuppressWarnings("WeakerAccess")
     public static class NavigationClickListener implements View.OnClickListener {
 
         public static final int ACTION_NEXT = -4;
@@ -1416,11 +1444,18 @@ public class VerticalStepperFormLayout extends RelativeLayout {
 
         protected void onDoNext() {
             if (vsf.verticalStepperFormImplementation != null) {
-                vsf.verticalStepperFormImplementation.onClickNextStep(getCurrentStep());
+                //Note: at this point vsf.isActiveStepCompleted() can return false,
+                //onClickNextStep will then revalidate, and by the following statement,
+                //vsf.isActiveStepCompleted() may be true
+                vsf.verticalStepperFormImplementation.onClickNextStep(getCurrentStep(), vsf.isActiveStepCompleted());
             }
             //goToStep((stepNumber + 1), false);
             if (vsf.isActiveStepCompleted()) {
                 vsf.goToNextStep();
+            } else {
+                //NOTE: do NOT go to next step - but DO re-enable the button
+                //NOTE: cannot just setActiveStepAsCompleted because it clears the error text!!
+                vsf.setActiveNextStepButtonAsCompleted();
             }
         }
 

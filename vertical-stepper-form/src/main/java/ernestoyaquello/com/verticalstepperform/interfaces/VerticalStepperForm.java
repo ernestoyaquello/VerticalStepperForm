@@ -26,8 +26,14 @@ public interface VerticalStepperForm {
     /**
      * This method will be called when the button for a step is clicked.
      * This method is not called for the final 'confirm data' step.
+     *
+     * Contract: Although this method does not return a value, if the validation mode
+     *    is next_press, you should change the validation state of the current step
+     *    within this callback
+     *
      * @param fromStepNumber the number of the step we are leaving; Uses a zero-based index
+     * @param isCurrentStepValid true if the step is currently reporting as valid
      */
-    void onClickNextStep(int fromStepNumber);
+    void onClickNextStep(int fromStepNumber, boolean isCurrentStepValid);
 
 }
