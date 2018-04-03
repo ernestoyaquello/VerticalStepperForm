@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="VerticalStepperFormLayout">
+        <attr name="validationMode" format="enum">
+            <enum name="step_open" value="0"/>
+            <enum name="next_press" value="1"/>
+        </attr>
+    </declare-styleable>
+
+</resources>

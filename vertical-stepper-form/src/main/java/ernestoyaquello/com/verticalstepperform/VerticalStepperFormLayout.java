@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.content.res.Resources;
+import android.content.res.TypedArray;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -65,6 +66,11 @@ public class VerticalStepperFormLayout extends RelativeLayout {
     protected boolean showVerticalLineWhenStepsAreCollapsed;
     protected @LayoutRes int customButtonLayout;
     protected @IdRes int customButtonId;
+    /**
+     * true = Late validation, button always enabled but only takes action if step is valid
+     * false =  on-step-open validation, button enabled once step is valid
+     */
+    protected boolean isValidateOnButtonPress = false;
 
     // Views
     protected LayoutInflater mInflater;
@@ -100,21 +106,38 @@ public class VerticalStepperFormLayout extends RelativeLayout {
 
     public VerticalStepperFormLayout(Context context) {
         super(context);
-        init(context);
+        init(context, null);
     }
 
     public VerticalStepperFormLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
-        init(context);
+        init(context, attrs);
     }
 
     public VerticalStepperFormLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        init(context);
+        init(context, attrs);
     }
 
-    protected void init(Context context) {
+    protected void init(Context context, @Nullable AttributeSet attrs) {
         this.context = context;
+            if (attrs != null) {
+            TypedArray a = context.getTheme().obtainStyledAttributes(attrs,
+                    R.styleable.VerticalStepperFormLayout, 0, 0);
+            if (a.hasValue(R.styleable.VerticalStepperFormLayout_validationMode)) {
+                int value = a.getInt(R.styleable.VerticalStepperFormLayout_validationMode, 0);
+                //noinspection RedundantIfStatement - so we can be explicit with comments
+                if (value == 1) {
+                    //NOTE: VALIDATE FROM BUTTON-PRESS
+                    isValidateOnButtonPress = true;
+                } else {
+                    //NOTE: VALIDATE BY DEFAULT STEP-OPENING/USER-ACTIONS
+                    isValidateOnButtonPress = false;
+                }
+            }
+
+            a.recycle();
+        }
         navListener = onCreateNavListener();
         mInflater = LayoutInflater.from(context);
         mInflater.inflate(R.layout.vertical_stepper_form_layout, this, true);
@@ -376,8 +399,7 @@ public class VerticalStepperFormLayout extends RelativeLayout {
             if(hideKeyboard) {
                 hideSoftKeyboard();
             }
-            boolean previousStepsAreCompleted =
-                    arePreviousStepsCompleted(stepNumber);
+            boolean previousStepsAreCompleted = arePreviousStepsCompleted(stepNumber);
             if (stepNumber == 0 || previousStepsAreCompleted) {
                 openStep(stepNumber, restoration);
             }
@@ -735,7 +757,7 @@ public class VerticalStepperFormLayout extends RelativeLayout {
     protected void openStep(int stepNumber, boolean restoration) {
         if (stepNumber >= 0 && stepNumber <= numberOfSteps) {
             activeStep = stepNumber;
-            Log.d(getClass().getSimpleName(), "Opened step " + activeStep);
+            //Log.d(getClass().getSimpleName(), "Opened step " + activeStep);
 
             if (stepNumber == 0) {
                 disablePreviousButtonInBottomNavigationLayout();
@@ -749,8 +771,8 @@ public class VerticalStepperFormLayout extends RelativeLayout {
                 disableNextButtonInBottomNavigationLayout();
             }
 
-            for(int i = 0; i <= numberOfSteps; i++) {
-                if(i != stepNumber) {
+            for (int i = 0; i <= numberOfSteps; i++) {
+                if (i != stepNumber) {
                     disableStepLayout(i, !restoration);
                 } else {
                     enableStepLayout(i, !restoration);

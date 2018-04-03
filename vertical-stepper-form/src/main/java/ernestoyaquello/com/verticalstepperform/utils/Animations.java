@@ -53,7 +53,7 @@ public class Animations {
     }
 
     public static void slideUp(final View v) {
-        if(v.getVisibility() == View.VISIBLE) {
+        if (v.getVisibility() == View.VISIBLE) {
 
             final int initialHeight = v.getMeasuredHeight();
 
