@@ -1452,7 +1452,7 @@ public class VerticalStepperFormLayout extends RelativeLayout {
             //goToStep((stepNumber + 1), false);
             if (vsf.isActiveStepCompleted()) {
                 vsf.goToNextStep();
-            } else {
+            } else if (vsf.isValidateOnButtonPress) {
                 //NOTE: do NOT go to next step - but DO re-enable the button
                 //NOTE: cannot just setActiveStepAsCompleted because it clears the error text!!
                 vsf.setActiveNextStepButtonAsCompleted();
