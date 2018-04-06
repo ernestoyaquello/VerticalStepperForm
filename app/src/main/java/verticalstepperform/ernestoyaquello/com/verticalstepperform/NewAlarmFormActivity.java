@@ -155,8 +155,8 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
     }
 
     @Override
-    public void onClickNextStep(int fromStepNumber) {
-
+    public void onClickNextStep(int fromStepNumber, boolean isCurrentStepValid) {
+        //do nothing right now
     }
 
     // OTHER METHODS USED TO MAKE THIS EXAMPLE WORK

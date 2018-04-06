@@ -2,10 +2,34 @@
 <resources>
 
     <declare-styleable name="VerticalStepperFormLayout">
-        <attr name="validationMode" format="enum">
+
+        <!-- NOTE: Everything is prefixed step so as not to conflict with other resources
+                   (such as errorColor in support libraries)  -->
+        <attr name="stepValidationMode" format="enum">
             <enum name="step_open" value="0"/>
             <enum name="next_press" value="1"/>
         </attr>
+
+        <attr name="stepPrimaryColor" format="reference" />
+        <attr name="stepPrimaryDarkColor" format="reference" />
+        <attr name="stepErrorIcon" format="reference" default="@drawable/ic_error" />
+        <attr name="stepErrorColor" format="reference" />
+        <attr name="stepNumberBackgroundColor" format="reference" />
+        <attr name="stepButtonBackgroundColor" format="reference" />
+        <attr name="stepButtonPressedBackgroundColor" format="reference" />
+        <attr name="stepNumberTextColor" format="reference" />
+        <attr name="stepTitleTextColor" format="reference" />
+        <attr name="stepSubtitleTextColor" format="reference" />
+        <attr name="stepButtonTextColor" format="reference" />
+        <attr name="stepButtonPressedTextColor" format="reference" />
+        <attr name="stepBottomNavigationBackgroundColor" format="reference" />
+
+        <attr name="stepButtonText" format="string" default="@string/vertical_form_stepper_form_continue" />
+        <attr name="stepsButtonTexts" format="reference" default="@null" />
+        <attr name="stepButtonCustomLayout" format="reference" default="@null" />
+        <attr name="stepButtonCustomId" format="reference" default="@null" />
+        <attr name="stepperDisplayBottomNavigation" format="boolean" default="true" />
+
     </declare-styleable>
 
 </resources>

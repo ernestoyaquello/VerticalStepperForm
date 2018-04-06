@@ -12,6 +12,9 @@ import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.os.Parcelable;
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.LayoutRes;
 import android.support.annotation.NonNull;
@@ -49,28 +52,30 @@ import ernestoyaquello.com.verticalstepperform.utils.Animations;
 public class VerticalStepperFormLayout extends RelativeLayout {
 
     // Style
-    protected float alphaOfDisabledElements;
-    protected int stepNumberBackgroundColor;
-    protected int buttonBackgroundColor;
-    protected int buttonPressedBackgroundColor;
-    protected int stepNumberTextColor;
-    protected int stepTitleTextColor;
-    protected int stepSubtitleTextColor;
-    protected int buttonTextColor;
-    protected int buttonPressedTextColor;
-    protected int errorMessageTextColor;
-    protected int bottomNavigationBackgroundColor;
-    protected boolean displayBottomNavigation;
-    protected boolean materialDesignInDisabledSteps;
-    protected boolean hideKeyboard;
-    protected boolean showVerticalLineWhenStepsAreCollapsed;
-    protected @LayoutRes int customButtonLayout;
-    protected @IdRes int customButtonId;
+    protected @ColorInt int stepNumberBackgroundColor = -1;
+    protected @ColorInt int buttonBackgroundColor = -1;
+    protected @ColorInt int buttonPressedBackgroundColor = -1;
+    protected @ColorInt int stepNumberTextColor = -1;
+    protected @ColorInt int stepTitleTextColor = -1;
+    protected @ColorInt int stepSubtitleTextColor = -1;
+    protected @ColorInt int buttonTextColor = -1;
+    protected @ColorInt int buttonPressedTextColor = -1;
+    protected @ColorInt int bottomNavigationBackgroundColor = -1;
+    protected @ColorInt int errorMessageTextColor = -1;
+    protected @DrawableRes int errorIcon = -1;
+    protected @LayoutRes int customButtonLayout = -1;
+    protected @IdRes int customButtonId = -1;
+    protected float alphaOfDisabledElements = -1;
+    protected boolean displayBottomNavigation = true;
+    protected boolean materialDesignInDisabledSteps = false;
+    protected boolean hideKeyboard = true;
+    protected boolean showVerticalLineWhenStepsAreCollapsed = false;
     /**
      * true = Late validation, button always enabled but only takes action if step is valid
      * false =  on-step-open validation, button enabled once step is valid
      */
     protected boolean isValidateOnButtonPress = false;
+    protected String customButtonText = null;
 
     // Views
     protected LayoutInflater mInflater;
@@ -89,7 +94,7 @@ public class VerticalStepperFormLayout extends RelativeLayout {
     // Data
     protected List<String> steps;
     protected List<String> stepsSubtitles;
-    @Nullable protected List<String> nextStepButtonTexts;
+    @Nullable protected List<CharSequence> nextStepButtonTexts;
 
     // Logic
     protected int activeStep = 0;
@@ -121,11 +126,11 @@ public class VerticalStepperFormLayout extends RelativeLayout {
 
     protected void init(Context context, @Nullable AttributeSet attrs) {
         this.context = context;
-            if (attrs != null) {
+        if (attrs != null) {
             TypedArray a = context.getTheme().obtainStyledAttributes(attrs,
                     R.styleable.VerticalStepperFormLayout, 0, 0);
-            if (a.hasValue(R.styleable.VerticalStepperFormLayout_validationMode)) {
-                int value = a.getInt(R.styleable.VerticalStepperFormLayout_validationMode, 0);
+            if (a.hasValue(R.styleable.VerticalStepperFormLayout_stepValidationMode)) {
+                int value = a.getInt(R.styleable.VerticalStepperFormLayout_stepValidationMode, 0);
                 //noinspection RedundantIfStatement - so we can be explicit with comments
                 if (value == 1) {
                     //NOTE: VALIDATE FROM BUTTON-PRESS
@@ -135,12 +140,114 @@ public class VerticalStepperFormLayout extends RelativeLayout {
                     isValidateOnButtonPress = false;
                 }
             }
-
+            initColoursFromAttrs(context, attrs, a);
+            if (a.hasValue(R.styleable.VerticalStepperFormLayout_stepErrorIcon)) {
+                @DrawableRes int res = a.getResourceId(R.styleable.VerticalStepperFormLayout_stepErrorIcon, -1);
+                if (res != 0 && res != -1) {
+                    errorIcon = res;
+                }
+            }
+            initCustomButtonFromAttrs(context, attrs, a);
+            initButtonTextFromAttrs(context, attrs, a);
+            if (a.hasValue(R.styleable.VerticalStepperFormLayout_stepperDisplayBottomNavigation)) {
+                displayBottomNavigation = a.getBoolean(R.styleable.VerticalStepperFormLayout_stepperDisplayBottomNavigation, true);
+            }
             a.recycle();
         }
         navListener = onCreateNavListener();
         mInflater = LayoutInflater.from(context);
         mInflater.inflate(R.layout.vertical_stepper_form_layout, this, true);
+    }
+
+    protected void initCustomButtonFromAttrs(Context context, @Nullable AttributeSet attrs, TypedArray a) {
+        boolean hasCustomLayout = a.hasValue(R.styleable.VerticalStepperFormLayout_stepButtonCustomLayout);
+        boolean hasCustomId = a.hasValue(R.styleable.VerticalStepperFormLayout_stepButtonCustomId);
+        if (hasCustomId != hasCustomLayout) {
+            throw new RuntimeException("stepButtonCustomLayout and stepButtonCustomId must only be set together (you cannot set only one)");
+        } else //noinspection ConstantConditions
+            if (hasCustomLayout && hasCustomId) {
+                @LayoutRes int layoutRes = a.getResourceId(R.styleable.VerticalStepperFormLayout_stepButtonCustomLayout, -1);
+                @IdRes int idRes = a.getResourceId(R.styleable.VerticalStepperFormLayout_stepButtonCustomId, -1);
+                if (layoutRes != 0 && layoutRes != -1 && idRes != 0 && idRes != -1) {
+                    customButtonLayout = layoutRes;
+                    customButtonId = idRes;
+                } else {
+                    throw new RuntimeException("stepButtonCustomLayout and stepButtonCustomId must only be set together (you cannot set or use -1 for only one)");
+                }
+            }
+    }
+
+    protected void initButtonTextFromAttrs(Context context, @Nullable AttributeSet attrs, TypedArray a) {
+        if (a.hasValue(R.styleable.VerticalStepperFormLayout_stepButtonText)) {
+            String string = a.getString(R.styleable.VerticalStepperFormLayout_stepButtonText);
+            if (string != null && !"".equals(string)) {
+                customButtonText = string;
+            }
+        }
+        //NOTE: stepsButtonTexts (string array) overrides stepButtonText (single string)
+        if (a.hasValue(R.styleable.VerticalStepperFormLayout_stepsButtonTexts)) {
+            CharSequence[] array = a.getTextArray(R.styleable.VerticalStepperFormLayout_stepsButtonTexts);
+            if (array != null) {
+                nextStepButtonTexts = Arrays.asList(array);
+            }
+        }
+    }
+
+    protected void initColoursFromAttrs(Context context, @Nullable AttributeSet attrs, TypedArray a) {
+        @ColorRes int res;
+        //Primary colours
+        res = a.getResourceId(R.styleable.VerticalStepperFormLayout_stepPrimaryColor, -1);
+        if (res != 0 && res != -1) {
+            @ColorInt int resolvedColour = ContextCompat.getColor(context, res);
+            this.stepNumberBackgroundColor = resolvedColour;
+            this.buttonBackgroundColor = resolvedColour;
+        }
+        res = a.getResourceId(R.styleable.VerticalStepperFormLayout_stepPrimaryDarkColor, -1);
+        if (res != 0 && res != -1) {
+            @ColorInt int resolvedColour = ContextCompat.getColor(context, res);
+            this.buttonPressedBackgroundColor = resolvedColour;
+        }
+        //Individual colours (override the primary colours)
+        res = a.getResourceId(R.styleable.VerticalStepperFormLayout_stepErrorColor, -1);
+        if (res != 0 && res != -1) { //Note: do NOT change to greater than - it's wrong for ColorRes
+            errorMessageTextColor = ContextCompat.getColor(context, res);
+        }
+        res = a.getResourceId(R.styleable.VerticalStepperFormLayout_stepNumberBackgroundColor, -1);
+        if (res != 0 && res != -1) {
+            stepNumberBackgroundColor = ContextCompat.getColor(context, res);
+        }
+        res = a.getResourceId(R.styleable.VerticalStepperFormLayout_stepButtonBackgroundColor, -1);
+        if (res != 0 && res != -1) {
+            buttonBackgroundColor = ContextCompat.getColor(context, res);
+        }
+        res = a.getResourceId(R.styleable.VerticalStepperFormLayout_stepButtonPressedBackgroundColor, -1);
+        if (res != 0 && res != -1) {
+            buttonPressedBackgroundColor = ContextCompat.getColor(context, res);
+        }
+        res = a.getResourceId(R.styleable.VerticalStepperFormLayout_stepNumberTextColor, -1);
+        if (res != 0 && res != -1) {
+            stepNumberTextColor = ContextCompat.getColor(context, res);
+        }
+        res = a.getResourceId(R.styleable.VerticalStepperFormLayout_stepTitleTextColor, -1);
+        if (res != 0 && res != -1) {
+            stepTitleTextColor = ContextCompat.getColor(context, res);
+        }
+        res = a.getResourceId(R.styleable.VerticalStepperFormLayout_stepSubtitleTextColor, -1);
+        if (res != 0 && res != -1) {
+            stepSubtitleTextColor = ContextCompat.getColor(context, res);
+        }
+        res = a.getResourceId(R.styleable.VerticalStepperFormLayout_stepButtonTextColor, -1);
+        if (res != 0 && res != -1) {
+            buttonTextColor = ContextCompat.getColor(context, res);
+        }
+        res = a.getResourceId(R.styleable.VerticalStepperFormLayout_stepButtonPressedTextColor, -1);
+        if (res != 0 && res != -1) {
+            buttonPressedTextColor = ContextCompat.getColor(context, res);
+        }
+        res = a.getResourceId(R.styleable.VerticalStepperFormLayout_stepBottomNavigationBackgroundColor, -1);
+        if (res != 0 && res != -1) {
+            bottomNavigationBackgroundColor = ContextCompat.getColor(context, res);
+        }
     }
 
     protected NavigationClickListener onCreateNavListener() {
@@ -173,7 +280,7 @@ public class VerticalStepperFormLayout extends RelativeLayout {
      * @param stepNumber The step number (counting from 0)
      * @return the button text string
      */
-    public String getNextStepButtonText(int stepNumber) {
+    public CharSequence getNextStepButtonText(int stepNumber) {
         if (nextStepButtonTexts != null) {
             return nextStepButtonTexts.get(stepNumber);
         }
@@ -459,10 +566,8 @@ public class VerticalStepperFormLayout extends RelativeLayout {
      */
     @Deprecated
     public void initialiseVerticalStepperForm(String[] stepsTitles,
-                                              int colorPrimary, int colorPrimaryDark,
-                                              VerticalStepperForm verticalStepperForm,
-                                              Activity activity) {
-
+                                              @ColorInt int colorPrimary, @ColorInt int colorPrimaryDark,
+                                              VerticalStepperForm verticalStepperForm, Activity activity) {
         this.alphaOfDisabledElements = 0.25f;
         this.buttonTextColor = Color.rgb(255, 255, 255);
         this.buttonPressedTextColor = Color.rgb(255, 255, 255);
@@ -477,10 +582,8 @@ public class VerticalStepperFormLayout extends RelativeLayout {
         this.materialDesignInDisabledSteps = false;
         this.hideKeyboard = true;
         this.showVerticalLineWhenStepsAreCollapsed = false;
-
         this.verticalStepperFormImplementation = verticalStepperForm;
         this.activity = activity;
-
         initStepperForm(stepsTitles, null, null);
     }
 
@@ -538,25 +641,91 @@ public class VerticalStepperFormLayout extends RelativeLayout {
     }
 
     protected void initialiseVerticalStepperForm(Builder builder) {
-        this.customButtonLayout = builder.customButtonLayout;
-        this.customButtonId = builder.customButtonId;
-        this.verticalStepperFormImplementation = builder.verticalStepperFormImplementation;
+        //Required attributes
         this.activity = builder.activity;
-        this.bottomNavigationBackgroundColor = builder.bottomNavigationBackgroundColor;
-        this.alphaOfDisabledElements = builder.alphaOfDisabledElements;
-        this.stepNumberBackgroundColor = builder.stepNumberBackgroundColor;
-        this.buttonBackgroundColor = builder.buttonBackgroundColor;
-        this.buttonPressedBackgroundColor = builder.buttonPressedBackgroundColor;
-        this.stepNumberTextColor = builder.stepNumberTextColor;
-        this.stepTitleTextColor = builder.stepTitleTextColor;
-        this.stepSubtitleTextColor = builder.stepSubtitleTextColor;
-        this.buttonTextColor = builder.buttonTextColor;
-        this.buttonPressedTextColor = builder.buttonPressedTextColor;
-        this.errorMessageTextColor = builder.errorMessageTextColor;
-        this.displayBottomNavigation = builder.displayBottomNavigation;
-        this.materialDesignInDisabledSteps = builder.materialDesignInDisabledSteps;
-        this.hideKeyboard = builder.hideKeyboard;
-        this.showVerticalLineWhenStepsAreCollapsed = builder.showVerticalLineWhenStepsAreCollapsed;
+        this.verticalStepperFormImplementation = builder.verticalStepperFormImplementation;
+        //Truly TOptional attributes
+        if (builder.errorIcon != -1) {
+            this.errorIcon = builder.errorIcon;
+        } else if (this.errorIcon == -1) {
+            this.errorIcon = R.drawable.ic_error;
+        }
+        if (builder.customButtonLayout != -1) {
+            this.customButtonLayout = builder.customButtonLayout;
+        }
+        if (builder.customButtonId != -1) {
+            this.customButtonId = builder.customButtonId;
+        }
+        if (builder.alphaOfDisabledElements != -1) {
+            this.alphaOfDisabledElements = builder.alphaOfDisabledElements;
+        } else if (this.alphaOfDisabledElements == -1) {
+            this.alphaOfDisabledElements = 0.25f;
+        }
+        //Optional color attributes
+        if (builder.stepNumberBackgroundColor != -1) {
+            this.stepNumberBackgroundColor = builder.stepNumberBackgroundColor;
+        } else if (this.stepNumberBackgroundColor == -1) {
+            this.stepNumberBackgroundColor = Color.rgb(63, 81, 181);
+        }
+        if (builder.buttonBackgroundColor != -1) {
+            this.buttonBackgroundColor = builder.buttonBackgroundColor;
+        } else if (this.buttonBackgroundColor == -1) {
+            this.buttonBackgroundColor = Color.rgb(63, 81, 181);
+        }
+        if (builder.buttonPressedBackgroundColor != -1) {
+            this.buttonPressedBackgroundColor = builder.buttonPressedBackgroundColor;
+        } else if (this.buttonPressedBackgroundColor == -1) {
+            this.buttonPressedBackgroundColor = Color.rgb(48, 63, 159);
+        }
+        if (builder.stepNumberTextColor != -1) {
+            this.stepNumberTextColor = builder.stepNumberTextColor;
+        } else if (this.stepNumberTextColor == -1) {
+            this.stepNumberTextColor = Color.rgb(255, 255, 255);
+        }
+        if (builder.stepTitleTextColor != -1) {
+            this.stepTitleTextColor = builder.stepTitleTextColor;
+        } else if (this.stepTitleTextColor == -1) {
+            this.stepTitleTextColor = Color.rgb(33, 33, 33);
+        }
+        if (builder.stepSubtitleTextColor != -1) {
+            this.stepSubtitleTextColor = builder.stepSubtitleTextColor;
+        } else if (this.stepSubtitleTextColor == -1) {
+            this.stepSubtitleTextColor = Color.rgb(162, 162, 162);
+        }
+        if (builder.buttonTextColor != -1) {
+            this.buttonTextColor = builder.buttonTextColor;
+        } else if (this.buttonTextColor == -1) {
+            this.buttonTextColor = Color.rgb(255, 255, 255);
+        }
+        //Log.d(getClass().getSimpleName(), "Button text colour is " + this.buttonTextColor + ". Builder said: " + builder.buttonTextColor);
+        if (builder.buttonPressedTextColor != -1) {
+            this.buttonPressedTextColor = builder.buttonPressedTextColor;
+        } else if (this.buttonPressedTextColor == -1) {
+            this.buttonPressedTextColor = Color.rgb(255, 255, 255);
+        }
+        if (builder.errorMessageTextColor != -1) {
+            this.errorMessageTextColor = builder.errorMessageTextColor;
+        } else if (this.errorMessageTextColor == -1) {
+            this.errorMessageTextColor = Color.rgb(175, 18, 18);
+        }
+        if (builder.bottomNavigationBackgroundColor != -1) {
+            this.bottomNavigationBackgroundColor = builder.bottomNavigationBackgroundColor;
+        } else if (this.bottomNavigationBackgroundColor == -1) {
+            this.bottomNavigationBackgroundColor = Color.parseColor("#EEEEEE");
+        }
+        //Non-resource attributes
+        if (builder.displayBottomNavigation != null) {
+            this.displayBottomNavigation = builder.displayBottomNavigation;
+        }
+        if (builder.materialDesignInDisabledSteps != null) {
+            this.materialDesignInDisabledSteps = builder.materialDesignInDisabledSteps;
+        }
+        if (builder.hideKeyboard != null) {
+            this.hideKeyboard = builder.hideKeyboard;
+        }
+        if (builder.showVerticalLineWhenStepsAreCollapsed != null) {
+            this.showVerticalLineWhenStepsAreCollapsed = builder.showVerticalLineWhenStepsAreCollapsed;
+        }
         initStepperForm(builder.steps, builder.stepsSubtitles, builder.stepButtonTexts);
     }
 
@@ -683,7 +852,7 @@ public class VerticalStepperFormLayout extends RelativeLayout {
 
         disableConfirmationButton();
 
-        if (nextStepButtonTexts != null && nextStepButtonTexts.size() > numberOfSteps && nextStepButtonTexts.get(numberOfSteps) != null) {
+        if (nextStepButtonTexts != null && nextStepButtonTexts.size() > numberOfSteps && nextStepButtonTexts.get(numberOfSteps) != null && !"".contentEquals(nextStepButtonTexts.get(numberOfSteps))) {
             confirmationButton.setText(nextStepButtonTexts.get(numberOfSteps));
         } else {
             confirmationButton.setText(R.string.vertical_form_stepper_form_confirm_button);
@@ -734,9 +903,12 @@ public class VerticalStepperFormLayout extends RelativeLayout {
         stepDoneImageView.setColorFilter(stepNumberTextColor);
 
         TextView errorMessage = (TextView) stepLayout.findViewById(R.id.error_message);
-        ImageView errorIcon = (ImageView) stepLayout.findViewById(R.id.error_icon);
+        ImageView errorIconView = (ImageView) stepLayout.findViewById(R.id.error_icon);
+        if (errorIcon != -1) {
+            errorIconView.setImageResource(errorIcon);
+        }
         errorMessage.setTextColor(errorMessageTextColor);
-        errorIcon.setColorFilter(errorMessageTextColor);
+        errorIconView.setColorFilter(errorMessageTextColor);
 
         RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
         stepHeader.setTag(stepNumber);
@@ -764,6 +936,9 @@ public class VerticalStepperFormLayout extends RelativeLayout {
         setButtonColor(nextButton, buttonBackgroundColor, buttonTextColor, buttonPressedBackgroundColor, buttonPressedTextColor);
         nextButton.setTag(NavigationClickListener.ACTION_NEXT);
         nextButton.setOnClickListener(navListener);
+        if (customButtonText != null) { //NOTE: This ends up as the default if any array entry is null or blank
+            nextButton.setText(customButtonText);
+        }
         if (nextStepButtonTexts != null && nextStepButtonTexts.size() > stepNumber && nextStepButtonTexts.get(stepNumber) != null) {
             nextButton.setText(nextStepButtonTexts.get(stepNumber));
         }
@@ -1135,23 +1310,24 @@ public class VerticalStepperFormLayout extends RelativeLayout {
         // Optional parameters
         protected String[] stepsSubtitles = null;
         protected String[] stepButtonTexts = null;
-        protected float alphaOfDisabledElements = 0.25f;
-        protected int stepNumberBackgroundColor = Color.rgb(63, 81, 181);
-        protected int buttonBackgroundColor = Color.rgb(63, 81, 181);
-        protected int buttonPressedBackgroundColor = Color.rgb(48, 63, 159);
-        protected int stepNumberTextColor = Color.rgb(255, 255, 255);
-        protected int stepTitleTextColor = Color.rgb(33, 33, 33);
-        protected int stepSubtitleTextColor = Color.rgb(162, 162, 162);
-        protected int buttonTextColor = Color.rgb(255, 255, 255);
-        protected int buttonPressedTextColor = Color.rgb(255, 255, 255);
-        protected int errorMessageTextColor = Color.rgb(175, 18, 18);
-        protected int bottomNavigationBackgroundColor = -1;
-        protected boolean displayBottomNavigation = true;
-        protected boolean materialDesignInDisabledSteps = false;
-        protected boolean hideKeyboard = true;
-        protected boolean showVerticalLineWhenStepsAreCollapsed = false;
+        protected float alphaOfDisabledElements = -1;
+        protected @ColorInt int stepNumberBackgroundColor = -1;
+        protected @ColorInt int buttonBackgroundColor = -1;
+        protected @ColorInt int buttonPressedBackgroundColor = -1;
+        protected @ColorInt int stepNumberTextColor = -1;
+        protected @ColorInt int stepTitleTextColor = -1;
+        protected @ColorInt int stepSubtitleTextColor = -1;
+        protected @ColorInt int buttonTextColor = -1;
+        protected @ColorInt int buttonPressedTextColor = -1;
+        protected @ColorInt int errorMessageTextColor = -1;
+        protected @ColorInt int bottomNavigationBackgroundColor = -1;
+        protected @DrawableRes int errorIcon = -1;
         protected @LayoutRes int customButtonLayout = -1;
         protected @IdRes int customButtonId = -1;
+        protected Boolean displayBottomNavigation = null;
+        protected Boolean materialDesignInDisabledSteps = null;
+        protected Boolean hideKeyboard = null;
+        protected Boolean showVerticalLineWhenStepsAreCollapsed = null;
 
         protected Builder(VerticalStepperFormLayout stepperLayout,
                           String[] steps,
@@ -1181,6 +1357,37 @@ public class VerticalStepperFormLayout extends RelativeLayout {
         }
 
         /**
+         * Set the dark primary color resource (background color of the buttons when clicked)
+         * @param colorPrimaryDark primary color resource (dark)
+         * @return the builder instance
+         */
+        public Builder primaryDarkColorRes(@ColorRes int colorPrimaryDark) {
+            this.buttonPressedBackgroundColor = ContextCompat.getColor(activity, colorPrimaryDark);
+            return this;
+        }
+
+        /**
+         * Set the primary color (background color of the left circles and buttons)
+         * @param colorPrimary primary color
+         * @return the builder instance
+         */
+        public Builder primaryColor(@ColorInt int colorPrimary) {
+            this.stepNumberBackgroundColor = colorPrimary;
+            this.buttonBackgroundColor = colorPrimary;
+            return this;
+        }
+
+        /**
+         * Set the dark primary color (background color of the buttons when clicked)
+         * @param colorPrimaryDark primary color (dark)
+         * @return the builder instance
+         */
+        public Builder primaryDarkColor(@ColorInt int colorPrimaryDark) {
+            this.buttonPressedBackgroundColor = colorPrimaryDark;
+            return this;
+        }
+
+        /**
          * Set the subtitles of the steps
          * @param stepsSubtitles a String array with the subtitles of the steps
          * @return the builder instance
@@ -1201,63 +1408,12 @@ public class VerticalStepperFormLayout extends RelativeLayout {
         }
 
         /**
-         * Set the primary color (background color of the left circles and buttons)
-         * @param colorPrimary primary color
+         * Set an bullet icon for when error messages are shown
+         * @param errorIcon drawable for the error icon
          * @return the builder instance
          */
-        public Builder primaryColor(int colorPrimary) {
-            this.stepNumberBackgroundColor = colorPrimary;
-            this.buttonBackgroundColor = colorPrimary;
-            return this;
-        }
-
-        /**
-         * Set the dark primary color (background color of the buttons when clicked)
-         * @param colorPrimaryDark primary color (dark)
-         * @return the builder instance
-         */
-        public Builder primaryDarkColor(int colorPrimaryDark) {
-            this.buttonPressedBackgroundColor = colorPrimaryDark;
-            return this;
-        }
-
-        /**
-         * Set the color of the bottom navigation bar
-         * @param color backgroudn color
-         * @return the builder instance
-         */
-        public Builder bottomNavBackgroundColor(int color) {
-            this.bottomNavigationBackgroundColor = color;
-            return this;
-        }
-
-        /**
-         * Set the background color of the left circles
-         * @param stepNumberBackgroundColor background color of the left circles
-         * @return the builder instance
-         */
-        public Builder stepNumberBackgroundColor(int stepNumberBackgroundColor) {
-            this.stepNumberBackgroundColor = stepNumberBackgroundColor;
-            return this;
-        }
-
-        /**
-         * Set the background colour of the buttons
-         * @param buttonBackgroundColor background color of the buttons
-         * @return the builder instance
-         */
-        public Builder buttonBackgroundColor(int buttonBackgroundColor) {
-            this.buttonBackgroundColor = buttonBackgroundColor;
-            return this;
-        }
-
-        /**
-         * Set the background color of the buttons when clicked
-         * @param buttonPressedBackgroundColor background color of the buttons when clicked
-         * @return the builder instance
-         */
-        public Builder buttonPressedBackgroundColor(int buttonPressedBackgroundColor) {
-            this.buttonPressedBackgroundColor = buttonPressedBackgroundColor;
+        public Builder errorIcon(@DrawableRes int errorIcon) {
+            this.errorIcon = errorIcon;
             return this;
         }
 
@@ -1276,11 +1432,111 @@ public class VerticalStepperFormLayout extends RelativeLayout {
         }
 
         /**
+         * Set the text color resource of the left circles
+         * @param stepNumberTextColor text color resource of the left circles
+         * @return the builder instance
+         */
+        public Builder stepNumberTextColorRes(@ColorRes int stepNumberTextColor) {
+            this.stepNumberTextColor = ContextCompat.getColor(activity, stepNumberTextColor);
+            return this;
+        }
+
+        /**
+         * Set the text color resource of the step title
+         * @param stepTitleTextColor the color resource of the step title
+         * @return this builder instance
+         */
+        public Builder stepTitleTextColorRes(@ColorRes int stepTitleTextColor) {
+            this.stepTitleTextColor = ContextCompat.getColor(activity, stepTitleTextColor);
+            return this;
+        }
+
+        /**
+         * Set the text color resource of the step subtitle
+         * @param stepSubtitleTextColor the color resource of the step title
+         * @return this builder instance
+         */
+        public Builder stepSubtitleTextColorRes(@ColorRes int stepSubtitleTextColor) {
+            this.stepSubtitleTextColor = ContextCompat.getColor(activity, stepSubtitleTextColor);
+            return this;
+        }
+
+        /**
+         * Set the text color resource of the buttons
+         * @param buttonTextColor text color resource of the buttons
+         * @return the builder instance
+         */
+        public Builder buttonTextColorRes(@ColorRes int buttonTextColor) {
+            this.buttonTextColor = ContextCompat.getColor(activity, buttonTextColor);
+            return this;
+        }
+
+        /**
+         * Set the text color of the buttons when clicked
+         * @param buttonPressedTextColor text color of the buttons when clicked
+         * @return the builder instance
+         */
+        public Builder buttonPressedTextColorRes(@ColorRes int buttonPressedTextColor) {
+            this.buttonPressedTextColor = ContextCompat.getColor(activity, buttonPressedTextColor);
+            return this;
+        }
+
+        /**
+         * Set the error message color resource
+         * @param errorMessageTextColor error message color resource
+         * @return the builder instance
+         */
+        public Builder errorMessageTextColorRes(@ColorRes int errorMessageTextColor) {
+            this.errorMessageTextColor = ContextCompat.getColor(activity, errorMessageTextColor);
+            return this;
+        }
+
+        /**
+         * Set the color resource of the bottom navigation bar
+         * @param color background color resource
+         * @return the builder instance
+         */
+        public Builder bottomNavBackgroundColorRes(@ColorRes int color) {
+            this.bottomNavigationBackgroundColor = ContextCompat.getColor(activity, color);
+            return this;
+        }
+
+        /**
+         * Set the background color resource of the left circles
+         * @param stepNumberBackgroundColor background color resource of the left circles
+         * @return the builder instance
+         */
+        public Builder stepNumberBackgroundColorRes(@ColorRes int stepNumberBackgroundColor) {
+            this.stepNumberBackgroundColor = ContextCompat.getColor(activity, stepNumberBackgroundColor);
+            return this;
+        }
+
+        /**
+         * Set the background colour resource of the buttons
+         * @param buttonBackgroundColor background color resource of the buttons
+         * @return the builder instance
+         */
+        public Builder buttonBackgroundColorRes(@ColorRes int buttonBackgroundColor) {
+            this.buttonBackgroundColor = ContextCompat.getColor(activity, buttonBackgroundColor);
+            return this;
+        }
+
+        /**
+         * Set the background color resource of the buttons when clicked
+         * @param buttonPressedBackgroundColor background color resource of the buttons when clicked
+         * @return the builder instance
+         */
+        public Builder buttonPressedBackgroundColorRes(@ColorRes int buttonPressedBackgroundColor) {
+            this.buttonPressedBackgroundColor = ContextCompat.getColor(activity, buttonPressedBackgroundColor);
+            return this;
+        }
+
+        /**
          * Set the text color of the left circles
          * @param stepNumberTextColor text color of the left circles
          * @return the builder instance
          */
-        public Builder stepNumberTextColor(int stepNumberTextColor) {
+        public Builder stepNumberTextColor(@ColorInt int stepNumberTextColor) {
             this.stepNumberTextColor = stepNumberTextColor;
             return this;
         }
@@ -1290,7 +1546,7 @@ public class VerticalStepperFormLayout extends RelativeLayout {
          * @param stepTitleTextColor the color of the step title
          * @return this builder instance
          */
-        public Builder stepTitleTextColor(int stepTitleTextColor) {
+        public Builder stepTitleTextColor(@ColorInt int stepTitleTextColor) {
             this.stepTitleTextColor = stepTitleTextColor;
             return this;
         }
@@ -1300,7 +1556,7 @@ public class VerticalStepperFormLayout extends RelativeLayout {
          * @param stepSubtitleTextColor the color of the step title
          * @return this builder instance
          */
-        public Builder stepSubtitleTextColor(int stepSubtitleTextColor) {
+        public Builder stepSubtitleTextColor(@ColorInt int stepSubtitleTextColor) {
             this.stepSubtitleTextColor = stepSubtitleTextColor;
             return this;
         }
@@ -1310,7 +1566,7 @@ public class VerticalStepperFormLayout extends RelativeLayout {
          * @param buttonTextColor text color of the buttons
          * @return the builder instance
          */
-        public Builder buttonTextColor(int buttonTextColor) {
+        public Builder buttonTextColor(@ColorInt int buttonTextColor) {
             this.buttonTextColor = buttonTextColor;
             return this;
         }
@@ -1320,7 +1576,7 @@ public class VerticalStepperFormLayout extends RelativeLayout {
          * @param buttonPressedTextColor text color of the buttons when clicked
          * @return the builder instance
          */
-        public Builder buttonPressedTextColor(int buttonPressedTextColor) {
+        public Builder buttonPressedTextColor(@ColorInt int buttonPressedTextColor) {
             this.buttonPressedTextColor = buttonPressedTextColor;
             return this;
         }
@@ -1330,8 +1586,60 @@ public class VerticalStepperFormLayout extends RelativeLayout {
          * @param errorMessageTextColor error message color
          * @return the builder instance
          */
-        public Builder errorMessageTextColor(int errorMessageTextColor) {
+        public Builder errorMessageTextColor(@ColorInt int errorMessageTextColor) {
             this.errorMessageTextColor = errorMessageTextColor;
+            return this;
+        }
+
+        /**
+         * Set the primary color resource (background color of the left circles and buttons)
+         * @param colorPrimary primary color resource
+         * @return the builder instance
+         */
+        public Builder primaryColorRes(@ColorRes int colorPrimary) {
+            @ColorInt int resolvedColour = ContextCompat.getColor(activity, colorPrimary);
+            this.stepNumberBackgroundColor = resolvedColour;
+            this.buttonBackgroundColor = resolvedColour;
+            return this;
+        }
+
+        /**
+         * Set the color of the bottom navigation bar
+         * @param color backgroudn color
+         * @return the builder instance
+         */
+        public Builder bottomNavBackgroundColor(@ColorInt int color) {
+            this.bottomNavigationBackgroundColor = color;
+            return this;
+        }
+
+        /**
+         * Set the background color of the left circles
+         * @param stepNumberBackgroundColor background color of the left circles
+         * @return the builder instance
+         */
+        public Builder stepNumberBackgroundColor(@ColorInt int stepNumberBackgroundColor) {
+            this.stepNumberBackgroundColor = stepNumberBackgroundColor;
+            return this;
+        }
+
+        /**
+         * Set the background colour of the buttons
+         * @param buttonBackgroundColor background color of the buttons
+         * @return the builder instance
+         */
+        public Builder buttonBackgroundColor(@ColorInt int buttonBackgroundColor) {
+            this.buttonBackgroundColor = buttonBackgroundColor;
+            return this;
+        }
+
+        /**
+         * Set the background color of the buttons when clicked
+         * @param buttonPressedBackgroundColor background color of the buttons when clicked
+         * @return the builder instance
+         */
+        public Builder buttonPressedBackgroundColor(@ColorInt int buttonPressedBackgroundColor) {
+            this.buttonPressedBackgroundColor = buttonPressedBackgroundColor;
             return this;
         }
 
