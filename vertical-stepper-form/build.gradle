@@ -37,7 +37,7 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:24.0.0'
+    implementation 'com.android.support:appcompat-v7:24.0.0'
 }
 
 // Place it at the end of the file
