@@ -36,4 +36,10 @@ public interface VerticalStepperForm {
      */
     void onClickNextStep(int fromStepNumber, boolean isCurrentStepValid);
 
+    /**
+     * @param inflatedView the next step view which is already attached to its parent
+     * @param stepNumber the step this view was inflated for
+     */
+    void onNextStepViewInflated(View inflatedView, int stepNumber);
+
 }

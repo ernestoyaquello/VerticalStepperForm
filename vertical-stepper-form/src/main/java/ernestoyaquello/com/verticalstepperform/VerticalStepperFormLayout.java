@@ -928,9 +928,11 @@ public class VerticalStepperFormLayout extends RelativeLayout {
         AppCompatButton nextButton;
         if (customButtonLayout == -1) {
             View v = inflater.inflate(R.layout.step_layout_next_button, (ViewGroup) stepLayout.findViewById(R.id.next_step_button_insert), true);
+            verticalStepperFormImplementation.onNextStepViewInflated(v, stepNumber);
             nextButton = (AppCompatButton) v.findViewById(R.id.next_step);
         } else {
             View v = inflater.inflate(customButtonLayout, (ViewGroup) stepLayout.findViewById(R.id.next_step_button_insert), true);
+            verticalStepperFormImplementation.onNextStepViewInflated(v, stepNumber);
             nextButton = (AppCompatButton) v.findViewById(customButtonId);
         }
         setButtonColor(nextButton, buttonBackgroundColor, buttonTextColor, buttonPressedBackgroundColor, buttonPressedTextColor);
