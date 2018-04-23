@@ -56,6 +56,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected boolean materialDesignInDisabledSteps;
     protected boolean hideKeyboard;
     protected boolean showVerticalLineWhenStepsAreCollapsed;
+    protected boolean stepHeadersClickable;
 
     // Views
     protected LayoutInflater mInflater;
@@ -391,6 +392,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.materialDesignInDisabledSteps = false;
         this.hideKeyboard = true;
         this.showVerticalLineWhenStepsAreCollapsed = false;
+        this.stepHeadersClickable = true;
 
         this.verticalStepperFormImplementation = verticalStepperForm;
         this.activity = activity;
@@ -444,6 +446,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.materialDesignInDisabledSteps = false;
         this.hideKeyboard = true;
         this.showVerticalLineWhenStepsAreCollapsed = false;
+        this.stepHeadersClickable = true;
 
         this.verticalStepperFormImplementation = verticalStepperForm;
         this.activity = activity;
@@ -470,6 +473,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.materialDesignInDisabledSteps = builder.materialDesignInDisabledSteps;
         this.hideKeyboard = builder.hideKeyboard;
         this.showVerticalLineWhenStepsAreCollapsed = builder.showVerticalLineWhenStepsAreCollapsed;
+        this.stepHeadersClickable = builder.stepHeadersClickable;
 
         initStepperForm(builder.steps, builder.stepsSubtitles);
     }
@@ -625,13 +629,15 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         errorMessage.setTextColor(errorMessageTextColor);
         errorIcon.setColorFilter(errorMessageTextColor);
 
-        RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
-        stepHeader.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToStep(stepNumber, false);
-            }
-        });
+        if(stepHeadersClickable) {
+            RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
+            stepHeader.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    goToStep(stepNumber, false);
+                }
+            });
+        }
 
         AppCompatButton nextButton = (AppCompatButton) stepLayout.findViewById(R.id.next_step);
         setButtonColor(nextButton,
@@ -1032,6 +1038,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         protected boolean materialDesignInDisabledSteps = false;
         protected boolean hideKeyboard = true;
         protected boolean showVerticalLineWhenStepsAreCollapsed = false;
+        protected boolean stepHeadersClickable = true;
 
         protected Builder(VerticalStepperFormLayout stepperLayout,
                           String[] steps,
@@ -1219,6 +1226,16 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
          */
         public Builder showVerticalLineWhenStepsAreCollapsed(boolean showVerticalLineWhenStepsAreCollapsed) {
             this.showVerticalLineWhenStepsAreCollapsed = showVerticalLineWhenStepsAreCollapsed;
+            return this;
+        }
+
+        /**
+         * Specify whether or not the previous step headers should be clickable
+         * @param stepHeadersClickable true to show the lines; false to not
+         * @return the builder instance
+         */
+        public Builder stepHeadersClickable(boolean stepHeadersClickable) {
+            this.stepHeadersClickable = stepHeadersClickable;
             return this;
         }
 

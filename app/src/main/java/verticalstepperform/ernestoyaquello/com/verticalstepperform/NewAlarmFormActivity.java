@@ -91,6 +91,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
                 //.stepsSubtitles(stepsSubtitles)
                 //.materialDesignInDisabledSteps(true) // false by default
                 //.showVerticalLineWhenStepsAreCollapsed(true) // false by default
+                //.stepHeadersClickable(false) // true by default
                 .primaryColor(colorPrimary)
                 .primaryDarkColor(colorPrimaryDark)
                 .displayBottomNavigation(true)
