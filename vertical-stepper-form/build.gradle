@@ -4,18 +4,22 @@ apply plugin: 'com.github.dcendents.android-maven'
 group='com.github.ericwjr'
 
 android {
-    compileSdkVersion 25
-    buildToolsVersion "24.0.2"
+    compileSdkVersion 27
+    buildToolsVersion "27.0.3"
 
     defaultConfig {
         minSdkVersion 16
-        targetSdkVersion 24
+        targetSdkVersion 27
         versionCode 1
         versionName "1.0"
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:25.1.1'
-    compile 'com.github.ericwjr:floating-text-button:0.1.5'
+    compile 'com.android.support:appcompat-v7:27.1.1'
+    compile 'com.github.ericwjr:floating-text-button:0.1.7'
 }
