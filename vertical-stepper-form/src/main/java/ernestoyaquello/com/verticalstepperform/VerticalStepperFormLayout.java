@@ -81,7 +81,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected List<String> stepsSubtitles;
 
     // Logic
-    protected int activeStep = 0;
+    protected int activeStep = -1;
     protected int numberOfSteps;
     protected boolean[] completedSteps;
 
@@ -539,7 +539,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         if (!displayBottomNavigation) {
             hideBottomNavigation();
         }
-        goToStep(0, true);
+        goToStep(0, false);
 
         setObserverForKeyboard();
     }
