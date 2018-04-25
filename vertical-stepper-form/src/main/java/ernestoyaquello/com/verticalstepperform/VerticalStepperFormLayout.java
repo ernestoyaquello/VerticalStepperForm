@@ -51,6 +51,9 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected int stepTitleTextColor;
     protected int stepSubtitleTextColor;
     protected int buttonTextColor;
+    protected int buttonTextSize;
+    protected int buttonHorizontalPadding;
+    protected int buttonVerticalPadding;
     protected String submitText = getResources().getString(R.string.vertical_form_stepper_form_confirm_button);
     protected int buttonPressedTextColor;
     protected int errorMessageTextColor;
@@ -482,6 +485,9 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         this.stepTitleTextColor = builder.stepTitleTextColor;
         this.stepSubtitleTextColor = builder.stepSubtitleTextColor;
         this.buttonTextColor = builder.buttonTextColor;
+        this.buttonTextSize = builder.buttonTextSize;
+        this.buttonHorizontalPadding = builder.buttonHorizontalPadding;
+        this.buttonVerticalPadding = builder.buttonVerticalPadding;
         this.submitText = builder.submitText;
         this.buttonPressedTextColor = builder.buttonPressedTextColor;
         this.errorMessageTextColor = builder.errorMessageTextColor;
@@ -573,7 +579,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         LinearLayout stepLayout = createStepLayout(stepNumber);
         if (stepNumber < numberOfSteps) {
             // The content of the step is the corresponding custom view previously created
-            RelativeLayout stepContent = (RelativeLayout) stepLayout.findViewById(R.id.step_content);
+            RelativeLayout stepContent = stepLayout.findViewById(R.id.step_content);
             stepContent.addView(stepContentViews.get(stepNumber));
         } else {
             setUpStepLayoutAsConfirmationStepLayout(stepLayout);
@@ -658,9 +664,12 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
             }
         });
 
-        FloatingTextButton nextButton = (FloatingTextButton) stepLayout.findViewById(R.id.next_step);
+        FloatingTextButton nextButton = stepLayout.findViewById(R.id.next_step);
+        nextButton.setHorizontalPadding(buttonHorizontalPadding);
+        nextButton.setVerticalPadding(buttonVerticalPadding);
         nextButton.setBackgroundColor(buttonBackgroundColor);
         nextButton.setTitleColor(buttonTextColor);
+        nextButton.setTitleSize(buttonTextSize);
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -1057,6 +1066,9 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         protected int stepTitleTextColor = Color.rgb(33, 33, 33);
         protected int stepSubtitleTextColor = Color.rgb(162, 162, 162);
         protected int buttonTextColor = Color.rgb(255, 255, 255);
+        protected int buttonTextSize= 12;
+        protected int buttonHorizontalPadding = 8;
+        protected int buttonVerticalPadding = 8;
         protected String submitText ;
         protected int buttonPressedTextColor = Color.rgb(255, 255, 255);
         protected int errorMessageTextColor = Color.rgb(175, 18, 18);
@@ -1193,6 +1205,36 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
          */
         public Builder buttonTextColor(int buttonTextColor) {
             this.buttonTextColor = buttonTextColor;
+            return this;
+        }
+
+        /**
+         * Set the text color of the buttons
+         * @param buttonTextSize text size of the buttons
+         * @return the builder instance
+         */
+        public Builder buttonTextSize(int buttonTextSize) {
+            this.buttonTextSize = buttonTextSize;
+            return this;
+        }
+
+        /**
+         * Set the text color of the buttons
+         * @param buttonHorizontalPadding horizontal padding of the buttons
+         * @return the builder instance
+         */
+        public Builder buttonHorizontalPadding(int buttonHorizontalPadding) {
+            this.buttonHorizontalPadding = buttonHorizontalPadding;
+            return this;
+        }
+
+        /**
+         * Set the text color of the buttons
+         * @param buttonVerticalPadding vertical padding of the buttons
+         * @return the builder instance
+         */
+        public Builder buttonVerticalPadding(int buttonVerticalPadding) {
+            this.buttonHorizontalPadding = buttonVerticalPadding;
             return this;
         }
 
