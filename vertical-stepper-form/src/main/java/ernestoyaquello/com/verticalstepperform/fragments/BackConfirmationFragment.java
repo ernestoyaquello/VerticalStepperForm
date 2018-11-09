@@ -3,8 +3,8 @@ package ernestoyaquello.com.verticalstepperform.fragments;
 import android.app.Dialog;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v4.app.DialogFragment;
-import android.support.v7.app.AlertDialog;
+import androidx.fragment.app.DialogFragment;
+import androidx.appcompat.app.AlertDialog;
 
 /**
  * This fragment can be used to display a confirmation dialog when the user tries to go back
