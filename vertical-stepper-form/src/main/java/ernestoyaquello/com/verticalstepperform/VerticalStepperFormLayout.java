@@ -3,7 +3,6 @@ package ernestoyaquello.com.verticalstepperform;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
-import android.content.res.Resources;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -15,19 +14,19 @@ import androidx.core.content.ContextCompat;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatImageButton;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+
+import com.google.android.material.button.MaterialButton;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -39,7 +38,7 @@ import ernestoyaquello.com.verticalstepperform.utils.Animations;
 /**
  * Custom layout that implements a vertical stepper form
  */
-public class VerticalStepperFormLayout extends RelativeLayout implements View.OnClickListener {
+public class VerticalStepperFormLayout extends LinearLayout implements View.OnClickListener {
 
     // Style
     protected float alphaOfDisabledElements;
@@ -61,14 +60,14 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     protected LayoutInflater mInflater;
     protected LinearLayout content;
     protected ScrollView stepsScrollView;
-    protected List<LinearLayout> stepLayouts;
+    protected List<View> stepLayouts;
     protected List<View> stepContentViews;
     protected List<TextView> stepsTitlesViews;
     protected List<TextView> stepsSubtitlesViews;
-    protected AppCompatButton confirmationButton;
+    protected MaterialButton confirmationButton;
     protected ProgressBar progressBar;
     protected AppCompatImageButton previousStepButton, nextStepButton;
-    protected RelativeLayout bottomNavigation;
+    protected View bottomNavigation;
 
     // Data
     protected List<String> steps;
@@ -88,16 +87,19 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
     public VerticalStepperFormLayout(Context context) {
         super(context);
+
         init(context);
     }
 
     public VerticalStepperFormLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
+
         init(context);
     }
 
     public VerticalStepperFormLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
+
         init(context);
     }
 
@@ -188,13 +190,12 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     public void setStepAsCompleted(int stepNumber) {
         completedSteps[stepNumber] = true;
 
-        LinearLayout stepLayout = stepLayouts.get(stepNumber);
-        RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
-        ImageView stepDone = (ImageView) stepHeader.findViewById(R.id.step_done);
-        TextView stepNumberTextView = (TextView) stepHeader.findViewById(R.id.step_number);
-        LinearLayout errorContainer = (LinearLayout) stepLayout.findViewById(R.id.error_container);
-        TextView errorTextView = (TextView) errorContainer.findViewById(R.id.error_message);
-        AppCompatButton nextButton = (AppCompatButton) stepLayout.findViewById(R.id.next_step);
+        View stepLayout = stepLayouts.get(stepNumber);
+        View stepDone = stepLayout.findViewById(R.id.step_done);
+        View stepNumberTextView = stepLayout.findViewById(R.id.step_number);
+        View errorContainer = stepLayout.findViewById(R.id.error_container);
+        TextView errorTextView = errorContainer.findViewById(R.id.error_message);
+        View nextButton = stepLayout.findViewById(R.id.next_step);
 
         enableStepHeader(stepLayout);
 
@@ -203,7 +204,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
         if (stepNumber != activeStep) {
             stepDone.setVisibility(View.VISIBLE);
-            stepNumberTextView.setVisibility(View.INVISIBLE);
+            stepNumberTextView.setVisibility(View.GONE);
         } else {
             if (stepNumber != numberOfSteps) {
                 enableNextButtonInBottomNavigationLayout();
@@ -227,13 +228,12 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     public void setStepAsUncompleted(int stepNumber, String errorMessage) {
         completedSteps[stepNumber] = false;
 
-        LinearLayout stepLayout = stepLayouts.get(stepNumber);
-        RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
-        ImageView stepDone = (ImageView) stepHeader.findViewById(R.id.step_done);
-        TextView stepNumberTextView = (TextView) stepHeader.findViewById(R.id.step_number);
-        AppCompatButton nextButton = (AppCompatButton) stepLayout.findViewById(R.id.next_step);
+        View stepLayout = stepLayouts.get(stepNumber);
+        View stepDone = stepLayout.findViewById(R.id.step_done);
+        View stepNumberTextView = stepLayout.findViewById(R.id.step_number);
+        View nextButton = stepLayout.findViewById(R.id.next_step);
 
-        stepDone.setVisibility(View.INVISIBLE);
+        stepDone.setVisibility(View.GONE);
         stepNumberTextView.setVisibility(View.VISIBLE);
 
         nextButton.setEnabled(false);
@@ -250,8 +250,8 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         }
 
         if (errorMessage != null && !errorMessage.equals("")) {
-            LinearLayout errorContainer = (LinearLayout) stepLayout.findViewById(R.id.error_container);
-            TextView errorTextView = (TextView) errorContainer.findViewById(R.id.error_message);
+            View errorContainer = stepLayout.findViewById(R.id.error_container);
+            TextView errorTextView = errorContainer.findViewById(R.id.error_message);
 
             errorTextView.setText(errorMessage);
             //errorContainer.setVisibility(View.VISIBLE);
@@ -372,10 +372,12 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
      * </pre></blockquote>
      */
     @Deprecated
-    public void initialiseVerticalStepperForm(String[] stepsTitles,
-                                              int colorPrimary, int colorPrimaryDark,
-                                              VerticalStepperForm verticalStepperForm,
-                                              Activity activity) {
+    public void initialiseVerticalStepperForm(
+            String[] stepsTitles,
+            int colorPrimary, 
+            int colorPrimaryDark,
+            VerticalStepperForm verticalStepperForm,
+            Activity activity) {
 
         this.alphaOfDisabledElements = 0.25f;
         this.buttonTextColor = Color.rgb(255, 255, 255);
@@ -423,12 +425,16 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
      * </pre></blockquote>
      */
     @Deprecated
-    public void initialiseVerticalStepperForm(String[] stepsTitles,
-                                              int buttonBackgroundColor, int buttonTextColor,
-                                              int buttonPressedBackgroundColor, int buttonPressedTextColor,
-                                              int stepNumberBackgroundColor, int stepNumberTextColor,
-                                              VerticalStepperForm verticalStepperForm,
-                                              Activity activity) {
+    public void initialiseVerticalStepperForm(
+            String[] stepsTitles,
+            int buttonBackgroundColor, 
+            int buttonTextColor,
+            int buttonPressedBackgroundColor, 
+            int buttonPressedTextColor,
+            int stepNumberBackgroundColor, 
+            int stepNumberTextColor,
+            VerticalStepperForm verticalStepperForm,
+            Activity activity) {
 
         this.alphaOfDisabledElements = 0.25f;
         this.buttonBackgroundColor = buttonBackgroundColor;
@@ -550,10 +556,10 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     protected void setUpStep(int stepNumber) {
-        LinearLayout stepLayout = createStepLayout(stepNumber);
+        View stepLayout = createStepLayout(stepNumber);
         if (stepNumber < numberOfSteps) {
             // The content of the step is the corresponding custom view previously created
-            RelativeLayout stepContent = (RelativeLayout) stepLayout.findViewById(R.id.step_content);
+            ViewGroup stepContent = stepLayout.findViewById(R.id.step_content);
             stepContent.addView(stepContentViews.get(stepNumber));
         } else {
             setUpStepLayoutAsConfirmationStepLayout(stepLayout);
@@ -561,17 +567,12 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         addStepToContent(stepLayout);
     }
 
-    protected void addStepToContent(LinearLayout stepLayout) {
+    protected void addStepToContent(View stepLayout) {
         content.addView(stepLayout);
     }
 
-    protected void setUpStepLayoutAsConfirmationStepLayout(LinearLayout stepLayout) {
-        LinearLayout stepLeftLine = (LinearLayout) stepLayout.findViewById(R.id.vertical_line);
-        LinearLayout stepLeftLine2 = (LinearLayout) stepLayout.findViewById(R.id.vertical_line_subtitle);
-        confirmationButton = (AppCompatButton) stepLayout.findViewById(R.id.next_step);
-
-        stepLeftLine.setVisibility(View.INVISIBLE);
-        stepLeftLine2.setVisibility(View.INVISIBLE);
+    protected void setUpStepLayoutAsConfirmationStepLayout(View stepLayout) {
+        confirmationButton = stepLayout.findViewById(R.id.next_step);
 
         disableConfirmationButton();
 
@@ -587,16 +588,16 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         // RelativeLayout stepContent = (RelativeLayout) stepLayout.findViewById(R.id.step_content);
     }
 
-    protected LinearLayout createStepLayout(final int stepNumber) {
-        LinearLayout stepLayout = generateStepLayout();
+    protected View createStepLayout(final int stepNumber) {
+        View stepLayout = generateStepLayout();
 
-        LinearLayout circle = (LinearLayout) stepLayout.findViewById(R.id.circle);
+        View circle = stepLayout.findViewById(R.id.circle);
         Drawable bg = ContextCompat.getDrawable(context, R.drawable.circle_step_done);
         bg.setColorFilter(new PorterDuffColorFilter(
                 stepNumberBackgroundColor, PorterDuff.Mode.SRC_IN));
         circle.setBackground(bg);
 
-        TextView stepTitle = (TextView) stepLayout.findViewById(R.id.step_title);
+        TextView stepTitle = stepLayout.findViewById(R.id.step_title);
         stepTitle.setText(steps.get(stepNumber));
         stepTitle.setTextColor(stepTitleTextColor);
         stepsTitlesViews.add(stepNumber, stepTitle);
@@ -605,7 +606,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         if(stepsSubtitles != null && stepNumber < stepsSubtitles.size()) {
             String subtitle = stepsSubtitles.get(stepNumber);
             if(subtitle != null && !subtitle.equals("")) {
-                stepSubtitle = (TextView) stepLayout.findViewById(R.id.step_subtitle);
+                stepSubtitle = stepLayout.findViewById(R.id.step_subtitle);
                 stepSubtitle.setText(subtitle);
                 stepSubtitle.setTextColor(stepSubtitleTextColor);
                 stepSubtitle.setVisibility(View.VISIBLE);
@@ -613,19 +614,19 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         }
         stepsSubtitlesViews.add(stepNumber, stepSubtitle);
 
-        TextView stepNumberTextView = (TextView) stepLayout.findViewById(R.id.step_number);
+        TextView stepNumberTextView = stepLayout.findViewById(R.id.step_number);
         stepNumberTextView.setText(String.valueOf(stepNumber + 1));
         stepNumberTextView.setTextColor(stepNumberTextColor);
 
-        ImageView stepDoneImageView = (ImageView) stepLayout.findViewById(R.id.step_done);
+        ImageView stepDoneImageView = stepLayout.findViewById(R.id.step_done);
         stepDoneImageView.setColorFilter(stepNumberTextColor);
 
-        TextView errorMessage = (TextView) stepLayout.findViewById(R.id.error_message);
-        ImageView errorIcon = (ImageView) stepLayout.findViewById(R.id.error_icon);
+        TextView errorMessage = stepLayout.findViewById(R.id.error_message);
+        ImageView errorIcon = stepLayout.findViewById(R.id.error_icon);
         errorMessage.setTextColor(errorMessageTextColor);
         errorIcon.setColorFilter(errorMessageTextColor);
 
-        RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
+        View stepHeader = stepLayout.findViewById(R.id.step_header);
         stepHeader.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -633,7 +634,7 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
             }
         });
 
-        AppCompatButton nextButton = (AppCompatButton) stepLayout.findViewById(R.id.next_step);
+        AppCompatButton nextButton = stepLayout.findViewById(R.id.next_step);
         setButtonColor(nextButton,
                 buttonBackgroundColor, buttonTextColor, buttonPressedBackgroundColor, buttonPressedTextColor);
         nextButton.setOnClickListener(new View.OnClickListener() {
@@ -648,9 +649,9 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         return stepLayout;
     }
 
-    protected LinearLayout generateStepLayout() {
+    protected View generateStepLayout() {
         LayoutInflater inflater = LayoutInflater.from(context);
-        return (LinearLayout) inflater.inflate(R.layout.step_layout, content, false);
+        return inflater.inflate(R.layout.step_layout, content, false);
     }
 
     protected void openStep(int stepNumber, boolean restoration) {
@@ -708,38 +709,34 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     protected void findViews() {
-        content = (LinearLayout) findViewById(R.id.content);
-        stepsScrollView = (ScrollView) findViewById(R.id.steps_scroll);
-        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
-        previousStepButton = (AppCompatImageButton) findViewById(R.id.down_previous);
-        nextStepButton = (AppCompatImageButton) findViewById(R.id.down_next);
-        bottomNavigation = (RelativeLayout) findViewById(R.id.bottom_navigation);
+        content = findViewById(R.id.content);
+        stepsScrollView = findViewById(R.id.steps_scroll);
+        progressBar = findViewById(R.id.progress_bar);
+        previousStepButton = findViewById(R.id.down_previous);
+        nextStepButton = findViewById(R.id.down_next);
+        bottomNavigation = findViewById(R.id.bottom_navigation);
     }
 
-    protected void disableStepLayout(int stepNumber, boolean smoothieDisabling) {
-        LinearLayout stepLayout = stepLayouts.get(stepNumber);
-        RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
-        ImageView stepDone = (ImageView) stepHeader.findViewById(R.id.step_done);
-        TextView stepNumberTextView = (TextView) stepHeader.findViewById(R.id.step_number);
-        LinearLayout button = (LinearLayout) stepLayout.findViewById(R.id.next_step_button_container);
-        RelativeLayout stepContent = (RelativeLayout) stepLayout.findViewById(R.id.step_content);
+    protected void disableStepLayout(int stepNumber, boolean useAnimations) {
+        View stepLayout = stepLayouts.get(stepNumber);
+        View stepDone = stepLayout.findViewById(R.id.step_done);
+        TextView stepNumberTextView = stepLayout.findViewById(R.id.step_number);
+        View stepAndButton = stepLayout.findViewById(R.id.step_content_and_button);
 
-        if (smoothieDisabling) {
-            Animations.slideUp(button);
-            Animations.slideUp(stepContent);
+        if (useAnimations) {
+            Animations.slideUp(stepAndButton);
         } else {
-            button.setVisibility(View.GONE);
-            stepContent.setVisibility(View.GONE);
+            stepAndButton.setVisibility(View.GONE);
         }
 
         if (!completedSteps[stepNumber]) {
             disableStepHeader(stepLayout);
-            stepDone.setVisibility(View.INVISIBLE);
+            stepDone.setVisibility(View.GONE);
             stepNumberTextView.setVisibility(View.VISIBLE);
         } else {
             enableStepHeader(stepLayout);
             stepDone.setVisibility(View.VISIBLE);
-            stepNumberTextView.setVisibility(View.INVISIBLE);
+            stepNumberTextView.setVisibility(View.GONE);
         }
 
         showVerticalLineInCollapsedStepIfNecessary(stepLayout);
@@ -747,28 +744,24 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     protected void enableStepLayout(int stepNumber, boolean smoothieEnabling) {
-        LinearLayout stepLayout = stepLayouts.get(stepNumber);
-        RelativeLayout stepContent = (RelativeLayout) stepLayout.findViewById(R.id.step_content);
-        RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
-        ImageView stepDone = (ImageView) stepHeader.findViewById(R.id.step_done);
-        TextView stepNumberTextView = (TextView) stepHeader.findViewById(R.id.step_number);
-        LinearLayout button = (LinearLayout) stepLayout.findViewById(R.id.next_step_button_container);
+        View stepLayout = stepLayouts.get(stepNumber);
+        View stepAndButton = stepLayout.findViewById(R.id.step_content_and_button);
+        View stepDone = stepLayout.findViewById(R.id.step_done);
+        View stepNumberTextView = stepLayout.findViewById(R.id.step_number);
 
         enableStepHeader(stepLayout);
 
         if (smoothieEnabling) {
-            Animations.slideDown(stepContent);
-            Animations.slideDown(button);
+            Animations.slideDown(stepAndButton);
         } else {
-            stepContent.setVisibility(View.VISIBLE);
-            button.setVisibility(View.VISIBLE);
+            stepAndButton.setVisibility(View.VISIBLE);
         }
 
         if (completedSteps[stepNumber] && activeStep != stepNumber) {
             stepDone.setVisibility(View.VISIBLE);
-            stepNumberTextView.setVisibility(View.INVISIBLE);
+            stepNumberTextView.setVisibility(View.GONE);
         } else {
-            stepDone.setVisibility(View.INVISIBLE);
+            stepDone.setVisibility(View.GONE);
             stepNumberTextView.setVisibility(View.VISIBLE);
         }
 
@@ -776,25 +769,25 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
     }
 
-    protected void enableStepHeader(LinearLayout stepLayout) {
+    protected void enableStepHeader(View stepLayout) {
         setHeaderAppearance(stepLayout, 1, buttonBackgroundColor);
     }
 
-    protected void disableStepHeader(LinearLayout stepLayout) {
+    protected void disableStepHeader(View stepLayout) {
         setHeaderAppearance(stepLayout, alphaOfDisabledElements, Color.rgb(176, 176, 176));
     }
 
-    protected void showVerticalLineInCollapsedStepIfNecessary(LinearLayout stepLayout) {
+    protected void showVerticalLineInCollapsedStepIfNecessary(View stepLayout) {
         // The height of the line will be 16dp when the subtitle textview is gone
         if(showVerticalLineWhenStepsAreCollapsed) {
-            setVerticalLineNearSubtitleHeightWhenSubtitleIsGone(stepLayout, 16);
+            // TODO
         }
     }
 
-    protected void hideVerticalLineInCollapsedStepIfNecessary(LinearLayout stepLayout) {
+    protected void hideVerticalLineInCollapsedStepIfNecessary(View stepLayout) {
         // The height of the line will be 0 when the subtitle text is being shown
         if(showVerticalLineWhenStepsAreCollapsed) {
-            setVerticalLineNearSubtitleHeightWhenSubtitleIsGone(stepLayout, 0);
+            // TODO
         }
     }
 
@@ -841,12 +834,12 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         enableBottomButtonNavigation(nextStepButton);
     }
 
-    protected void enableBottomButtonNavigation(ImageButton button) {
+    protected void enableBottomButtonNavigation(View button) {
         button.setAlpha(1f);
         button.setEnabled(true);
     }
 
-    protected void disableBottomButtonNavigation(ImageButton button) {
+    protected void disableBottomButtonNavigation(View button) {
         button.setAlpha(alphaOfDisabledElements);
         button.setEnabled(false);
     }
@@ -879,11 +872,11 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
     }
 
     protected void displayDoneIconInConfirmationStep() {
-        LinearLayout confirmationStepLayout = stepLayouts.get(stepLayouts.size() - 1);
-        ImageView stepDone = (ImageView) confirmationStepLayout.findViewById(R.id.step_done);
-        TextView stepNumberTextView = (TextView) confirmationStepLayout.findViewById(R.id.step_number);
+        View confirmationStepLayout = stepLayouts.get(stepLayouts.size() - 1);
+        View stepDone = confirmationStepLayout.findViewById(R.id.step_done);
+        View stepNumberTextView = confirmationStepLayout.findViewById(R.id.step_number);
         stepDone.setVisibility(View.VISIBLE);
-        stepNumberTextView.setVisibility(View.INVISIBLE);
+        stepNumberTextView.setVisibility(View.GONE);
     }
 
     protected void restoreFormState() {
@@ -891,31 +884,12 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         displayCurrentProgress();
     }
 
-    protected int convertDpToPixel(float dp){
-        Resources resources = context.getResources();
-        DisplayMetrics metrics = resources.getDisplayMetrics();
-        float px = dp * ((float)metrics.densityDpi / DisplayMetrics.DENSITY_DEFAULT);
-        return (int)px;
-    }
-
-    protected void setVerticalLineNearSubtitleHeightWhenSubtitleIsGone(LinearLayout stepLayout, int height) {
-        TextView stepSubtitle = (TextView) stepLayout.findViewById(R.id.step_subtitle);
-        if (stepSubtitle.getVisibility() == View.GONE) {
-            LinearLayout stepLeftLine = (LinearLayout) stepLayout.findViewById(R.id.vertical_line_subtitle);
-            LayoutParams params = (LayoutParams) stepLeftLine.getLayoutParams();
-            params.height = convertDpToPixel(height);
-            stepLeftLine.setLayoutParams(params);
-        }
-    }
-
-    protected void setHeaderAppearance(LinearLayout stepLayout, float alpha,
-                                       int stepCircleBackgroundColor) {
+    protected void setHeaderAppearance(View stepLayout, float alpha, int stepCircleBackgroundColor) {
         if(!materialDesignInDisabledSteps) {
-            RelativeLayout stepHeader = (RelativeLayout) stepLayout.findViewById(R.id.step_header);
-            TextView title = (TextView) stepHeader.findViewById(R.id.step_title);
-            TextView subtitle = (TextView) stepHeader.findViewById(R.id.step_subtitle);
-            LinearLayout circle = (LinearLayout) stepHeader.findViewById(R.id.circle);
-            ImageView done = (ImageView) stepHeader.findViewById(R.id.step_done);
+            TextView title = stepLayout.findViewById(R.id.step_title);
+            TextView subtitle = stepLayout.findViewById(R.id.step_subtitle);
+            View circle = stepLayout.findViewById(R.id.circle);
+            ImageView done = stepLayout.findViewById(R.id.step_done);
 
             title.setAlpha(alpha);
             circle.setAlpha(alpha);
@@ -933,15 +907,20 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         }
     }
 
-    protected void setStepCircleBackgroundColor(LinearLayout stepLayout, int color) {
-        LinearLayout circle = (LinearLayout) stepLayout.findViewById(R.id.circle);
+    protected void setStepCircleBackgroundColor(View stepLayout, int color) {
+        View circle = stepLayout.findViewById(R.id.circle);
         Drawable bg = ContextCompat.getDrawable(context, R.drawable.circle_step_done);
         bg.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));
         circle.setBackground(bg);
     }
 
-    protected void setButtonColor(AppCompatButton button, int buttonColor, int buttonTextColor,
-                                  int buttonPressedColor, int buttonPressedTextColor) {
+    protected void setButtonColor(
+            AppCompatButton button,
+            int buttonColor,
+            int buttonTextColor,
+            int buttonPressedColor,
+            int buttonPressedTextColor) {
+
         int[][] states = new int[][]{
                 new int[]{android.R.attr.state_pressed},
                 new int[]{android.R.attr.state_focused},
@@ -975,11 +954,11 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
 
     @Override
     public void onClick(View v) {
-        String previousNavigationButtonTag =
-                context.getString(R.string.vertical_form_stepper_form_down_previous);
-        if (v.getTag().equals(previousNavigationButtonTag)) {
+        int viewId = v.getId();
+
+        if (viewId == R.id.down_previous) {
             goToPreviousStep();
-        } else {
+        } else if (viewId == R.id.down_next) {
             if (isActiveStepCompleted()) {
                 goToNextStep();
             }
@@ -1240,5 +1219,4 @@ public class VerticalStepperFormLayout extends RelativeLayout implements View.On
         }
 
     }
-
 }

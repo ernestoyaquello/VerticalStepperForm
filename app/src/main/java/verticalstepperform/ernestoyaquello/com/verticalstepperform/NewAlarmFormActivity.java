@@ -20,6 +20,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
@@ -55,7 +56,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
 
     // Week days step
     private boolean[] weekDays;
-    private LinearLayout daysStepContent;
+    private ScrollView daysStepContent;
     public static final String STATE_WEEK_DAYS = "week_days";
 
     private boolean confirmBack = true;
@@ -232,7 +233,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         LayoutInflater inflater = LayoutInflater.from(getBaseContext());
         LinearLayout timeStepContent =
                 (LinearLayout) inflater.inflate(R.layout.step_time_layout, null, false);
-        timeTextView = (TextView) timeStepContent.findViewById(R.id.time);
+        timeTextView = timeStepContent.findViewById(R.id.time);
         timeTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -244,13 +245,13 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
 
     private View createAlarmDaysStep() {
         LayoutInflater inflater = LayoutInflater.from(getBaseContext());
-        daysStepContent = (LinearLayout) inflater.inflate(
+        daysStepContent = (ScrollView) inflater.inflate(
                 R.layout.step_days_of_week_layout, null, false);
 
         String[] weekDays = getResources().getStringArray(R.array.week_days);
         for(int i = 0; i < weekDays.length; i++) {
             final int index = i;
-            final LinearLayout dayLayout = getDayLayout(index);
+            final View dayLayout = getDayLayout(index);
             if(index < 5) {
                 activateDay(index, dayLayout, false);
             } else {
@@ -268,7 +269,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
                 }
             });
 
-            final TextView dayText = (TextView) dayLayout.findViewById(R.id.day);
+            final TextView dayText = dayLayout.findViewById(R.id.day);
             dayText.setText(weekDays[index]);
         }
         return daysStepContent;
@@ -315,7 +316,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         timeTextView.setText(time);
     }
 
-    private void activateDay(int index, LinearLayout dayLayout, boolean check) {
+    private void activateDay(int index, View dayLayout, boolean check) {
         weekDays[index] = true;
 
         dayLayout.setTag(true);
@@ -326,7 +327,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         bg.setColorFilter(new PorterDuffColorFilter(colorPrimary, PorterDuff.Mode.SRC_IN));
         dayLayout.setBackground(bg);
 
-        TextView dayText = (TextView) dayLayout.findViewById(R.id.day);
+        TextView dayText = dayLayout.findViewById(R.id.day);
         dayText.setTextColor(Color.rgb(255, 255, 255));
 
         if(check) {
@@ -334,14 +335,14 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         }
     }
 
-    private void deactivateDay(int index, LinearLayout dayLayout, boolean check) {
+    private void deactivateDay(int index, View dayLayout, boolean check) {
         weekDays[index] = false;
 
         dayLayout.setTag(false);
 
         dayLayout.setBackgroundResource(0);
 
-        TextView dayText = (TextView) dayLayout.findViewById(R.id.day);
+        TextView dayText = dayLayout.findViewById(R.id.day);
         int colour = ContextCompat.getColor(getBaseContext(), R.color.colorPrimary);
         dayText.setTextColor(colour);
 
@@ -365,10 +366,10 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         return thereIsAtLeastOneDaySelected;
     }
 
-    private LinearLayout getDayLayout(int i) {
+    private View getDayLayout(int i) {
         int id = daysStepContent.getResources().getIdentifier(
                 "day_" + i, "id", getPackageName());
-        return (LinearLayout) daysStepContent.findViewById(id);
+        return daysStepContent.findViewById(id);
     }
 
     // CONFIRMATION DIALOG WHEN USER TRIES TO LEAVE WITHOUT SUBMITTING
@@ -493,7 +494,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
             weekDays = savedInstanceState.getBooleanArray(STATE_WEEK_DAYS);
             if (weekDays != null) {
                 for (int i = 0; i < weekDays.length; i++) {
-                    LinearLayout dayLayout = getDayLayout(i);
+                    View dayLayout = getDayLayout(i);
                     if (weekDays[i]) {
                         activateDay(i, dayLayout, false);
                     } else {

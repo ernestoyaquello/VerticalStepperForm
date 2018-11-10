@@ -27,10 +27,8 @@ public class BackConfirmationFragment extends DialogFragment {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle(ernestoyaquello.com.verticalstepperform.R.string.vertical_form_stepper_form_discard_question)
                 .setMessage(ernestoyaquello.com.verticalstepperform.R.string.vertical_form_stepper_form_info_will_be_lost)
-                .setNegativeButton(ernestoyaquello.com.verticalstepperform.R.string.vertical_form_stepper_form_discard_cancel,
-                        onConfirmBack)
-                .setPositiveButton(ernestoyaquello.com.verticalstepperform.R.string.vertical_form_stepper_form_discard,
-                        onNotConfirmBack);
+                .setNegativeButton(ernestoyaquello.com.verticalstepperform.R.string.vertical_form_stepper_form_discard_cancel, onConfirmBack)
+                .setPositiveButton(ernestoyaquello.com.verticalstepperform.R.string.vertical_form_stepper_form_discard, onNotConfirmBack);
         return builder.create();
     }
 }
