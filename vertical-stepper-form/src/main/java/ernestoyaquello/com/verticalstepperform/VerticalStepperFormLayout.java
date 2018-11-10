@@ -1,6 +1,5 @@
 package ernestoyaquello.com.verticalstepperform;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -8,18 +7,16 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.ShapeDrawable;
 import android.os.Bundle;
 import android.os.Parcelable;
 import androidx.core.content.ContextCompat;
-import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatImageButton;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
-import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -32,15 +29,14 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import ernestoyaquello.com.verticalstepperform.interfaces.VerticalStepperForm;
-import ernestoyaquello.com.verticalstepperform.utils.Animations;
+import ernestoyaquello.com.verticalstepperform.listener.VerticalStepperFormListener;
+import ernestoyaquello.com.verticalstepperform.util.Animations;
 
 /**
- * Custom layout that implements a vertical stepper form
+ * Custom layout that implements a vertical stepper form.
  */
-public class VerticalStepperFormLayout extends LinearLayout implements View.OnClickListener {
+public class VerticalStepperFormLayout extends LinearLayout {
 
-    // Style
     protected float alphaOfDisabledElements;
     protected int stepNumberBackgroundColor;
     protected int buttonBackgroundColor;
@@ -52,11 +48,8 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
     protected int buttonPressedTextColor;
     protected int errorMessageTextColor;
     protected boolean displayBottomNavigation;
-    protected boolean materialDesignInDisabledSteps;
-    protected boolean hideKeyboard;
     protected boolean showVerticalLineWhenStepsAreCollapsed;
 
-    // Views
     protected LayoutInflater mInflater;
     protected LinearLayout content;
     protected ScrollView stepsScrollView;
@@ -69,84 +62,80 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
     protected AppCompatImageButton previousStepButton, nextStepButton;
     protected View bottomNavigation;
 
-    // Data
-    protected List<String> steps;
-    protected List<String> stepsSubtitles;
+    protected List<String> stepTitles;
+    protected List<String> stepSubtitles;
 
-    // Logic
     protected int activeStep = 0;
     protected int numberOfSteps;
     protected boolean[] completedSteps;
 
-    // Listeners and callbacks
-    protected VerticalStepperForm verticalStepperFormImplementation;
-
-    // Context
-    protected Context context;
-    protected Activity activity;
+    protected VerticalStepperFormListener verticalStepperFormListener;
 
     public VerticalStepperFormLayout(Context context) {
         super(context);
 
-        init(context);
+        inflateLayout(context);
     }
 
     public VerticalStepperFormLayout(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-        init(context);
+        inflateLayout(context);
     }
 
     public VerticalStepperFormLayout(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
-        init(context);
+        inflateLayout(context);
     }
 
-    protected void init(Context context) {
-        this.context = context;
+    private void inflateLayout(Context context) {
         mInflater = LayoutInflater.from(context);
         mInflater.inflate(R.layout.vertical_stepper_form_layout, this, true);
     }
 
     /**
-     * Returns the title of a step
-     * @param stepNumber The step number (counting from 0)
-     * @return the title string
+     * Returns the title of a specified step.
+     * 
+     * @param stepPosition The step position, counting from 0.
+     * @return The title string.
      */
-    public String getStepTitle(int stepNumber) {
-        return steps.get(stepNumber);
+    public String getStepTitle(int stepPosition) {
+        return stepTitles.get(stepPosition);
     }
 
     /**
-     * Returns the subtitle of a step
-     * @param stepNumber The step number (counting from 0)
-     * @return the subtitle string
+     * Returns the subtitle of a specified step.
+     * 
+     * @param stepPosition The step position, counting from 0.
+     * @return The subtitle string.
      */
-    public String getStepsSubtitles(int stepNumber) {
-        if(stepsSubtitles != null) {
-            return stepsSubtitles.get(stepNumber);
+    public String getStepsSubtitles(int stepPosition) {
+        if(stepSubtitles != null) {
+            return stepSubtitles.get(stepPosition);
         }
         return null;
     }
 
     /**
-     * Returns the active step number
-     * @return the active step number (counting from 0)
+     * Returns the active step number.
+     * 
+     * @return The active step number, counting from 0.
      */
     public int getActiveStepNumber() {
         return activeStep;
     }
 
     /**
-     * Set the title of certain step
-     * @param stepNumber The step number (counting from 0)
-     * @param title New title of the step
+     * Sets the title of a specified step.
+     * 
+     * @param stepPosition The step position, counting from 0.
+     * @param title New title of the step.
      */
-    public void setStepTitle(int stepNumber, String title) {
+    public void setStepTitle(int stepPosition, String title) {
         if(title != null && !title.equals("")) {
-            steps.set(stepNumber, title);
-            TextView titleView = stepsTitlesViews.get(stepNumber);
+            stepTitles.set(stepPosition, title);
+            TextView titleView = stepsTitlesViews.get(stepPosition);
             if (titleView != null) {
                 titleView.setText(title);
             }
@@ -154,14 +143,15 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
     }
 
     /**
-     * Set the subtitle of certain step
-     * @param stepNumber The step number (counting from 0)
-     * @param subtitle New subtitle of the step
+     * Sets the subtitle of a specified step.
+     * 
+     * @param stepPosition The step position, counting from 0.
+     * @param subtitle New subtitle of the step.
      */
-    public void setStepSubtitle(int stepNumber, String subtitle) {
-        if(stepsSubtitles != null && subtitle != null && !subtitle.equals("")) {
-            stepsSubtitles.set(stepNumber, subtitle);
-            TextView subtitleView = stepsSubtitlesViews.get(stepNumber);
+    public void setStepSubtitle(int stepPosition, String subtitle) {
+        if(stepSubtitles != null && subtitle != null && !subtitle.equals("")) {
+            stepSubtitles.set(stepPosition, subtitle);
+            TextView subtitleView = stepsSubtitlesViews.get(stepPosition);
             if (subtitleView != null) {
                 subtitleView.setText(subtitle);
             }
@@ -169,28 +159,31 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
     }
 
     /**
-     * Set the active step as completed
+     * Sets the active step as completed.
      */
     public void setActiveStepAsCompleted() {
         setStepAsCompleted(activeStep);
     }
 
     /**
-     * Set the active step as not completed
-     * @param errorMessage Error message that will be displayed (null for no message)
+     * Sets the active step as not completed.
+     * 
+     * @param errorMessage Error message that will be displayed in the step. If null, no error
+     *                     message will be displayed.
      */
     public void setActiveStepAsUncompleted(String errorMessage) {
         setStepAsUncompleted(activeStep, errorMessage);
     }
 
     /**
-     * Set the step as completed
-     * @param stepNumber the step number (counting from 0)
+     * Sets the specified step as completed.
+     * 
+     * @param stepPosition The step position, counting from 0.
      */
-    public void setStepAsCompleted(int stepNumber) {
-        completedSteps[stepNumber] = true;
+    public void setStepAsCompleted(int stepPosition) {
+        completedSteps[stepPosition] = true;
 
-        View stepLayout = stepLayouts.get(stepNumber);
+        View stepLayout = stepLayouts.get(stepPosition);
         View stepDone = stepLayout.findViewById(R.id.step_done);
         View stepNumberTextView = stepLayout.findViewById(R.id.step_number);
         View errorContainer = stepLayout.findViewById(R.id.error_container);
@@ -202,11 +195,11 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         nextButton.setEnabled(true);
         nextButton.setAlpha(1);
 
-        if (stepNumber != activeStep) {
+        if (stepPosition != activeStep) {
             stepDone.setVisibility(View.VISIBLE);
             stepNumberTextView.setVisibility(View.GONE);
         } else {
-            if (stepNumber != numberOfSteps) {
+            if (stepPosition != numberOfSteps) {
                 enableNextButtonInBottomNavigationLayout();
             } else {
                 disableNextButtonInBottomNavigationLayout();
@@ -214,21 +207,22 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         }
 
         errorTextView.setText("");
-        //errorContainer.setVisibility(View.GONE);
         Animations.slideUp(errorContainer);
 
         displayCurrentProgress();
     }
 
     /**
-     * Set the step as not completed
-     * @param stepNumber the step number (counting from 0)
-     * @param errorMessage Error message that will be displayed (null for no message)
+     * Sets the specified step as not completed.
+     *
+     * @param stepPosition The step position, counting from 0.
+     * @param errorMessage Error message that will be displayed in the step. If null, no error
+     *                     message will be displayed.
      */
-    public void setStepAsUncompleted(int stepNumber, String errorMessage) {
-        completedSteps[stepNumber] = false;
+    public void setStepAsUncompleted(int stepPosition, String errorMessage) {
+        completedSteps[stepPosition] = false;
 
-        View stepLayout = stepLayouts.get(stepNumber);
+        View stepLayout = stepLayouts.get(stepPosition);
         View stepDone = stepLayout.findViewById(R.id.step_done);
         View stepNumberTextView = stepLayout.findViewById(R.id.step_number);
         View nextButton = stepLayout.findViewById(R.id.next_step);
@@ -239,13 +233,13 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         nextButton.setEnabled(false);
         nextButton.setAlpha(alphaOfDisabledElements);
 
-        if (stepNumber == activeStep) {
+        if (stepPosition == activeStep) {
             disableNextButtonInBottomNavigationLayout();
         } else {
             disableStepHeader(stepLayout);
         }
 
-        if (stepNumber < numberOfSteps) {
+        if (stepPosition < numberOfSteps) {
             setStepAsUncompleted(numberOfSteps, null);
         }
 
@@ -254,7 +248,6 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
             TextView errorTextView = errorContainer.findViewById(R.id.error_message);
 
             errorTextView.setText(errorMessage);
-            //errorContainer.setVisibility(View.VISIBLE);
             Animations.slideDown(errorContainer);
         }
 
@@ -262,25 +255,28 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
     }
 
     /**
-     * Determines whether the active step is completed or not
-     * @return true if the active step is completed; false otherwise
+     * Determines whether the active step is completed or not.
+     *
+     * @return True if the active step is completed; false otherwise
      */
     public boolean isActiveStepCompleted() {
         return isStepCompleted(activeStep);
     }
 
     /**
-     * Determines whether the given step is completed or not
-     * @param stepNumber the step number (counting from 0)
-     * @return true if the step is completed, false otherwise
+     * Determines whether the specified step is completed or not.
+     *
+     * @param stepPosition The step position, counting from 0.
+     * @return True if the step is completed, false otherwise.
      */
-    public boolean isStepCompleted(int stepNumber) {
-        return completedSteps[stepNumber];
+    public boolean isStepCompleted(int stepPosition) {
+        return completedSteps[stepPosition];
     }
 
     /**
-     * Determines if any step has been completed
-     * @return true if at least 1 step has been completed; false otherwise
+     * Determines if any step has been completed.
+     *
+     * @return True if at least 1 step has been completed; false otherwise.
      */
     public boolean isAnyStepCompleted() {
         for (boolean completedStep : completedSteps) {
@@ -292,176 +288,52 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
     }
 
     /**
-     * Determines if the steps that are previous to the given one are completed
-     * @param stepNumber the selected step number (counting from 0)
-     * @return true if all the previous steps have been completed; false otherwise
+     * Determines if the stepTitles that are previous to the specified one are completed.
+     *
+     * @param stepPosition The step position, counting from 0.
+     * @return True if all the previous stepTitles have been completed; false otherwise.
      */
-    public boolean arePreviousStepsCompleted(int stepNumber) {
+    public boolean arePreviousStepsCompleted(int stepPosition) {
         boolean previousStepsAreCompleted = true;
-        for (int i = (stepNumber - 1); i >= 0 && previousStepsAreCompleted; i--) {
+        for (int i = (stepPosition - 1); i >= 0 && previousStepsAreCompleted; i--) {
             previousStepsAreCompleted = completedSteps[i];
         }
         return previousStepsAreCompleted;
     }
 
     /**
-     * Go to the next step
+     * Goes to the next step and opens it.
      */
     public void goToNextStep() {
         goToStep(activeStep + 1, false);
     }
 
     /**
-     * Go to the previous step
+     * Goes to the previous step and opens it.
      */
     public void goToPreviousStep() {
         goToStep(activeStep - 1, false);
     }
 
     /**
-     * Go to the selected step
-     * @param stepNumber the selected step number (counting from 0)
-     * @param restoration true if the method has been called to restore the form; false otherwise
+     * Goes to the selected step and opens it.
+     *
+     * @param stepPosition The step position, counting from 0.
+     * @param restoration True if the method has been called to restore the form; false otherwise.
      */
-    public void goToStep(int stepNumber, boolean restoration) {
-        if (activeStep != stepNumber || restoration) {
-            if(hideKeyboard) {
-                hideSoftKeyboard();
-            }
+    public void goToStep(int stepPosition, boolean restoration) {
+        if (activeStep != stepPosition || restoration) {
             boolean previousStepsAreCompleted =
-                    arePreviousStepsCompleted(stepNumber);
-            if (stepNumber == 0 || previousStepsAreCompleted) {
-                openStep(stepNumber, restoration);
+                    arePreviousStepsCompleted(stepPosition);
+            if (stepPosition == 0 || previousStepsAreCompleted) {
+                openStep(stepPosition, restoration);
             }
         }
     }
 
-    /**
-     * Set the active step as not completed
-     * @deprecated use {@link #setActiveStepAsUncompleted(String)} instead
-     */
-    @Deprecated
-    public void setActiveStepAsUncompleted() {
-        setStepAsUncompleted(activeStep, null);
-    }
+    private void initialiseVerticalStepperForm(Builder builder) {
 
-    /**
-     * Set the selected step as not completed
-     * @param stepNumber the step number (counting from 0)
-     * @deprecated use {@link #setStepAsUncompleted(int, String)} instead
-     */
-    @Deprecated
-    public void setStepAsUncompleted(int stepNumber) {
-        setStepAsUncompleted(stepNumber, null);
-    }
-
-    /**
-     * Set up and initialize the form
-     * @param stepsTitles names of the steps
-     * @param colorPrimary primary color
-     * @param colorPrimaryDark primary color (dark)
-     * @param verticalStepperForm instance that implements the interface "VerticalStepperForm"
-     * @param activity activity where the form is
-     *
-     * @deprecated use {@link Builder#newInstance(VerticalStepperFormLayout, String[], VerticalStepperForm, Activity)} instead like this:
-     * <blockquote><pre>
-     * VerticalStepperFormLayout.Builder.newInstance(verticalStepperFormLayout, stepsTitles, verticalStepperForm, activity)<br>
-     *     .primaryColor(colorPrimary)<br>
-     *     .primaryDarkColor(colorPrimaryDark)<br>
-     *     .init();
-     * </pre></blockquote>
-     */
-    @Deprecated
-    public void initialiseVerticalStepperForm(
-            String[] stepsTitles,
-            int colorPrimary, 
-            int colorPrimaryDark,
-            VerticalStepperForm verticalStepperForm,
-            Activity activity) {
-
-        this.alphaOfDisabledElements = 0.25f;
-        this.buttonTextColor = Color.rgb(255, 255, 255);
-        this.buttonPressedTextColor = Color.rgb(255, 255, 255);
-        this.stepNumberTextColor = Color.rgb(255, 255, 255);
-        this.stepTitleTextColor = Color.rgb(33, 33, 33);
-        this.stepSubtitleTextColor = Color.rgb(162, 162, 162);
-        this.stepNumberBackgroundColor = colorPrimary;
-        this.buttonBackgroundColor = colorPrimary;
-        this.buttonPressedBackgroundColor = colorPrimaryDark;
-        this.errorMessageTextColor = Color.rgb(175, 18, 18);
-        this.displayBottomNavigation = true;
-        this.materialDesignInDisabledSteps = false;
-        this.hideKeyboard = true;
-        this.showVerticalLineWhenStepsAreCollapsed = false;
-
-        this.verticalStepperFormImplementation = verticalStepperForm;
-        this.activity = activity;
-
-        initStepperForm(stepsTitles, null);
-    }
-
-    /**
-     * Set up and initialize the form
-     * @param stepsTitles names of the steps
-     * @param buttonBackgroundColor background colour of the buttons
-     * @param buttonTextColor text color of the buttons
-     * @param buttonPressedBackgroundColor background color of the buttons when clicked
-     * @param buttonPressedTextColor text color of the buttons when clicked
-     * @param stepNumberBackgroundColor background color of the left circles
-     * @param stepNumberTextColor text color of the left circles
-     * @param verticalStepperForm instance that implements the interface "VerticalStepperForm"
-     * @param activity activity where the form is
-     *
-     * @deprecated use {@link Builder#newInstance(VerticalStepperFormLayout, String[], VerticalStepperForm, Activity)} instead like this:
-     * <blockquote><pre>
-     * VerticalStepperFormLayout.Builder.newInstance(verticalStepperFormLayout, stepsTitles, verticalStepperForm, activity)<br>
-     *     .buttonBackgroundColor(buttonBackgroundColor)<br>
-     *     .buttonTextColor(buttonTextColor)<br>
-     *     .buttonPressedBackgroundColor(buttonPressedBackgroundColor)<br>
-     *     .buttonPressedTextColor(buttonPressedTextColor)<br>
-     *     .stepNumberBackgroundColor(stepNumberBackgroundColor)<br>
-     *     .stepNumberTextColor(stepNumberTextColor)<br>
-     *     .init();
-     * </pre></blockquote>
-     */
-    @Deprecated
-    public void initialiseVerticalStepperForm(
-            String[] stepsTitles,
-            int buttonBackgroundColor, 
-            int buttonTextColor,
-            int buttonPressedBackgroundColor, 
-            int buttonPressedTextColor,
-            int stepNumberBackgroundColor, 
-            int stepNumberTextColor,
-            VerticalStepperForm verticalStepperForm,
-            Activity activity) {
-
-        this.alphaOfDisabledElements = 0.25f;
-        this.buttonBackgroundColor = buttonBackgroundColor;
-        this.buttonTextColor = buttonTextColor;
-        this.buttonPressedBackgroundColor = buttonPressedBackgroundColor;
-        this.buttonPressedTextColor = buttonPressedTextColor;
-        this.stepNumberBackgroundColor = stepNumberBackgroundColor;
-        this.stepTitleTextColor = Color.rgb(33, 33, 33);
-        this.stepSubtitleTextColor = Color.rgb(162, 162, 162);
-        this.stepNumberTextColor = stepNumberTextColor;
-        this.errorMessageTextColor = Color.rgb(175, 18, 18);
-        this.displayBottomNavigation = true;
-        this.materialDesignInDisabledSteps = false;
-        this.hideKeyboard = true;
-        this.showVerticalLineWhenStepsAreCollapsed = false;
-
-        this.verticalStepperFormImplementation = verticalStepperForm;
-        this.activity = activity;
-
-        initStepperForm(stepsTitles, null);
-    }
-
-    protected void initialiseVerticalStepperForm(Builder builder) {
-
-        this.verticalStepperFormImplementation = builder.verticalStepperFormImplementation;
-        this.activity = builder.activity;
-
+        this.verticalStepperFormListener = builder.verticalStepperFormListener;
         this.alphaOfDisabledElements = builder.alphaOfDisabledElements;
         this.stepNumberBackgroundColor = builder.stepNumberBackgroundColor;
         this.buttonBackgroundColor = builder.buttonBackgroundColor;
@@ -473,46 +345,39 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         this.buttonPressedTextColor = builder.buttonPressedTextColor;
         this.errorMessageTextColor = builder.errorMessageTextColor;
         this.displayBottomNavigation = builder.displayBottomNavigation;
-        this.materialDesignInDisabledSteps = builder.materialDesignInDisabledSteps;
-        this.hideKeyboard = builder.hideKeyboard;
         this.showVerticalLineWhenStepsAreCollapsed = builder.showVerticalLineWhenStepsAreCollapsed;
 
-        initStepperForm(builder.steps, builder.stepsSubtitles);
+        initStepperForm(builder.stepTitles, builder.stepSubtitles);
     }
 
-    protected void initStepperForm(String[] stepsTitles, String[] stepsSubtitles) {
-        setSteps(stepsTitles, stepsSubtitles);
+    private void initStepperForm(String[] stepTitles, String[] stepSubtitles) {
+        setSteps(stepTitles, stepSubtitles);
 
         List<View> stepContentLayouts = new ArrayList<>();
         for (int i = 0; i < numberOfSteps; i++) {
-            View stepLayout = verticalStepperFormImplementation.createStepContentView(i);
+            View stepLayout = verticalStepperFormListener.getStepLayout(i);
             stepContentLayouts.add(stepLayout);
         }
         stepContentViews = stepContentLayouts;
 
         initializeForm();
 
-        verticalStepperFormImplementation.onStepOpening(activeStep);
+        verticalStepperFormListener.onStepOpened(activeStep);
     }
 
-    protected void setSteps(String[] steps, String[] stepsSubtitles) {
-        this.steps = new ArrayList<>(Arrays.asList(steps));
+    private void setSteps(String[] steps, String[] stepsSubtitles) {
+        this.stepTitles = new ArrayList<>(Arrays.asList(steps));
         if(stepsSubtitles != null) {
-            this.stepsSubtitles = new ArrayList<>(Arrays.asList(stepsSubtitles));
+            this.stepSubtitles = new ArrayList<>(Arrays.asList(stepsSubtitles));
         } else {
-            this.stepsSubtitles = null;
+            this.stepSubtitles = null;
         }
         numberOfSteps = steps.length;
         setAuxVars();
         addConfirmationStepToStepsList();
     }
 
-    protected void registerListeners() {
-        previousStepButton.setOnClickListener(this);
-        nextStepButton.setOnClickListener(this);
-    }
-
-    protected void initializeForm() {
+    private void initializeForm() {
         stepsTitlesViews = new ArrayList<>();
         stepsSubtitlesViews = new ArrayList<>();
         setUpSteps();
@@ -524,30 +389,30 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         setObserverForKeyboard();
     }
 
-    // http://stackoverflow.com/questions/2150078/how-to-check-visibility-of-software-keyboard-in-android
-    protected void setObserverForKeyboard() {
+    private void setObserverForKeyboard() {
         content.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 Rect r = new Rect();
-                //r will be populated with the coordinates of your view that area still visible.
                 content.getWindowVisibleDisplayFrame(r);
+                int screenHeight = content.getRootView().getHeight();
+                int keypadHeight = screenHeight - r.bottom;
 
-                int heightDiff = content.getRootView().getHeight() - (r.bottom - r.top);
-                if (heightDiff > 100) { // if more than 100 pixels, it is probably a keyboard...
+                if (keypadHeight > screenHeight * 0.15) {
+                    // The keyboard has probably been opened, so we scroll to the step
                     scrollToActiveStep(true);
                 }
             }
         });
     }
 
-    protected void hideBottomNavigation() {
+    private void hideBottomNavigation() {
         bottomNavigation.setVisibility(View.GONE);
     }
 
-    protected void setUpSteps() {
+    private void setUpSteps() {
         stepLayouts = new ArrayList<>();
-        // Set up normal steps
+        // Set up normal stepTitles
         for (int i = 0; i < numberOfSteps; i++) {
             setUpStep(i);
         }
@@ -555,23 +420,23 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         setUpStep(numberOfSteps);
     }
 
-    protected void setUpStep(int stepNumber) {
-        View stepLayout = createStepLayout(stepNumber);
-        if (stepNumber < numberOfSteps) {
+    private void setUpStep(int stepPosition) {
+        View stepLayout = createStepLayout(stepPosition);
+        if (stepPosition < numberOfSteps) {
             // The content of the step is the corresponding custom view previously created
             ViewGroup stepContent = stepLayout.findViewById(R.id.step_content);
-            stepContent.addView(stepContentViews.get(stepNumber));
+            stepContent.addView(stepContentViews.get(stepPosition));
         } else {
             setUpStepLayoutAsConfirmationStepLayout(stepLayout);
         }
         addStepToContent(stepLayout);
     }
 
-    protected void addStepToContent(View stepLayout) {
+    private void addStepToContent(View stepLayout) {
         content.addView(stepLayout);
     }
 
-    protected void setUpStepLayoutAsConfirmationStepLayout(View stepLayout) {
+    private void setUpStepLayoutAsConfirmationStepLayout(View stepLayout) {
         confirmationButton = stepLayout.findViewById(R.id.next_step);
 
         disableConfirmationButton();
@@ -583,28 +448,25 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
                 prepareSendingAndSend();
             }
         });
-
-        // Some content could be added to the final step inside stepContent layout
-        // RelativeLayout stepContent = (RelativeLayout) stepLayout.findViewById(R.id.step_content);
     }
 
-    protected View createStepLayout(final int stepNumber) {
+    protected View createStepLayout(final int stepPosition) {
         View stepLayout = generateStepLayout();
 
         View circle = stepLayout.findViewById(R.id.circle);
-        Drawable bg = ContextCompat.getDrawable(context, R.drawable.circle_step_done);
+        Drawable bg = ContextCompat.getDrawable(getContext(), R.drawable.circle_step_done);
         bg.setColorFilter(new PorterDuffColorFilter(
                 stepNumberBackgroundColor, PorterDuff.Mode.SRC_IN));
         circle.setBackground(bg);
 
         TextView stepTitle = stepLayout.findViewById(R.id.step_title);
-        stepTitle.setText(steps.get(stepNumber));
+        stepTitle.setText(stepTitles.get(stepPosition));
         stepTitle.setTextColor(stepTitleTextColor);
-        stepsTitlesViews.add(stepNumber, stepTitle);
+        stepsTitlesViews.add(stepPosition, stepTitle);
 
         TextView stepSubtitle = null;
-        if(stepsSubtitles != null && stepNumber < stepsSubtitles.size()) {
-            String subtitle = stepsSubtitles.get(stepNumber);
+        if(stepSubtitles != null && stepPosition < stepSubtitles.size()) {
+            String subtitle = stepSubtitles.get(stepPosition);
             if(subtitle != null && !subtitle.equals("")) {
                 stepSubtitle = stepLayout.findViewById(R.id.step_subtitle);
                 stepSubtitle.setText(subtitle);
@@ -612,10 +474,10 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
                 stepSubtitle.setVisibility(View.VISIBLE);
             }
         }
-        stepsSubtitlesViews.add(stepNumber, stepSubtitle);
+        stepsSubtitlesViews.add(stepPosition, stepSubtitle);
 
         TextView stepNumberTextView = stepLayout.findViewById(R.id.step_number);
-        stepNumberTextView.setText(String.valueOf(stepNumber + 1));
+        stepNumberTextView.setText(String.valueOf(stepPosition + 1));
         stepNumberTextView.setTextColor(stepNumberTextColor);
 
         ImageView stepDoneImageView = stepLayout.findViewById(R.id.step_done);
@@ -630,17 +492,17 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         stepHeader.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToStep(stepNumber, false);
+                goToStep(stepPosition, false);
             }
         });
 
-        AppCompatButton nextButton = stepLayout.findViewById(R.id.next_step);
+        MaterialButton nextButton = stepLayout.findViewById(R.id.next_step);
         setButtonColor(nextButton,
                 buttonBackgroundColor, buttonTextColor, buttonPressedBackgroundColor, buttonPressedTextColor);
         nextButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                goToStep((stepNumber + 1), false);
+                goToStep((stepPosition + 1), false);
             }
         });
 
@@ -650,28 +512,28 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
     }
 
     protected View generateStepLayout() {
-        LayoutInflater inflater = LayoutInflater.from(context);
+        LayoutInflater inflater = LayoutInflater.from(getContext());
         return inflater.inflate(R.layout.step_layout, content, false);
     }
 
-    protected void openStep(int stepNumber, boolean restoration) {
-        if (stepNumber >= 0 && stepNumber <= numberOfSteps) {
-            activeStep = stepNumber;
+    private void openStep(int stepPosition, boolean restoration) {
+        if (stepPosition >= 0 && stepPosition <= numberOfSteps) {
+            activeStep = stepPosition;
 
-            if (stepNumber == 0) {
+            if (stepPosition == 0) {
                 disablePreviousButtonInBottomNavigationLayout();
             } else {
                 enablePreviousButtonInBottomNavigationLayout();
             }
 
-            if (completedSteps[stepNumber] && activeStep != numberOfSteps) {
+            if (completedSteps[stepPosition] && activeStep != numberOfSteps) {
                 enableNextButtonInBottomNavigationLayout();
             } else {
                 disableNextButtonInBottomNavigationLayout();
             }
 
             for(int i = 0; i <= numberOfSteps; i++) {
-                if(i != stepNumber) {
+                if(i != stepPosition) {
                     disableStepLayout(i, !restoration);
                 } else {
                     enableStepLayout(i, !restoration);
@@ -680,45 +542,36 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
 
             scrollToActiveStep(!restoration);
 
-            if (stepNumber == numberOfSteps) {
-                setStepAsCompleted(stepNumber);
+            if (stepPosition == numberOfSteps) {
+                setStepAsCompleted(stepPosition);
             }
 
-            verticalStepperFormImplementation.onStepOpening(stepNumber);
+            verticalStepperFormListener.onStepOpened(stepPosition);
         }
     }
 
-    protected void scrollToStep(final int stepNumber, boolean smoothScroll) {
+    private void scrollToStep(final int stepPosition, boolean smoothScroll) {
         if (smoothScroll) {
             stepsScrollView.post(new Runnable() {
                 public void run() {
-                    stepsScrollView.smoothScrollTo(0, stepLayouts.get(stepNumber).getTop());
+                    stepsScrollView.smoothScrollTo(0, stepLayouts.get(stepPosition).getTop());
                 }
             });
         } else {
             stepsScrollView.post(new Runnable() {
                 public void run() {
-                    stepsScrollView.scrollTo(0, stepLayouts.get(stepNumber).getTop());
+                    stepsScrollView.scrollTo(0, stepLayouts.get(stepPosition).getTop());
                 }
             });
         }
     }
 
-    protected void scrollToActiveStep(boolean smoothScroll) {
+    private void scrollToActiveStep(boolean smoothScroll) {
         scrollToStep(activeStep, smoothScroll);
     }
-
-    protected void findViews() {
-        content = findViewById(R.id.content);
-        stepsScrollView = findViewById(R.id.steps_scroll);
-        progressBar = findViewById(R.id.progress_bar);
-        previousStepButton = findViewById(R.id.down_previous);
-        nextStepButton = findViewById(R.id.down_next);
-        bottomNavigation = findViewById(R.id.bottom_navigation);
-    }
-
-    protected void disableStepLayout(int stepNumber, boolean useAnimations) {
-        View stepLayout = stepLayouts.get(stepNumber);
+    
+    private void disableStepLayout(int stepPosition, boolean useAnimations) {
+        View stepLayout = stepLayouts.get(stepPosition);
         View stepDone = stepLayout.findViewById(R.id.step_done);
         TextView stepNumberTextView = stepLayout.findViewById(R.id.step_number);
         View stepAndButton = stepLayout.findViewById(R.id.step_content_and_button);
@@ -729,7 +582,7 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
             stepAndButton.setVisibility(View.GONE);
         }
 
-        if (!completedSteps[stepNumber]) {
+        if (!completedSteps[stepPosition]) {
             disableStepHeader(stepLayout);
             stepDone.setVisibility(View.GONE);
             stepNumberTextView.setVisibility(View.VISIBLE);
@@ -743,8 +596,8 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
 
     }
 
-    protected void enableStepLayout(int stepNumber, boolean smoothieEnabling) {
-        View stepLayout = stepLayouts.get(stepNumber);
+    private void enableStepLayout(int stepPosition, boolean smoothieEnabling) {
+        View stepLayout = stepLayouts.get(stepPosition);
         View stepAndButton = stepLayout.findViewById(R.id.step_content_and_button);
         View stepDone = stepLayout.findViewById(R.id.step_done);
         View stepNumberTextView = stepLayout.findViewById(R.id.step_number);
@@ -757,7 +610,7 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
             stepAndButton.setVisibility(View.VISIBLE);
         }
 
-        if (completedSteps[stepNumber] && activeStep != stepNumber) {
+        if (completedSteps[stepPosition] && activeStep != stepPosition) {
             stepDone.setVisibility(View.VISIBLE);
             stepNumberTextView.setVisibility(View.GONE);
         } else {
@@ -769,29 +622,29 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
 
     }
 
-    protected void enableStepHeader(View stepLayout) {
+    private void enableStepHeader(View stepLayout) {
         setHeaderAppearance(stepLayout, 1, buttonBackgroundColor);
     }
 
-    protected void disableStepHeader(View stepLayout) {
+    private void disableStepHeader(View stepLayout) {
         setHeaderAppearance(stepLayout, alphaOfDisabledElements, Color.rgb(176, 176, 176));
     }
 
-    protected void showVerticalLineInCollapsedStepIfNecessary(View stepLayout) {
+    private void showVerticalLineInCollapsedStepIfNecessary(View stepLayout) {
         // The height of the line will be 16dp when the subtitle textview is gone
         if(showVerticalLineWhenStepsAreCollapsed) {
             // TODO
         }
     }
 
-    protected void hideVerticalLineInCollapsedStepIfNecessary(View stepLayout) {
+    private void hideVerticalLineInCollapsedStepIfNecessary(View stepLayout) {
         // The height of the line will be 0 when the subtitle text is being shown
         if(showVerticalLineWhenStepsAreCollapsed) {
             // TODO
         }
     }
 
-    protected void displayCurrentProgress() {
+    private void displayCurrentProgress() {
         int progress = 0;
         for (int i = 0; i < (completedSteps.length - 1); i++) {
             if (completedSteps[i]) {
@@ -801,11 +654,11 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         progressBar.setProgress(progress);
     }
 
-    protected void displayMaxProgress() {
+    private void displayMaxProgress() {
         setProgress(numberOfSteps + 1);
     }
 
-    protected void setAuxVars() {
+    private void setAuxVars() {
         completedSteps = new boolean[numberOfSteps + 1];
         for (int i = 0; i < (numberOfSteps + 1); i++) {
             completedSteps[i] = false;
@@ -813,65 +666,57 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         progressBar.setMax(numberOfSteps + 1);
     }
 
-    protected void addConfirmationStepToStepsList() {
-        String confirmationStepText = context.getString(R.string.vertical_form_stepper_form_last_step);
-        steps.add(confirmationStepText);
+    private void addConfirmationStepToStepsList() {
+        String confirmationStepText = getContext().getString(R.string.vertical_form_stepper_form_last_step);
+        stepTitles.add(confirmationStepText);
     }
 
-    protected void disablePreviousButtonInBottomNavigationLayout() {
+    private void disablePreviousButtonInBottomNavigationLayout() {
         disableBottomButtonNavigation(previousStepButton);
     }
 
-    protected void enablePreviousButtonInBottomNavigationLayout() {
+    private void enablePreviousButtonInBottomNavigationLayout() {
         enableBottomButtonNavigation(previousStepButton);
     }
 
-    protected void disableNextButtonInBottomNavigationLayout() {
+    private void disableNextButtonInBottomNavigationLayout() {
         disableBottomButtonNavigation(nextStepButton);
     }
 
-    protected void enableNextButtonInBottomNavigationLayout() {
+    private void enableNextButtonInBottomNavigationLayout() {
         enableBottomButtonNavigation(nextStepButton);
     }
 
-    protected void enableBottomButtonNavigation(View button) {
+    private void enableBottomButtonNavigation(View button) {
         button.setAlpha(1f);
         button.setEnabled(true);
     }
 
-    protected void disableBottomButtonNavigation(View button) {
+    private void disableBottomButtonNavigation(View button) {
         button.setAlpha(alphaOfDisabledElements);
         button.setEnabled(false);
     }
 
-    protected void setProgress(int progress) {
+    private void setProgress(int progress) {
         if (progress > 0 && progress <= (numberOfSteps + 1)) {
             progressBar.setProgress(progress);
         }
     }
 
-    protected void disableConfirmationButton() {
+    private void disableConfirmationButton() {
         confirmationButton.setEnabled(false);
         confirmationButton.setAlpha(alphaOfDisabledElements);
     }
 
-    protected void hideSoftKeyboard() {
-        activity.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
-        View view = activity.getCurrentFocus();
-        if (view != null) {
-            InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
-    }
-
-    protected void prepareSendingAndSend() {
+    private void prepareSendingAndSend() {
         displayDoneIconInConfirmationStep();
         disableConfirmationButton();
         displayMaxProgress();
-        verticalStepperFormImplementation.sendData();
+
+        verticalStepperFormListener.onCompletedForm();
     }
 
-    protected void displayDoneIconInConfirmationStep() {
+    private void displayDoneIconInConfirmationStep() {
         View confirmationStepLayout = stepLayouts.get(stepLayouts.size() - 1);
         View stepDone = confirmationStepLayout.findViewById(R.id.step_done);
         View stepNumberTextView = confirmationStepLayout.findViewById(R.id.step_number);
@@ -879,43 +724,41 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         stepNumberTextView.setVisibility(View.GONE);
     }
 
-    protected void restoreFormState() {
+    private void restoreFormState() {
         goToStep(activeStep, true);
         displayCurrentProgress();
     }
 
-    protected void setHeaderAppearance(View stepLayout, float alpha, int stepCircleBackgroundColor) {
-        if(!materialDesignInDisabledSteps) {
-            TextView title = stepLayout.findViewById(R.id.step_title);
-            TextView subtitle = stepLayout.findViewById(R.id.step_subtitle);
-            View circle = stepLayout.findViewById(R.id.circle);
-            ImageView done = stepLayout.findViewById(R.id.step_done);
+    private void setHeaderAppearance(View stepLayout, float alpha, int stepCircleBackgroundColor) {
+        TextView title = stepLayout.findViewById(R.id.step_title);
+        TextView subtitle = stepLayout.findViewById(R.id.step_subtitle);
+        View circle = stepLayout.findViewById(R.id.circle);
+        ImageView done = stepLayout.findViewById(R.id.step_done);
 
-            title.setAlpha(alpha);
-            circle.setAlpha(alpha);
-            done.setAlpha(alpha);
+        title.setAlpha(alpha);
+        circle.setAlpha(alpha);
+        done.setAlpha(alpha);
 
-            if(subtitle.getText() != null && !subtitle.getText().equals("")) {
-                if(alpha == 1) {
-                    subtitle.setVisibility(View.VISIBLE);
-                } else {
-                    subtitle.setVisibility(View.GONE);
-                }
+        if(subtitle.getText() != null && !subtitle.getText().equals("")) {
+            if(alpha == 1) {
+                subtitle.setVisibility(View.VISIBLE);
+            } else {
+                subtitle.setVisibility(View.GONE);
             }
-        } else {
-            setStepCircleBackgroundColor(stepLayout, stepCircleBackgroundColor);
         }
     }
 
-    protected void setStepCircleBackgroundColor(View stepLayout, int color) {
-        View circle = stepLayout.findViewById(R.id.circle);
-        Drawable bg = ContextCompat.getDrawable(context, R.drawable.circle_step_done);
-        bg.setColorFilter(new PorterDuffColorFilter(color, PorterDuff.Mode.SRC_IN));
-        circle.setBackground(bg);
+    private void setStepCircleBackgroundColor(View stepLayout, int color) {
+        View circleLayout = stepLayout.findViewById(R.id.circle);
+        ShapeDrawable circleBackground = (ShapeDrawable) ContextCompat.getDrawable(getContext(), R.drawable.circle_step_done);
+        if (circleBackground != null) {
+            circleBackground.getPaint().setColor(color);
+            circleLayout.setBackground(circleBackground);
+        }
     }
 
-    protected void setButtonColor(
-            AppCompatButton button,
+    private void setButtonColor(
+            MaterialButton button,
             int buttonColor,
             int buttonTextColor,
             int buttonPressedColor,
@@ -940,7 +783,7 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
                         buttonPressedTextColor,
                         buttonTextColor
                 });
-        button.setSupportBackgroundTintList(buttonColours);
+        button.setBackgroundTintList(buttonColours);
         button.setTextColor(buttonTextColours);
     }
 
@@ -952,17 +795,29 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         registerListeners();
     }
 
-    @Override
-    public void onClick(View v) {
-        int viewId = v.getId();
+    private void findViews() {
+        content = findViewById(R.id.content);
+        stepsScrollView = findViewById(R.id.steps_scroll);
+        progressBar = findViewById(R.id.progress_bar);
+        previousStepButton = findViewById(R.id.down_previous);
+        nextStepButton = findViewById(R.id.down_next);
+        bottomNavigation = findViewById(R.id.bottom_navigation);
+    }
 
-        if (viewId == R.id.down_previous) {
-            goToPreviousStep();
-        } else if (viewId == R.id.down_next) {
-            if (isActiveStepCompleted()) {
+    private void registerListeners() {
+        previousStepButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                goToPreviousStep();
+            }
+        });
+        
+        nextStepButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
                 goToNextStep();
             }
-        }
+        });
     }
 
     @Override
@@ -987,73 +842,81 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         super.onRestoreInstanceState(state);
     }
 
+    /**
+     * Gets an instance of the builder that will be used to set up and initialize the form.
+     *
+     * @param stepTitles A String array with the names of the steps.
+     * @param stepperImplementation The listener for the stepper form events.
+     * @return An instance of the stepper form builder.
+     */
+    public Builder setup(
+            String[] stepTitles,
+            VerticalStepperFormListener stepperImplementation) {
+
+        return new Builder(this, stepTitles, stepperImplementation);
+    }
+
     public static class Builder {
 
-        // Required parameters
-        protected VerticalStepperFormLayout verticalStepperFormLayout;
-        protected String[] steps;
-        protected VerticalStepperForm verticalStepperFormImplementation;
-        protected Activity activity;
+        private VerticalStepperFormLayout verticalStepperFormLayout;
+        private String[] stepTitles;
+        private VerticalStepperFormListener verticalStepperFormListener;
 
-        // Optional parameters
-        protected String[] stepsSubtitles = null;
-        protected float alphaOfDisabledElements = 0.25f;
-        protected int stepNumberBackgroundColor = Color.rgb(63, 81, 181);
-        protected int buttonBackgroundColor = Color.rgb(63, 81, 181);
-        protected int buttonPressedBackgroundColor = Color.rgb(48, 63, 159);
-        protected int stepNumberTextColor = Color.rgb(255, 255, 255);
-        protected int stepTitleTextColor = Color.rgb(33, 33, 33);
-        protected int stepSubtitleTextColor = Color.rgb(162, 162, 162);
-        protected int buttonTextColor = Color.rgb(255, 255, 255);
-        protected int buttonPressedTextColor = Color.rgb(255, 255, 255);
-        protected int errorMessageTextColor = Color.rgb(175, 18, 18);
-        protected boolean displayBottomNavigation = true;
-        protected boolean materialDesignInDisabledSteps = false;
-        protected boolean hideKeyboard = true;
-        protected boolean showVerticalLineWhenStepsAreCollapsed = false;
+        private String[] stepSubtitles = null;
+        private float alphaOfDisabledElements = alphaOfDisabledElementsDefault;
+        private int stepNumberBackgroundColor = stepNumberBackgroundColorDefault;
+        private int buttonBackgroundColor = buttonBackgroundColorDefault;
+        private int buttonPressedBackgroundColor = buttonPressedBackgroundColorDefault;
+        private int stepNumberTextColor = stepNumberTextColorDefault;
+        private int stepTitleTextColor = stepTitleTextColorDefault;
+        private int stepSubtitleTextColor = stepSubtitleTextColorDefault;
+        private int buttonTextColor = buttonTextColorDefault;
+        private int buttonPressedTextColor = buttonPressedTextColorDefault;
+        private int errorMessageTextColor = errorMessageTextColorDefault;
+        private boolean displayBottomNavigation = displayBottomNavigationDefault;
+        private boolean showVerticalLineWhenStepsAreCollapsed = showVerticalLineWhenStepsAreCollapsedDefault;
 
-        protected Builder(VerticalStepperFormLayout stepperLayout,
-                          String[] steps,
-                          VerticalStepperForm stepperImplementation,
-                          Activity activity) {
+        private static float alphaOfDisabledElementsDefault = 0.25f;
+        private static int stepNumberBackgroundColorDefault = Color.rgb(63, 81, 181);
+        private static int buttonBackgroundColorDefault = Color.rgb(63, 81, 181);
+        private static int buttonPressedBackgroundColorDefault = Color.rgb(48, 63, 159);
+        private static int stepNumberTextColorDefault = Color.rgb(255, 255, 255);
+        private static int stepTitleTextColorDefault = Color.rgb(33, 33, 33);
+        private static int stepSubtitleTextColorDefault = Color.rgb(162, 162, 162);
+        private static int buttonTextColorDefault = Color.rgb(255, 255, 255);
+        private static int buttonPressedTextColorDefault = Color.rgb(255, 255, 255);
+        private static int errorMessageTextColorDefault = Color.rgb(175, 18, 18);
+        private static boolean displayBottomNavigationDefault = true;
+        private static boolean showVerticalLineWhenStepsAreCollapsedDefault = false;
+
+        private Builder(
+                VerticalStepperFormLayout stepperLayout,
+                String[] stepTitles,
+                VerticalStepperFormListener stepperImplementation) {
 
             this.verticalStepperFormLayout = stepperLayout;
-            this.steps = steps;
-            this.verticalStepperFormImplementation = stepperImplementation;
-            this.activity = activity;
+            this.stepTitles = stepTitles;
+            this.verticalStepperFormListener = stepperImplementation;
         }
 
         /**
-         * Generates an instance of the builder that will set up and initialize the form (after
-         * setting up the form it is mandatory to initialize it calling init())
-         * @param stepperLayout the form layout
-         * @param stepTitles a String array with the names of the steps
-         * @param stepperImplementation The instance that implements "VerticalStepperForm" interface
-         * @param activity The activity where the form is
-         * @return an instance of the builder
-         */
-        public static Builder newInstance(VerticalStepperFormLayout stepperLayout,
-                                          String[] stepTitles,
-                                          VerticalStepperForm stepperImplementation,
-                                          Activity activity) {
-
-            return new Builder(stepperLayout, stepTitles, stepperImplementation, activity);
-        }
-
-        /**
-         * Set the subtitles of the steps
-         * @param stepsSubtitles a String array with the subtitles of the steps
-         * @return the builder instance
+         * Sets the subtitles of the steps.
+         *
+         * @param stepsSubtitles A String array with the subtitles of the steps.
+         * @return The builder instance.
          */
         public Builder stepsSubtitles(String[] stepsSubtitles) {
-            this.stepsSubtitles = stepsSubtitles;
+            this.stepSubtitles = stepsSubtitles;
             return this;
         }
 
         /**
-         * Set the primary color (background color of the left circles and buttons)
-         * @param colorPrimary primary color
-         * @return the builder instance
+         * Sets the primary color of the form. Will be used for the left circles and the buttons.
+         * To set a different background color for buttons and left circles, please use
+         * stepNumberBackgroundColor() and buttonBackgroundColor().
+         *
+         * @param colorPrimary The primary color.
+         * @return The builder instance.
          */
         public Builder primaryColor(int colorPrimary) {
             this.stepNumberBackgroundColor = colorPrimary;
@@ -1062,9 +925,11 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         }
 
         /**
-         * Set the dark primary color (background color of the buttons when clicked)
-         * @param colorPrimaryDark primary color (dark)
-         * @return the builder instance
+         * Sets the dark primary color. Will be displayed as the background color of the buttons
+         * while clicked.
+         *
+         * @param colorPrimaryDark Primary color (dark)
+         * @return The builder instance.
          */
         public Builder primaryDarkColor(int colorPrimaryDark) {
             this.buttonPressedBackgroundColor = colorPrimaryDark;
@@ -1072,9 +937,10 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         }
 
         /**
-         * Set the background color of the left circles
-         * @param stepNumberBackgroundColor background color of the left circles
-         * @return the builder instance
+         * Sets the background color of the left circles.
+         *
+         * @param stepNumberBackgroundColor Background color of the left circles.
+         * @return The builder instance.
          */
         public Builder stepNumberBackgroundColor(int stepNumberBackgroundColor) {
             this.stepNumberBackgroundColor = stepNumberBackgroundColor;
@@ -1082,9 +948,10 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         }
 
         /**
-         * Set the background colour of the buttons
-         * @param buttonBackgroundColor background color of the buttons
-         * @return the builder instance
+         * Sets the background color of the buttons.
+         *
+         * @param buttonBackgroundColor Background color of the buttons.
+         * @return The builder instance.
          */
         public Builder buttonBackgroundColor(int buttonBackgroundColor) {
             this.buttonBackgroundColor = buttonBackgroundColor;
@@ -1092,9 +959,10 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         }
 
         /**
-         * Set the background color of the buttons when clicked
-         * @param buttonPressedBackgroundColor background color of the buttons when clicked
-         * @return the builder instance
+         * Sets the background color of the buttons when pressed.
+         *
+         * @param buttonPressedBackgroundColor Background color of the buttons when pressed.
+         * @return The builder instance.
          */
         public Builder buttonPressedBackgroundColor(int buttonPressedBackgroundColor) {
             this.buttonPressedBackgroundColor = buttonPressedBackgroundColor;
@@ -1102,9 +970,10 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         }
 
         /**
-         * Set the text color of the left circles
-         * @param stepNumberTextColor text color of the left circles
-         * @return the builder instance
+         * Sets the text color of the left circles.
+         *
+         * @param stepNumberTextColor Text color of the left circles.
+         * @return The builder instance.
          */
         public Builder stepNumberTextColor(int stepNumberTextColor) {
             this.stepNumberTextColor = stepNumberTextColor;
@@ -1112,9 +981,10 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         }
 
         /**
-         * Set the text color of the step title
-         * @param stepTitleTextColor the color of the step title
-         * @return this builder instance
+         * Sets the text color of the step title.
+         *
+         * @param stepTitleTextColor The color of the step title.
+         * @return This builder instance.
          */
         public Builder stepTitleTextColor(int stepTitleTextColor) {
             this.stepTitleTextColor = stepTitleTextColor;
@@ -1122,9 +992,10 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         }
 
         /**
-         * Set the text color of the step subtitle
-         * @param stepSubtitleTextColor the color of the step title
-         * @return this builder instance
+         * Sets the text color of the step subtitle.
+         *
+         * @param stepSubtitleTextColor The color of the step subtitle.
+         * @return This builder instance.
          */
         public Builder stepSubtitleTextColor(int stepSubtitleTextColor) {
             this.stepSubtitleTextColor = stepSubtitleTextColor;
@@ -1132,9 +1003,10 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         }
 
         /**
-         * Set the text color of the buttons
-         * @param buttonTextColor text color of the buttons
-         * @return the builder instance
+         * Sets the text color of the buttons.
+         *
+         * @param buttonTextColor Text color of the buttons.
+         * @return The builder instance.
          */
         public Builder buttonTextColor(int buttonTextColor) {
             this.buttonTextColor = buttonTextColor;
@@ -1142,9 +1014,10 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         }
 
         /**
-         * Set the text color of the buttons when clicked
-         * @param buttonPressedTextColor text color of the buttons when clicked
-         * @return the builder instance
+         * Sets the text color of the buttons when clicked.
+         *
+         * @param buttonPressedTextColor Text color of the buttons when clicked.
+         * @return The builder instance.
          */
         public Builder buttonPressedTextColor(int buttonPressedTextColor) {
             this.buttonPressedTextColor = buttonPressedTextColor;
@@ -1152,9 +1025,10 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         }
 
         /**
-         * Set the error message color
-         * @param errorMessageTextColor error message color
-         * @return the builder instance
+         * Sets the error message color.
+         *
+         * @param errorMessageTextColor Error message color.
+         * @return The builder instance.
          */
         public Builder errorMessageTextColor(int errorMessageTextColor) {
             this.errorMessageTextColor = errorMessageTextColor;
@@ -1162,9 +1036,10 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         }
 
         /**
-         * Set whether or not the bottom navigation bar will be displayed
-         * @param displayBottomNavigationBar true to display it; false otherwise
-         * @return the builder instance
+         * Specifies whether or not the bottom navigation bar will be displayed.
+         *
+         * @param displayBottomNavigationBar True to display it; false otherwise.
+         * @return The builder instance.
          */
         public Builder displayBottomNavigation(boolean displayBottomNavigationBar) {
             this.displayBottomNavigation = displayBottomNavigationBar;
@@ -1172,29 +1047,12 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         }
 
         /**
-         * Set whether or not the disabled steps will have a Material Design look
-         * @param materialDesignInDisabledSteps true to use Material Design for disabled steps; false otherwise
-         * @return the builder instance
-         */
-        public Builder materialDesignInDisabledSteps(boolean materialDesignInDisabledSteps) {
-            this.materialDesignInDisabledSteps = materialDesignInDisabledSteps;
-            return this;
-        }
-
-        /**
-         * Specify whether or not the keyboard should be hidden at the beginning
-         * @param hideKeyboard true to hide the keyboard; false to not hide it
-         * @return the builder instance
-         */
-        public Builder hideKeyboard(boolean hideKeyboard) {
-            this.hideKeyboard = hideKeyboard;
-            return this;
-        }
-
-        /**
-         * Specify whether or not the vertical lines should be displayed when steps are collapsed
-         * @param showVerticalLineWhenStepsAreCollapsed true to show the lines; false to not
-         * @return the builder instance
+         * Specifies whether or not the vertical lines should be displayed when the steps are
+         * collapsed.
+         *
+         * @param showVerticalLineWhenStepsAreCollapsed True to show the lines on collapsed steps;
+         *                                              false to not.
+         * @return The builder instance.
          */
         public Builder showVerticalLineWhenStepsAreCollapsed(boolean showVerticalLineWhenStepsAreCollapsed) {
             this.showVerticalLineWhenStepsAreCollapsed = showVerticalLineWhenStepsAreCollapsed;
@@ -1202,9 +1060,10 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         }
 
         /**
-         * Set the alpha level of disabled elements
-         * @param alpha alpha level of disabled elements (between 0 and 1)
-         * @return the builder instance
+         * Sets the alpha of the disabled elements.
+         *
+         * @param alpha Alpha level of disabled elements.
+         * @return The builder instance.
          */
         public Builder alphaOfDisabledElements(float alpha) {
             this.alphaOfDisabledElements = alpha;
@@ -1212,7 +1071,7 @@ public class VerticalStepperFormLayout extends LinearLayout implements View.OnCl
         }
 
         /**
-         * Set up the form and initialize it
+         * Sets up the form and initializes it.
          */
         public void init() {
             verticalStepperFormLayout.initialiseVerticalStepperForm(this);

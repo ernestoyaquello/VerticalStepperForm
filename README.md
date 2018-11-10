@@ -15,16 +15,16 @@ This Android library implements a [**vertical stepper form**](https://material.g
 * Dimensions are specified in an XML file so they can be overriden
 * Subtitles can be added in each step by calling ```stepsSubtitles()``` in the builder
 * Titles and subtitles can be modified after the form has been initialized thanks to ```setStepTitle()``` and ```setStepSubtitle()```
-* Official Material Design appearance can be applied to disabled/not visited steps by calling ```materialDesignInDisabledSteps(true)``` in the builder
+* Official Material Design appearance can be applied to disabled/not visited stepTitles by calling ```materialDesignInDisabledSteps(true)``` in the builder
 * The hiding of the software keyboard that is carried out by default every time a step is open can be avoided by calling ```hideKeyboard(false)``` in the builder
-* Now it is possible to force the vertical line to be displayed between collapsed steps by calling ```showVerticalLineWhenStepsAreCollapsed(true)``` in the builder
+* Now it is possible to force the vertical line to be displayed between collapsed stepTitles by calling ```showVerticalLineWhenStepsAreCollapsed(true)``` in the builder
 
 #### Version 0.9.8
 * Easier to set up (Builder Pattern has been implemented)
 * Navigation bar on the bottom can be hidden in order to make the form follow Material Design guidelines more precisely
 * Optional error messages for each step
 * Smoother transitions
-* Tick icon displayed on completed steps
+* Tick icon displayed on completed stepTitles
 * Javadoc documentation of the most important methods
 
 ## Installation and usage

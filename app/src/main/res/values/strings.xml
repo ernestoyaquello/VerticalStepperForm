@@ -2,11 +2,18 @@
     <string name="app_name">Vertical Stepper Form Example</string>
     <string name="add_alarm">Add New Alarm</string>
     <string name="new_alarm_added">New alarm added successfully</string>
+    <string name="error_title_min_characters">At least %1$d characters</string>
+    <string name="main_activity_alarm_added_info">Alarm %s set up at %s</string>
+    <string name="main_activity_explanation">Click the button to set up a new alarm</string>
+    <string name="main_activity_explanation_disclaimer">Don\'t worry, this app does not actually set up alarms.</string>
     <string name="form_hint_title">Alarm title (required)</string>
     <string name="form_hint_description">Alarm description (optional)</string>
-    <string name="error_title_min_characters">At least %1$d characters</string>
-    <string name="main_activity_explanation">Click the button to try it!</string>
-    <string name="main_activity_explanation_disclaimer">This app DOES NOT set up alarms for real!</string>
+    <string name="form_discard_question">Discard alarm?</string>
+    <string name="form_info_will_be_lost">All the information about this new alarm will be lost</string>
+    <string name="form_confirm_button">Add alarm</string>
+    <string name="form_sending_data_message">Adding new alarm…</string>
+    <string name="form_discard_cancel">Cancel</string>
+    <string name="form_discard">Discard</string>
     <string-array name="steps_titles">
         <item>Title</item>
         <item>Description</item>
@@ -28,11 +35,4 @@
         <item>S</item>
         <item>S</item>
     </string-array>
-
-    <!-- We can overwrite the values of the library's strings in order to customize them -->
-    <string name="vertical_form_stepper_form_discard_question">Discard alarm?</string>
-    <string name="vertical_form_stepper_form_info_will_be_lost">All the information about this new alarm will be lost</string>
-    <string name="vertical_form_stepper_form_confirm_button">Add alarm</string>
-    <string name="vertical_form_stepper_form_sending_data_message">Adding new alarm…</string>
-
 </resources>

@@ -42,9 +42,7 @@
             android:scaleType="centerInside"
             android:paddingTop="12dp"
             android:paddingBottom="12dp"
-            android:paddingLeft="16dp"
             android:paddingStart="16dp"
-            android:paddingRight="8dp"
             android:paddingEnd="8dp"
             android:textColor="#6c6c6c"
             android:alpha="0.25" />
@@ -73,9 +71,7 @@
             android:scaleType="centerInside"
             android:paddingTop="12dp"
             android:paddingBottom="12dp"
-            android:paddingRight="16dp"
             android:paddingEnd="16dp"
-            android:paddingLeft="8dp"
             android:paddingStart="8dp"
             android:textColor="#6c6c6c"
             android:alpha="0.25" />

@@ -3,7 +3,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginRight="12dp"
     android:layout_marginEnd="12dp"
     android:layout_marginTop="8dp"
     android:orientation="vertical">
@@ -63,7 +62,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp"
             android:paddingBottom="8dp">
 
@@ -112,7 +110,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:layout_marginLeft="16dp"
             android:layout_marginStart="16dp">
 
             <LinearLayout
@@ -129,7 +126,6 @@
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_error"
-                    android:layout_marginRight="4dp"
                     android:layout_marginEnd="4dp"/>
 
                 <TextView
@@ -151,7 +147,8 @@
                 <FrameLayout
                     android:id="@+id/step_content"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="wrap_content"
+                    android:paddingTop="1dp"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/next_step"
@@ -163,7 +160,6 @@
                     android:textColor="#FFFFFF"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="4dp"
-                    android:layout_marginRight="8dp"
                     android:layout_marginEnd="8dp"/>
 
             </LinearLayout>

@@ -1,4 +1,4 @@
-package ernestoyaquello.com.verticalstepperform.utils;
+package ernestoyaquello.com.verticalstepperform.util;
 
 import android.view.View;
 import android.view.WindowManager;
@@ -6,17 +6,19 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.LinearLayout;
 
-// http://stackoverflow.com/a/13381228/3891038 + modifications
 public class Animations {
+
     public static void slideDown(final View v) {
         if(v.getVisibility() != View.VISIBLE) {
 
             v.measure(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
             final int targetHeight = v.getMeasuredHeight();
 
-            // Older versions of android (pre API 21) cancel animations for views with a height of 0.
+            // Older versions of android (pre API 21) cancel animations for views with a height of 0,
+            // so we set it to 1 instead
             setHeight(v, 1);
             v.setVisibility(View.VISIBLE);
+
             Animation a = new Animation() {
                 @Override
                 protected void applyTransformation(float interpolatedTime, Transformation t) {
@@ -76,7 +78,9 @@ public class Animations {
 
             a.setAnimationListener(new Animation.AnimationListener() {
                 @Override
-                public void onAnimationStart(Animation animation) {}
+                public void onAnimationStart(Animation animation) {
+                    // Do nothing here
+                }
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
@@ -84,7 +88,9 @@ public class Animations {
                 }
 
                 @Override
-                public void onAnimationRepeat(Animation animation) {}
+                public void onAnimationRepeat(Animation animation) {
+                    // Do nothing here
+                }
             });
 
             // 1dp/ms
@@ -93,8 +99,7 @@ public class Animations {
         }
     }
 
-    protected static void setHeight(View v, int newHeight) {
-        //v.getLayoutParams().height = newHeight;
+    private static void setHeight(View v, int newHeight) {
         v.setLayoutParams(new LinearLayout.LayoutParams(v.getLayoutParams().width, newHeight));
     }
 
