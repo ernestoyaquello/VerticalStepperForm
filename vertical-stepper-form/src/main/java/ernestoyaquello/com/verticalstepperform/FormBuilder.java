@@ -46,6 +46,18 @@ public class FormBuilder {
     }
 
     /**
+     * Sets the title to be displayed on the confirmation step.
+     *
+     * @param confirmationStepTitle The title of the confirmation step.
+     * @return The builder instance.
+     */
+    public FormBuilder confirmationStepTitle(String confirmationStepTitle) {
+        style.confirmationStepTitle = confirmationStepTitle;
+
+        return this;
+    }
+
+    /**
      * Sets the primary color of the form. Will be used for the left circles and the buttons.
      * To set a different background color for buttons and left circles, please use
      * stepNumberBackgroundColor() and buttonBackgroundColor().
@@ -197,12 +209,12 @@ public class FormBuilder {
      * Specifies whether or not the vertical lines should be displayed when the steps are
      * collapsed.
      *
-     * @param showVerticalLineWhenStepsAreCollapsed True to show the lines on collapsed steps;
-     *                                              false to not.
+     * @param displayVerticalLineWhenStepsAreCollapsed True to show the lines on collapsed steps;
+     *                                                 false to not.
      * @return The builder instance.
      */
-    public FormBuilder showVerticalLineWhenStepsAreCollapsed(boolean showVerticalLineWhenStepsAreCollapsed) {
-        style.showVerticalLineWhenStepsAreCollapsed = showVerticalLineWhenStepsAreCollapsed;
+    public FormBuilder displayVerticalLineWhenStepsAreCollapsed(boolean displayVerticalLineWhenStepsAreCollapsed) {
+        style.displayVerticalLineWhenStepsAreCollapsed = displayVerticalLineWhenStepsAreCollapsed;
 
         return this;
     }
@@ -234,9 +246,35 @@ public class FormBuilder {
     }
 
     /**
+     * Specifies whether or not a confirmation step should be added as an extra step at the end of
+     * the form.
+     *
+     * @param includeConfirmationStep True to add a confirmation step as the final step of the form;
+     *                                false to not.
+     * @return The builder instance.
+     */
+    public FormBuilder includeConfirmationStep(boolean includeConfirmationStep) {
+        style.includeConfirmationStep = includeConfirmationStep;
+
+        return this;
+    }
+
+    /**
      * Sets up the form and initializes it.
      */
     public void init() {
+
+        if (style.includeConfirmationStep) {
+            ExtendedStep[] currentSteps = steps;
+
+            steps = new ExtendedStep[steps.length + 1];
+            for (int i = 0; i < currentSteps.length; i++) {
+                steps[i] = currentSteps[i];
+            }
+
+            steps[currentSteps.length] = new ExtendedStep("", "", "", false, true);
+        }
+
         formLayout.initialiseVerticalStepperForm(listener, style, steps);
     }
 }

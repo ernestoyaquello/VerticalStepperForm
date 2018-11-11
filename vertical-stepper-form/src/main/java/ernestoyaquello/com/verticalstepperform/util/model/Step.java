@@ -2,9 +2,9 @@ package ernestoyaquello.com.verticalstepperform.util.model;
 
 public class Step {
 
-    private String title;
-    private String subtitle;
-    private String buttonText;
+    protected String title;
+    protected String subtitle;
+    protected String buttonText;
 
     public Step(String title) {
         this(title, null);

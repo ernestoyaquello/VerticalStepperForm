@@ -2,6 +2,6 @@
 
     <string name="vertical_form_stepper_form_continue_button">Continue</string>
     <string name="vertical_form_stepper_form_confirm_button">Confirm data</string>
-    <string name="vertical_form_stepper_form_last_step">Confirmation</string>
+    <string name="vertical_form_stepper_form_confirmation_step_title">Confirmation</string>
 
 </resources>

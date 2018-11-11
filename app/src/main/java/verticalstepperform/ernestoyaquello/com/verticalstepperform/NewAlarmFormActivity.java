@@ -16,15 +16,20 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import android.text.Editable;
+import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
 import com.google.android.material.textfield.TextInputEditText;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import androidx.fragment.app.DialogFragment;
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
@@ -82,6 +87,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         verticalStepperForm.setup(this, steps)
                 .primaryColor(colorPrimary)
                 .primaryDarkColor(colorPrimaryDark)
+                .lastStepButtonText(getString(R.string.add_alarm))
                 .init();
     }
 
@@ -104,24 +110,64 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
 
     @Override
     public void onStepOpened(int stepPosition, boolean animated) {
+
+        // We remove the subtitle to avoid showing it while the step is open. We will add it back
+        // later on closing within the method onStepClosed().
+        verticalStepperForm.removeOpenStepSubtitle(animated);
+
         switch (stepPosition) {
             case ALARM_TITLE_STEP_POSITION:
                 String alarmTitle = alarmTitleEditText.getText().toString();
-                updateAlarmTitleStepState(alarmTitle, animated);
+                markTitleStepAsCompletedOrUncompleted(alarmTitle, animated);
                 break;
 
+            // As soon as they open, we mark these two steps, alarm description and alarm time, as
+            // completed, as no user input or checking is required on them (they already have
+            // default values and can never end up having invalid ones)
             case ALARM_DESCRIPTION_STEP_POSITION:
-            case ALARM_TIME_STEP_POSITION:
-                // As soon as they open, we mark these two steps as completed because no user input
-                // or checking is required on them: they already have default values and can never
-                // end up having invalid ones
                 verticalStepperForm.markStepAsCompleted(stepPosition, animated);
                 break;
 
+            case ALARM_TIME_STEP_POSITION:
+                verticalStepperForm.markStepAsCompleted(stepPosition, animated);
+                hideKeyboard();
+                break;
+
             case ALARM_DAYS_STEP_POSITION:
-                updateAlarmDaysStepState();
+                markDaysStepAsCompletedOrUncompleted(animated);
+                hideKeyboard();
                 break;
         }
+    }
+
+    @Override
+    public void onStepClosed(int stepPosition, boolean animated) {
+        String closedStepData = "";
+
+        switch (stepPosition) {
+            case ALARM_TITLE_STEP_POSITION:
+                closedStepData = alarmTitleEditText.getText().toString();
+                break;
+
+            case ALARM_DESCRIPTION_STEP_POSITION:
+                closedStepData = alarmDescriptionEditText.getText().toString();
+                break;
+
+            case ALARM_TIME_STEP_POSITION:
+                closedStepData = getAlarmTimeText();
+                break;
+
+            case ALARM_DAYS_STEP_POSITION:
+                closedStepData = getSelectedWeekDaysAsString();
+                break;
+        }
+
+        // We update the subtitle of the closed step in order to show the user the information they
+        // have filled in
+        closedStepData = closedStepData != null && !closedStepData.isEmpty()
+                ? closedStepData
+                : getString(R.string.form_empty_field);
+        verticalStepperForm.updateStepSubtitle(stepPosition, closedStepData, animated);
     }
 
     @Override
@@ -157,7 +203,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                updateAlarmTitleStepState(s.toString(), true);
+                markTitleStepAsCompletedOrUncompleted(s.toString(), true);
             }
 
             @Override
@@ -203,6 +249,16 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         return timeStepContent;
     }
 
+    private View createAlarmDaysStep() {
+        // We create this step view by inflating an XML layout
+        LayoutInflater inflater = LayoutInflater.from(getBaseContext());
+        daysStepContent = inflater.inflate(R.layout.step_days_of_week_layout, null, false);
+
+        setupAlarmDays();
+
+        return daysStepContent;
+    }
+
     private void setupAlarmTime() {
 
         if (!isTimeSet) {
@@ -234,16 +290,6 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
                 }
             });
         }
-    }
-
-    private View createAlarmDaysStep() {
-        // We create this step view by inflating an XML layout
-        LayoutInflater inflater = LayoutInflater.from(getBaseContext());
-        daysStepContent = inflater.inflate(R.layout.step_days_of_week_layout, null, false);
-
-        setupAlarmDays();
-
-        return daysStepContent;
     }
 
     private void setupAlarmDays() {
@@ -281,6 +327,12 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         }
     }
 
+    private View getDayLayout(int i) {
+        int id = daysStepContent.getResources().getIdentifier(
+                "day_" + i, "id", getPackageName());
+        return daysStepContent.findViewById(id);
+    }
+
     private void updateDayLayout(int dayIndex, View dayLayout, boolean updateState) {
         if (alarmDays[dayIndex]) {
             markAlarmDay(dayIndex, dayLayout, updateState);
@@ -289,27 +341,8 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         }
     }
 
-    private void updateAlarmTitleStepState(String alarmTitle, boolean useAnimations) {
-        if (isAlarmTitleCorrect(alarmTitle)) {
-            verticalStepperForm.markCurrentStepAsCompleted(useAnimations);
-        } else {
-            String titleErrorString = getResources().getString(R.string.error_title_min_characters);
-            String titleError = String.format(titleErrorString, MIN_CHARACTERS_TITLE);
-
-            verticalStepperForm.markCurrenttStepAsUncompleted(titleError, useAnimations);
-        }
-    }
-
     private boolean isAlarmTitleCorrect(String alarmTitle) {
         return alarmTitle.length() >= MIN_CHARACTERS_TITLE;
-    }
-
-    private void updateAlarmDaysStepState() {
-        if (isThereAtLeastOneDaySelected()) {
-            verticalStepperForm.markStepAsCompleted(ALARM_DAYS_STEP_POSITION, true);
-        } else {
-            verticalStepperForm.markStepAsUncompleted(ALARM_DAYS_STEP_POSITION, null, true);
-        }
     }
 
     private boolean isThereAtLeastOneDaySelected() {
@@ -323,13 +356,26 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         return thereIsAtLeastOneDaySelected;
     }
 
-    private View getDayLayout(int i) {
-        int id = daysStepContent.getResources().getIdentifier(
-                "day_" + i, "id", getPackageName());
-        return daysStepContent.findViewById(id);
+    private void markTitleStepAsCompletedOrUncompleted(String alarmTitle, boolean useAnimations) {
+        if (isAlarmTitleCorrect(alarmTitle)) {
+            verticalStepperForm.markOpenStepAsCompleted(useAnimations);
+        } else {
+            String titleErrorString = getResources().getString(R.string.error_title_min_characters);
+            String titleError = String.format(titleErrorString, MIN_CHARACTERS_TITLE);
+
+            verticalStepperForm.markOpenStepAsUncompleted(titleError, useAnimations);
+        }
     }
 
-    private void markAlarmDay(int dayIndex, View dayLayout, boolean updateStepState) {
+    private void markDaysStepAsCompletedOrUncompleted(boolean useAnimations) {
+        if (isThereAtLeastOneDaySelected()) {
+            verticalStepperForm.markStepAsCompleted(ALARM_DAYS_STEP_POSITION, useAnimations);
+        } else {
+            verticalStepperForm.markStepAsUncompleted(ALARM_DAYS_STEP_POSITION, null, useAnimations);
+        }
+    }
+
+    private void markAlarmDay(int dayIndex, View dayLayout, boolean markStepAsCompletedOrUncompleted) {
         alarmDays[dayIndex] = true;
 
         if (dayLayout != null) {
@@ -343,12 +389,12 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
             dayText.setTextColor(Color.rgb(255, 255, 255));
         }
 
-        if(updateStepState) {
-            updateAlarmDaysStepState();
+        if(markStepAsCompletedOrUncompleted) {
+            markDaysStepAsCompletedOrUncompleted(true);
         }
     }
 
-    private void unmarkAlarmDay(int dayIndex, View dayLayout, boolean updateStepState) {
+    private void unmarkAlarmDay(int dayIndex, View dayLayout, boolean markStepAsCompletedOrUncompleted) {
         alarmDays[dayIndex] = false;
 
         dayLayout.setBackgroundResource(0);
@@ -357,19 +403,33 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         int colour = ContextCompat.getColor(getBaseContext(), R.color.colorPrimary);
         dayText.setTextColor(colour);
 
-        if(updateStepState) {
-            updateAlarmDaysStepState();
+        if(markStepAsCompletedOrUncompleted) {
+            markDaysStepAsCompletedOrUncompleted(true);
         }
     }
 
     private void updatedAlarmTimeText() {
+        alarmTimeTextView.setText(getAlarmTimeText());
+    }
+
+    private String getAlarmTimeText() {
         String hourString = ((alarmTimeHour > 9) ?
                 String.valueOf(alarmTimeHour) : ("0" + alarmTimeHour));
         String minutesString = ((alarmTimeMinutes > 9) ?
                 String.valueOf(alarmTimeMinutes) : ("0" + alarmTimeMinutes));
-        String time = hourString + ":" + minutesString;
+        return hourString + ":" + minutesString;
+    }
 
-        alarmTimeTextView.setText(time);
+    private String getSelectedWeekDaysAsString() {
+        String[] weekDayStrings = getResources().getStringArray(R.array.week_days_extended);
+        List<String> selectedWeekDayStrings = new ArrayList<>();
+        for (int i = 0; i < weekDayStrings.length; i++) {
+            if (alarmDays[i]) {
+                selectedWeekDayStrings.add(weekDayStrings[i]);
+            }
+        }
+
+        return TextUtils.join(", ", selectedWeekDayStrings);
     }
 
     private Thread saveData() {
@@ -420,6 +480,14 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
             progressDialog.dismiss();
         }
         progressDialog = null;
+    }
+
+    private void hideKeyboard() {
+        View currentFocus = getCurrentFocus();
+        if (currentFocus != null) {
+            InputMethodManager inputMethodManager = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+            inputMethodManager.hideSoftInputFromWindow(currentFocus.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+        }
     }
 
     @Override

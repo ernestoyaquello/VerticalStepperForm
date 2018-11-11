@@ -22,6 +22,7 @@ class ExtendedStep extends Step {
 
     private boolean isCompleted;
     private boolean isOpen;
+    private boolean isConfirmationStep;
 
     private View stepLayout;
 
@@ -40,9 +41,14 @@ class ExtendedStep extends Step {
     }
 
     ExtendedStep(String title, String subtitle, String buttonText, boolean isCompleted) {
+        this(title, subtitle, buttonText, isCompleted, false);
+    }
+
+    ExtendedStep(String title, String subtitle, String buttonText, boolean isCompleted, boolean isConfirmationStep) {
         super(title, subtitle, buttonText);
 
         this.isCompleted = isCompleted;
+        this.isConfirmationStep = isConfirmationStep;
     }
 
     View initialize(
@@ -76,7 +82,7 @@ class ExtendedStep extends Step {
 
         // Update button view
         MaterialButton button = stepLayout.findViewById(R.id.step_button);
-        if (style.displayStepButtons) {
+        if (style.displayStepButtons || isConfirmationStep) {
             String stepButtonText = getButtonText() != null && !getButtonText().isEmpty()
                     ? getButtonText()
                     : isLast ? style.lastStepButtonText : style.stepButtonText;
@@ -141,6 +147,9 @@ class ExtendedStep extends Step {
                 formStyle.buttonPressedBackgroundColor,
                 formStyle.buttonPressedTextColor);
 
+        if (isConfirmationStep) {
+            title = formStyle.confirmationStepTitle;
+        }
         stepTitle.setText(getTitle());
         stepSubtitle.setText(getSubtitle());
         stepNumberTextView.setText(String.valueOf(position + 1));
@@ -206,15 +215,19 @@ class ExtendedStep extends Step {
             Animations.slideUpIfNecessary(stepAndButton, useAnimations);
         }
 
-        updateHeaderAppearance(useAnimations);
+        if (isOpen && isConfirmationStep && !isCompleted) {
+            // If the user has been able to open the confirmation step, then the form is completed,
+            // so we just mark the confirmation step as completed immediately to activate its button
+            markAsCompleted(useAnimations);
+        } else {
+            updateHeaderAppearance(useAnimations);
+        }
     }
 
     private void updateHeaderAppearance(boolean useAnimations) {
         TextView title = stepLayout.findViewById(R.id.step_title);
         TextView subtitle = stepLayout.findViewById(R.id.step_subtitle);
         View stepPosition = stepLayout.findViewById(R.id.step_number_circle);
-        View spacingView = stepLayout.findViewById(R.id.spacing_to_show_left_line);
-        View errorMessageContainer = stepLayout.findViewById(R.id.step_error_container);
 
         // Update alpha of header elements
         boolean enableHeader = isOpen || isCompleted;
@@ -224,28 +237,9 @@ class ExtendedStep extends Step {
         subtitle.setAlpha(subtitleAlpha);
         stepPosition.setAlpha(alpha);
 
-        // Update subtitle visibility
-        boolean showSubtitle = !getSubtitle().isEmpty() && (isOpen || isCompleted);
-        if (showSubtitle) {
-            Animations.slideDownIfNecessary(subtitle, useAnimations);
-        } else {
-            Animations.slideUpIfNecessary(subtitle, useAnimations);
-        }
-
-        // Update spacing view visibility to show/hide the left lines between collapsed steps
-        boolean showLineBetweenCollapsedSteps = !showSubtitle && formStyle.showVerticalLineWhenStepsAreCollapsed && !isOpen;
-        if (showLineBetweenCollapsedSteps) {
-            Animations.slideDownIfNecessary(spacingView, useAnimations);
-        } else {
-            Animations.slideUpIfNecessary(spacingView, useAnimations);
-        }
-
-        // Update error message view visibility
-        if (isOpen && !isCompleted && !getCurrentErrorMessage().isEmpty()) {
-            Animations.slideDownIfNecessary(errorMessageContainer, useAnimations);
-        } else {
-            Animations.slideUpIfNecessary(errorMessageContainer, useAnimations);
-        }
+        boolean showSubtitle = updateSubtitleVisibility(useAnimations);
+        updateSpacingViewVisibility(useAnimations, showSubtitle);
+        updateErrorMessageVisibility(useAnimations);
 
         // Update step position circle indicator layout
         if (isOpen || !isCompleted) {
@@ -296,12 +290,60 @@ class ExtendedStep extends Step {
         nextButton.setAlpha(formStyle.alphaOfDisabledElements);
     }
 
+    void updateSubtitle(String subtitle, boolean useAnimations) {
+        subtitle = subtitle == null ? "" : subtitle;
+        this.subtitle = subtitle;
+
+        TextView subtitleView = stepLayout.findViewById(R.id.step_subtitle);
+        subtitleView.setText(subtitle);
+
+        updateHeaderAppearance(useAnimations);
+    }
+
+    private boolean updateSubtitleVisibility(boolean useAnimations) {
+        TextView subtitle = stepLayout.findViewById(R.id.step_subtitle);
+
+        boolean showSubtitle = !getSubtitle().isEmpty() && (isOpen || isCompleted);
+        if (showSubtitle) {
+            Animations.slideDownIfNecessary(subtitle, useAnimations);
+        } else {
+            Animations.slideUpIfNecessary(subtitle, useAnimations);
+        }
+
+        return showSubtitle;
+    }
+
+    private void updateSpacingViewVisibility(boolean useAnimations, boolean showSubtitle) {
+        View spacingView = stepLayout.findViewById(R.id.spacing_to_show_left_line);
+
+        boolean showLineBetweenCollapsedSteps = !showSubtitle && formStyle.displayVerticalLineWhenStepsAreCollapsed && !isOpen;
+        if (showLineBetweenCollapsedSteps) {
+            Animations.slideDownIfNecessary(spacingView, useAnimations);
+        } else {
+            Animations.slideUpIfNecessary(spacingView, useAnimations);
+        }
+    }
+
+    private void updateErrorMessageVisibility(boolean useAnimations) {
+        View errorMessageContainer = stepLayout.findViewById(R.id.step_error_container);
+
+        if (isOpen && !isCompleted && !getCurrentErrorMessage().isEmpty()) {
+            Animations.slideDownIfNecessary(errorMessageContainer, useAnimations);
+        } else {
+            Animations.slideUpIfNecessary(errorMessageContainer, useAnimations);
+        }
+    }
+
     boolean isCompleted() {
         return isCompleted;
     }
 
     boolean isOpen() {
         return isOpen;
+    }
+
+    boolean isConfirmationStep() {
+        return isConfirmationStep;
     }
 
     View getStepLayout() {
