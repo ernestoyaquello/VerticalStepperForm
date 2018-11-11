@@ -25,6 +25,7 @@ class ExtendedStep extends Step {
     private boolean isConfirmationStep;
 
     private View stepLayout;
+    private View contentLayout;
 
     private FormStyle formStyle;
 
@@ -69,6 +70,7 @@ class ExtendedStep extends Step {
                     position,
                     clickOnNextButton,
                     clickOnHeader);
+            this.contentLayout = contentLayout;
 
             init(style, isLast, contentLayout);
         } else {
@@ -162,7 +164,7 @@ class ExtendedStep extends Step {
 
     private View createStepLayout(Context context, ViewGroup parent) {
         LayoutInflater inflater = LayoutInflater.from(context);
-        return inflater.inflate(R.layout.step_layout, parent, false);
+        return inflater.inflate(VerticalStepperFormLayout.getInternalStepLayout(), parent, false);
     }
 
     public void setContentLayout(View contentLayout) {
@@ -348,5 +350,9 @@ class ExtendedStep extends Step {
 
     View getStepLayout() {
         return stepLayout;
+    }
+
+    View getContentLayout() {
+        return contentLayout;
     }
 }

@@ -186,7 +186,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
                 } catch (RuntimeException e) {
                     // Do nothing
                 } finally {
-                    verticalStepperForm.cancelFormCompletion();
+                    verticalStepperForm.cancelFormCompletionAttempt();
                 }
             }
         });
@@ -213,7 +213,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if(isAlarmTitleCorrect(v.getText().toString())) {
-                    verticalStepperForm.goToNextStep();
+                    verticalStepperForm.goToNextStep(true);
                 }
                 return false;
             }
@@ -230,7 +230,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         alarmDescriptionEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                verticalStepperForm.goToNextStep();
+                verticalStepperForm.goToNextStep(true);
                 return false;
             }
         });

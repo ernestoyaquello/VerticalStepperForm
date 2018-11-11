@@ -35,7 +35,8 @@ public interface VerticalStepperFormListener {
     void onStepClosed(int stepPosition, boolean animated);
 
     /**
-     * This method will be called when the user press the confirmation button.
+     * This method will be called when the user clicks on the last button after all the steps have
+     * been marked as completed. It can be used to show loaders, send the data, etc.
      */
     void onCompletedForm();
 
