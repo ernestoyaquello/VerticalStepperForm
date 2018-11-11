@@ -191,7 +191,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
             updateBottomNavigationButtons();
             scrollToCurrentStep(useAnimations);
 
-            listener.onStepOpened(stepToOpenPosition);
+            listener.onStepOpened(stepToOpenPosition, useAnimations);
         } else if (stepToOpenPosition == steps.size()) {
             completeForm();
         }
@@ -362,12 +362,12 @@ public class VerticalStepperFormLayout extends LinearLayout {
         }
     }
 
-    private void restoreFromState(int positionToOpen, boolean[] completedSteps) {
+    private void restoreFromState(int positionToOpen, boolean[] completedSteps, String[] errorMessages) {
         for (int i = 0; i < completedSteps.length; i++) {
             if (completedSteps[i]) {
                 markStepAsCompleted(i, false);
             } else {
-                markStepAsUncompleted(i, null, false);
+                markStepAsUncompleted(i, errorMessages[i], false);
             }
         }
         goToStep(positionToOpen, false);
@@ -411,13 +411,18 @@ public class VerticalStepperFormLayout extends LinearLayout {
         Bundle bundle = new Bundle();
 
         boolean[] completedSteps = new boolean[steps.size()];
+        String[] errorMessages = new String[steps.size()];
         for (int i = 0; i < completedSteps.length; i++) {
             completedSteps[i] = steps.get(i).isCompleted();
+            if (!completedSteps[i]) {
+                errorMessages[i] = steps.get(i).getCurrentErrorMessage();
+            }
         }
 
         bundle.putParcelable("superState", super.onSaveInstanceState());
         bundle.putInt("activeStep", this.getCurrentStepPosition());
         bundle.putBooleanArray("completedSteps", completedSteps);
+        bundle.putStringArray("errorMessages", errorMessages);
 
         return bundle;
     }
@@ -428,11 +433,12 @@ public class VerticalStepperFormLayout extends LinearLayout {
         {
             Bundle bundle = (Bundle) state;
 
+            String[] errorMessages = bundle.getStringArray("errorMessages");
             boolean[] completedSteps = bundle.getBooleanArray("completedSteps");
             int positionToOpen = bundle.getInt("activeStep");
             state = bundle.getParcelable("superState");
 
-            restoreFromState(positionToOpen, completedSteps);
+            restoreFromState(positionToOpen, completedSteps, errorMessages);
         }
         super.onRestoreInstanceState(state);
     }

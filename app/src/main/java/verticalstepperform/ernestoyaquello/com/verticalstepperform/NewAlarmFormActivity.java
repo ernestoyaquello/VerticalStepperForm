@@ -103,11 +103,11 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
     }
 
     @Override
-    public void onStepOpened(int stepPosition) {
+    public void onStepOpened(int stepPosition, boolean animated) {
         switch (stepPosition) {
             case ALARM_TITLE_STEP_POSITION:
                 String alarmTitle = alarmTitleEditText.getText().toString();
-                updateAlarmTitleStepState(alarmTitle);
+                updateAlarmTitleStepState(alarmTitle, animated);
                 break;
 
             case ALARM_DESCRIPTION_STEP_POSITION:
@@ -115,7 +115,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
                 // As soon as they open, we mark these two steps as completed because no user input
                 // or checking is required on them: they already have default values and can never
                 // end up having invalid ones
-                verticalStepperForm.markStepAsCompleted(stepPosition, true);
+                verticalStepperForm.markStepAsCompleted(stepPosition, animated);
                 break;
 
             case ALARM_DAYS_STEP_POSITION:
@@ -157,7 +157,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                updateAlarmTitleStepState(s.toString());
+                updateAlarmTitleStepState(s.toString(), true);
             }
 
             @Override
@@ -289,14 +289,14 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         }
     }
 
-    private void updateAlarmTitleStepState(String alarmTitle) {
+    private void updateAlarmTitleStepState(String alarmTitle, boolean useAnimations) {
         if (isAlarmTitleCorrect(alarmTitle)) {
-            verticalStepperForm.markCurrentStepAsCompleted(true);
+            verticalStepperForm.markCurrentStepAsCompleted(useAnimations);
         } else {
             String titleErrorString = getResources().getString(R.string.error_title_min_characters);
             String titleError = String.format(titleErrorString, MIN_CHARACTERS_TITLE);
 
-            verticalStepperForm.markCurrenttStepAsUncompleted(titleError, true);
+            verticalStepperForm.markCurrenttStepAsUncompleted(titleError, useAnimations);
         }
     }
 

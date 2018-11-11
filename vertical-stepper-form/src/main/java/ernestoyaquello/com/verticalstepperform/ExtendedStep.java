@@ -176,8 +176,6 @@ class ExtendedStep extends Step {
         isCompleted = completed;
 
         TextView errorTextView = stepLayout.findViewById(R.id.step_error_message);
-        View nextButton = stepLayout.findViewById(R.id.step_button);
-
         errorMessage = errorMessage != null ? errorMessage : "";
         errorTextView.setText(errorMessage);
 
@@ -214,7 +212,6 @@ class ExtendedStep extends Step {
     private void updateHeaderAppearance(boolean useAnimations) {
         TextView title = stepLayout.findViewById(R.id.step_title);
         TextView subtitle = stepLayout.findViewById(R.id.step_subtitle);
-        TextView errorMessage = stepLayout.findViewById(R.id.step_error_message);
         View stepPosition = stepLayout.findViewById(R.id.step_number_circle);
         View spacingView = stepLayout.findViewById(R.id.spacing_to_show_left_line);
         View errorMessageContainer = stepLayout.findViewById(R.id.step_error_container);
@@ -244,7 +241,7 @@ class ExtendedStep extends Step {
         }
 
         // Update error message view visibility
-        if (isOpen && !isCompleted && !errorMessage.getText().toString().isEmpty()) {
+        if (isOpen && !isCompleted && !getCurrentErrorMessage().isEmpty()) {
             Animations.slideDownIfNecessary(errorMessageContainer, useAnimations);
         } else {
             Animations.slideUpIfNecessary(errorMessageContainer, useAnimations);
@@ -256,6 +253,17 @@ class ExtendedStep extends Step {
         } else {
             showDoneIconAndHideStepNumber();
         }
+    }
+
+    String getCurrentErrorMessage() {
+        if (stepLayout != null) {
+            TextView errorMessage = stepLayout.findViewById(R.id.step_error_message);
+            if (errorMessage != null) {
+                return errorMessage.getText().toString();
+            }
+        }
+
+        return "";
     }
 
     private void showDoneIconAndHideStepNumber() {

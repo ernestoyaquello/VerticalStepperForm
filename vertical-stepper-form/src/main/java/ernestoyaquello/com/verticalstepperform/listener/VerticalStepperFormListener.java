@@ -20,8 +20,10 @@ public interface VerticalStepperFormListener {
      * This method will be called every time a certain step is opened.
      *
      * @param stepPosition The step position, counting from 0.
+     * @param animated True if the step was opened using animations; false otherwise.
+     *                 It will only be false if the step was opened on loading or on restoration.
      */
-    void onStepOpened(int stepPosition);
+    void onStepOpened(int stepPosition, boolean animated);
 
     /**
      * This method will be called when the user press the confirmation button.
