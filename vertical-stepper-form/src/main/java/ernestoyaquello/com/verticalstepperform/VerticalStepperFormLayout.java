@@ -74,7 +74,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
         FormStyle.defaultButtonPressedTextColor = Color.rgb(255, 255, 255);
         FormStyle.defaultErrorMessageTextColor = Color.rgb(175, 18, 18);
         FormStyle.defaultDisplayBottomNavigation = true;
-        FormStyle.defaultShowVerticalLineWhenStepsAreCollapsed = false;
+        FormStyle.defaultShowVerticalLineWhenStepsAreCollapsed = true;
         FormStyle.defaultDisplayStepButtons = true;
     }
 
