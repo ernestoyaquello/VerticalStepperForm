@@ -21,7 +21,7 @@
             android:orientation="vertical">
 
             <FrameLayout
-                android:id="@+id/circle"
+                android:id="@+id/step_number_circle"
                 android:layout_width="@dimen/vertical_stepper_circle_size"
                 android:layout_height="@dimen/vertical_stepper_circle_size"
                 android:background="@drawable/circle_step_done">
@@ -36,7 +36,7 @@
                     tools:text="1" />
 
                 <ImageView
-                    android:id="@+id/step_done"
+                    android:id="@+id/step_done_icon"
                     android:layout_width="@dimen/vertical_stepper_circle_size"
                     android:layout_height="@dimen/vertical_stepper_circle_size"
                     android:padding="2dp"
@@ -48,6 +48,7 @@
             </FrameLayout>
 
             <View
+                android:id="@+id/line1"
                 android:layout_marginTop="8dp"
                 android:layout_width="@dimen/vertical_stepper_vertical_line_thickness"
                 android:layout_height="0dp"
@@ -84,6 +85,18 @@
                 tools:visibility="visible"
                 tools:text="Little description of this step" />
 
+            <FrameLayout
+                android:id="@+id/spacing_to_show_left_line"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="12dp" />
+
+            </FrameLayout>
+
         </LinearLayout>
 
     </LinearLayout>
@@ -98,6 +111,7 @@
             android:layout_height="match_parent">
 
             <View
+                android:id="@+id/line2"
                 android:layout_width="@dimen/vertical_stepper_vertical_line_thickness"
                 android:layout_height="match_parent"
                 android:background="#e0e0e0"
@@ -113,7 +127,7 @@
             android:layout_marginStart="16dp">
 
             <LinearLayout
-                android:id="@+id/error_container"
+                android:id="@+id/step_error_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -122,14 +136,14 @@
                 tools:visibility="visible">
 
                 <ImageView
-                    android:id="@+id/error_icon"
+                    android:id="@+id/step_error_icon"
                     android:layout_width="24dp"
                     android:layout_height="24dp"
                     android:src="@drawable/ic_error"
                     android:layout_marginEnd="4dp"/>
 
                 <TextView
-                    android:id="@+id/error_message"
+                    android:id="@+id/step_error_message"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:textSize="@dimen/vertical_stepper_vertical_error_message_text_size"
@@ -151,12 +165,12 @@
                     android:paddingTop="1dp"/>
 
                 <com.google.android.material.button.MaterialButton
-                    android:id="@+id/next_step"
+                    android:id="@+id/step_button"
                     style="@style/Widget.MaterialComponents.Button.UnelevatedButton"
                     android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/vertical_form_stepper_form_continue"
+                    android:text="@string/vertical_form_stepper_form_continue_button"
                     android:textColor="#FFFFFF"
                     android:layout_marginTop="16dp"
                     android:layout_marginBottom="4dp"

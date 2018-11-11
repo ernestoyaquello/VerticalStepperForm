@@ -8,8 +8,13 @@ import android.widget.LinearLayout;
 
 public class Animations {
 
-    public static void slideDown(final View v) {
+    public static void slideDownIfNecessary(final View v, boolean animate) {
         if(v.getVisibility() != View.VISIBLE) {
+
+            if (!animate) {
+                v.setVisibility(View.VISIBLE);
+                return;
+            }
 
             v.measure(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
             final int targetHeight = v.getMeasuredHeight();
@@ -37,7 +42,9 @@ public class Animations {
 
             a.setAnimationListener(new Animation.AnimationListener() {
                 @Override
-                public void onAnimationStart(Animation animation) {}
+                public void onAnimationStart(Animation animation) {
+                    // Do nothing here
+                }
 
                 @Override
                 public void onAnimationEnd(Animation animation) {
@@ -45,7 +52,9 @@ public class Animations {
                 }
 
                 @Override
-                public void onAnimationRepeat(Animation animation) {}
+                public void onAnimationRepeat(Animation animation) {
+                    // Do nothing here
+                }
             });
 
             // 1dp/ms
@@ -54,8 +63,13 @@ public class Animations {
         }
     }
 
-    public static void slideUp(final View v) {
+    public static void slideUpIfNecessary(final View v, boolean animate) {
         if(v.getVisibility() == View.VISIBLE) {
+
+            if (!animate) {
+                v.setVisibility(View.GONE);
+                return;
+            }
 
             final int initialHeight = v.getMeasuredHeight();
 
@@ -73,7 +87,6 @@ public class Animations {
                 public boolean willChangeBounds() {
                     return true;
                 }
-
             };
 
             a.setAnimationListener(new Animation.AnimationListener() {
@@ -102,5 +115,4 @@ public class Animations {
     private static void setHeight(View v, int newHeight) {
         v.setLayoutParams(new LinearLayout.LayoutParams(v.getLayoutParams().width, newHeight));
     }
-
 }

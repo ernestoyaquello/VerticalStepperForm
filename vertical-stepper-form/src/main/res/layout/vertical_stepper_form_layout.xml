@@ -2,7 +2,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="center_horizontal"
-    android:id="@+id/bottom_navigation"
     android:orientation="vertical">
 
     <ScrollView
@@ -21,11 +20,12 @@
             android:layout_marginRight="16dp"
             android:layout_marginEnd="16dp"
             android:paddingTop="8dp"
-            android:paddingBottom="16dp" />
+            android:paddingBottom="8dp" />
 
     </ScrollView>
 
     <LinearLayout
+        android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="48dp"
         android:orientation="horizontal"

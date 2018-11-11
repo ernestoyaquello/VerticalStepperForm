@@ -14,7 +14,7 @@ public interface VerticalStepperFormListener {
      * @return The step's layout.
      */
     @NonNull
-    View getStepLayout(int stepPosition);
+    View getStepContentLayout(int stepPosition);
 
     /**
      * This method will be called every time a certain step is opened.

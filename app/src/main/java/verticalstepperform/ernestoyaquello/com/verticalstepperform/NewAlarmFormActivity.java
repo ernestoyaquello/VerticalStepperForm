@@ -21,13 +21,15 @@ import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.TimePicker;
+
+import com.google.android.material.textfield.TextInputEditText;
 
 import androidx.fragment.app.DialogFragment;
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
 import ernestoyaquello.com.verticalstepperform.listener.VerticalStepperFormListener;
+import ernestoyaquello.com.verticalstepperform.util.model.Step;
 
 public class NewAlarmFormActivity extends AppCompatActivity implements VerticalStepperFormListener {
 
@@ -45,9 +47,9 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
     public static final String STATE_TIME_MINUTES = "time_minutes";
     public static final String STATE_WEEK_DAYS = "week_days";
 
-    private EditText alarmTitleEditText;
+    private TextInputEditText alarmTitleEditText;
     
-    private EditText alarmDescriptionEditText;
+    private TextInputEditText alarmDescriptionEditText;
 
     private TextView alarmTimeTextView;
     private TimePickerDialog alarmTimePicker;
@@ -69,21 +71,23 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
         int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
         String[] stepTitles = getResources().getStringArray(R.array.steps_titles);
-        //String[] stepSubtitles = getResources().getStringArray(R.array.steps_subtitles);
+
+        Step[] steps = new Step[stepTitles.length];
+        for (int i = 0; i < stepTitles.length; i++) {
+            String title = stepTitles[i];
+            steps[i] = new Step(title);
+        }
 
         verticalStepperForm = findViewById(R.id.vertical_stepper_form);
-        verticalStepperForm.setup(stepTitles, this)
-                //.stepSubtitles(stepSubtitles)
-                //.showVerticalLineWhenStepsAreCollapsed(true) // false by default
+        verticalStepperForm.setup(this, steps)
                 .primaryColor(colorPrimary)
                 .primaryDarkColor(colorPrimaryDark)
-                .displayBottomNavigation(true)
                 .init();
     }
 
     @Override
     @NonNull
-    public View getStepLayout(int stepPosition) {
+    public View getStepContentLayout(int stepPosition) {
         switch (stepPosition) {
             case ALARM_TITLE_STEP_POSITION:
                 return createAlarmTitleStep();
@@ -111,7 +115,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
                 // As soon as they open, we mark these two steps as completed because no user input
                 // or checking is required on them: they already have default values and can never
                 // end up having invalid ones
-                verticalStepperForm.setStepAsCompleted(stepPosition);
+                verticalStepperForm.markStepAsCompleted(stepPosition, true);
                 break;
 
             case ALARM_DAYS_STEP_POSITION:
@@ -122,17 +126,29 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
 
     @Override
     public void onCompletedForm() {
+        final Thread dataSavingThread = saveData();
+
         progressDialog = new ProgressDialog(this);
         progressDialog.setCancelable(true);
         progressDialog.show();
         progressDialog.setMessage(getString(R.string.form_sending_data_message));
-
-        saveData();
+        progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialogInterface) {
+                try {
+                    dataSavingThread.interrupt();
+                } catch (RuntimeException e) {
+                    // Do nothing
+                } finally {
+                    verticalStepperForm.cancelFormCompletion();
+                }
+            }
+        });
     }
 
     private View createAlarmTitleStep() {
         // We create this step view programmatically
-        alarmTitleEditText = new EditText(this);
+        alarmTitleEditText = new TextInputEditText(this);
         alarmTitleEditText.setHint(R.string.form_hint_title);
         alarmTitleEditText.setSingleLine(true);
         alarmTitleEditText.addTextChangedListener(new TextWatcher() {
@@ -162,7 +178,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
 
     private View createAlarmDescriptionStep() {
         // We create this step view programmatically
-        alarmDescriptionEditText = new EditText(this);
+        alarmDescriptionEditText = new TextInputEditText(this);
         alarmDescriptionEditText.setHint(R.string.form_hint_description);
         alarmDescriptionEditText.setSingleLine(true);
         alarmDescriptionEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -247,7 +263,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
                     unmarkAlarmDay(index, dayLayout, false);
                 }
             } else {
-                updateDayLayout(index, dayLayout);
+                updateDayLayout(index, dayLayout, false);
             }
 
             if (dayLayout != null) {
@@ -255,7 +271,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
                     @Override
                     public void onClick(View v) {
                         alarmDays[index] = !alarmDays[index];
-                        updateDayLayout(index, dayLayout);
+                        updateDayLayout(index, dayLayout, true);
                     }
                 });
 
@@ -265,22 +281,22 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         }
     }
 
-    private void updateDayLayout(int dayIndex, View dayLayout) {
+    private void updateDayLayout(int dayIndex, View dayLayout, boolean updateState) {
         if (alarmDays[dayIndex]) {
-            markAlarmDay(dayIndex, dayLayout, true);
+            markAlarmDay(dayIndex, dayLayout, updateState);
         } else {
-            unmarkAlarmDay(dayIndex, dayLayout, true);
+            unmarkAlarmDay(dayIndex, dayLayout, updateState);
         }
     }
 
     private void updateAlarmTitleStepState(String alarmTitle) {
         if (isAlarmTitleCorrect(alarmTitle)) {
-            verticalStepperForm.setActiveStepAsCompleted();
+            verticalStepperForm.markCurrentStepAsCompleted(true);
         } else {
             String titleErrorString = getResources().getString(R.string.error_title_min_characters);
             String titleError = String.format(titleErrorString, MIN_CHARACTERS_TITLE);
 
-            verticalStepperForm.setActiveStepAsUncompleted(titleError);
+            verticalStepperForm.markCurrenttStepAsUncompleted(titleError, true);
         }
     }
 
@@ -290,9 +306,9 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
 
     private void updateAlarmDaysStepState() {
         if (isThereAtLeastOneDaySelected()) {
-            verticalStepperForm.setStepAsCompleted(ALARM_DAYS_STEP_POSITION);
+            verticalStepperForm.markStepAsCompleted(ALARM_DAYS_STEP_POSITION, true);
         } else {
-            verticalStepperForm.setStepAsUncompleted(ALARM_DAYS_STEP_POSITION, null);
+            verticalStepperForm.markStepAsUncompleted(ALARM_DAYS_STEP_POSITION, null, true);
         }
     }
 
@@ -356,10 +372,10 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
         alarmTimeTextView.setText(time);
     }
 
-    private void saveData() {
+    private Thread saveData() {
 
         // Fake data saving effect
-        new Thread(new Runnable() {
+        Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
@@ -378,7 +394,10 @@ public class NewAlarmFormActivity extends AppCompatActivity implements VerticalS
                     e.printStackTrace();
                 }
             }
-        }).start();
+        });
+        thread.start();
+
+        return thread;
     }
 
     private void finishIfPossible() {
