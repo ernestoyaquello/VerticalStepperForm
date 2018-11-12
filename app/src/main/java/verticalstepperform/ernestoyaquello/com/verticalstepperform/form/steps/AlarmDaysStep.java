@@ -77,6 +77,7 @@ public class AlarmDaysStep extends FormStep<boolean[]> {
             }
         }
 
+        // TODO Set an error message as well for when thereIsAtLeastOneDaySelected is false
         return new IsDataValid(thereIsAtLeastOneDaySelected);
     }
 
@@ -91,21 +92,17 @@ public class AlarmDaysStep extends FormStep<boolean[]> {
 
             if (firstSetup) {
                 // By default, we only mark the working days as activated
-                if (index < 5) {
-                    markAlarmDay(form, stepPosition, index, dayLayout, false);
-                } else {
-                    unmarkAlarmDay(form, stepPosition, index, dayLayout, false);
-                }
-            } else {
-                updateDayLayout(form, stepPosition, index, dayLayout, false);
+                alarmDays[index] = index < 5;
             }
+
+            updateDayLayout(form, index, dayLayout, false);
 
             if (dayLayout != null) {
                 dayLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         alarmDays[index] = !alarmDays[index];
-                        updateDayLayout(form, stepPosition, index, dayLayout, true);
+                        updateDayLayout(form, index, dayLayout, true);
                     }
                 });
 
@@ -121,23 +118,15 @@ public class AlarmDaysStep extends FormStep<boolean[]> {
         return daysStepContent.findViewById(id);
     }
 
-    private void updateDayLayout(VerticalStepperFormLayout form, int stepPostion, int dayIndex, View dayLayout, boolean updateState) {
+    private void updateDayLayout(VerticalStepperFormLayout form, int dayIndex, View dayLayout, boolean useAnimations) {
         if (alarmDays[dayIndex]) {
-            markAlarmDay(form, stepPostion, dayIndex, dayLayout, updateState);
+            markAlarmDay(form, dayIndex, dayLayout, useAnimations);
         } else {
-            unmarkAlarmDay(form, stepPostion, dayIndex, dayLayout, updateState);
+            unmarkAlarmDay(form, dayIndex, dayLayout, useAnimations);
         }
     }
 
-    private void markDaysStepAsCompletedOrUncompleted(VerticalStepperFormLayout form, int stepPosition, boolean useAnimations) {
-        if (isStepDataValid().isValid()) {
-            form.markStepAsCompleted(stepPosition, useAnimations);
-        } else {
-            form.markStepAsUncompleted(stepPosition, null, useAnimations);
-        }
-    }
-
-    private void markAlarmDay(VerticalStepperFormLayout form, int stepPosition, int dayIndex, View dayLayout, boolean markStepAsCompletedOrUncompleted) {
+    private void markAlarmDay(VerticalStepperFormLayout form, int dayIndex, View dayLayout, boolean useAnimations) {
         alarmDays[dayIndex] = true;
 
         if (dayLayout != null) {
@@ -150,12 +139,10 @@ public class AlarmDaysStep extends FormStep<boolean[]> {
             dayText.setTextColor(Color.rgb(255, 255, 255));
         }
 
-        if(markStepAsCompletedOrUncompleted) {
-            markDaysStepAsCompletedOrUncompleted(form, stepPosition, true);
-        }
+        markStepAsCompletedOrUncompleted(form, useAnimations);
     }
 
-    private void unmarkAlarmDay(VerticalStepperFormLayout form, int stepPosition, int dayIndex, View dayLayout, boolean markStepAsCompletedOrUncompleted) {
+    private void unmarkAlarmDay(VerticalStepperFormLayout form, int dayIndex, View dayLayout, boolean useAnimations) {
         alarmDays[dayIndex] = false;
 
         dayLayout.setBackgroundResource(0);
@@ -164,9 +151,7 @@ public class AlarmDaysStep extends FormStep<boolean[]> {
         int colour = ContextCompat.getColor(form.getContext(), R.color.colorPrimary);
         dayText.setTextColor(colour);
 
-        if(markStepAsCompletedOrUncompleted) {
-            markDaysStepAsCompletedOrUncompleted(form, stepPosition, true);
-        }
+        markStepAsCompletedOrUncompleted(form, useAnimations);
     }
 
     private String getSelectedWeekDaysAsString(Context context) {

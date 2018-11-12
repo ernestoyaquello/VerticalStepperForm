@@ -39,7 +39,7 @@ public class AlarmNameStep extends FormStep<String> {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                markAsCompletedOrUncompleted(form, true);
+                markStepAsCompletedOrUncompleted(form, true);
             }
 
             @Override
@@ -92,15 +92,6 @@ public class AlarmNameStep extends FormStep<String> {
             return new IsDataValid(false, titleError);
         } else {
             return new IsDataValid(true);
-        }
-    }
-
-    private void markAsCompletedOrUncompleted(VerticalStepperFormLayout form, boolean useAnimations) {
-        if (isStepDataValid().isValid()) {
-            form.markOpenStepAsCompleted(useAnimations);
-        } else {
-            String titleError = String.format(unformattedErrorString, MIN_CHARACTERS_ALARM_NAME);
-            form.markOpenStepAsUncompleted(titleError, useAnimations);
         }
     }
 }

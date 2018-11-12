@@ -127,6 +127,21 @@ public abstract class FormStep<T> {
      */
     protected abstract void onStepClosed(VerticalStepperFormLayout form, int stepPosition, boolean animated);
 
+    /**
+     * Marks the step as completed or uncompleted depending on whether the step data is valid or not.
+     *
+     * @param form The vertical stepper form.
+     * @param useAnimations True to animate the changes in the views, false to not.
+     */
+    protected void markStepAsCompletedOrUncompleted(VerticalStepperFormLayout form, boolean useAnimations) {
+        IsDataValid isDataValid = isStepDataValid();
+        if (isDataValid.isValid()) {
+            form.markOpenStepAsCompleted(useAnimations);
+        } else {
+            form.markOpenStepAsUncompleted(isDataValid.getErrorMessage(), useAnimations);
+        }
+    }
+
     protected void updateTitle(int stepPosition, String title, boolean useAnimations) {
         this.title = title;
 
@@ -152,13 +167,7 @@ public abstract class FormStep<T> {
     }
 
     void onStepOpenedImpl(VerticalStepperFormLayout form, int stepPosition, boolean animated) {
-        IsDataValid dataValidation = isStepDataValid();
-        if (dataValidation.isValid) {
-            form.markStepAsCompleted(stepPosition, animated);
-        } else {
-            form.markStepAsUncompleted(stepPosition, dataValidation.errorMessage, animated);
-        }
-
+        markStepAsCompletedOrUncompleted(form, animated);
         onStepOpened(form, stepPosition, animated);
     }
 
