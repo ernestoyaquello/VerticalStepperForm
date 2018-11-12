@@ -1,11 +1,11 @@
-package ernestoyaquello.com.verticalstepperform.util;
+package ernestoyaquello.com.verticalstepperform;
 
 import android.content.res.ColorStateList;
 import androidx.appcompat.widget.AppCompatButton;
 
-public class UIHelpers {
+class UIHelpers {
 
-    public static void setButtonColor(
+    static void setButtonColor(
             AppCompatButton button,
             int buttonColor,
             int buttonTextColor,

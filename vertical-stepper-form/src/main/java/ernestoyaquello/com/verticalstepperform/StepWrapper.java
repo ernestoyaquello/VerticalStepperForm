@@ -12,14 +12,13 @@ import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import ernestoyaquello.com.verticalstepperform.util.Animations;
-import ernestoyaquello.com.verticalstepperform.util.UIHelpers;
-import ernestoyaquello.com.verticalstepperform.util.model.Step;
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout.FormStyle;
 
-class ExtendedStep extends Step {
+class StepWrapper implements FormStep.InternalFormStepListener {
 
+    private FormStep step;
     private boolean isCompleted;
     private boolean isOpen;
     private boolean isConfirmationStep;
@@ -29,34 +28,21 @@ class ExtendedStep extends Step {
 
     private FormStyle formStyle;
 
-    ExtendedStep(Step step) {
-        this(step.getTitle(), step.getSubtitle(), step.getButtonText());
+    StepWrapper(@NonNull FormStep step) {
+        this(step, false);
     }
 
-    ExtendedStep(String title, String subtitle) {
-        this(title, subtitle, null);
-    }
-
-    ExtendedStep(String title, String subtitle, String buttonText) {
-        this(title, subtitle, buttonText, false);
-    }
-
-    ExtendedStep(String title, String subtitle, String buttonText, boolean isCompleted) {
-        this(title, subtitle, buttonText, isCompleted, false);
-    }
-
-    ExtendedStep(String title, String subtitle, String buttonText, boolean isCompleted, boolean isConfirmationStep) {
-        super(title, subtitle, buttonText);
-
-        this.isCompleted = isCompleted;
+    StepWrapper(FormStep step, boolean isConfirmationStep) {
+        this.step = !isConfirmationStep ? step : new EmptyFormStep();
         this.isConfirmationStep = isConfirmationStep;
+        this.step.internalListener = this;
     }
 
     View initialize(
+            VerticalStepperFormLayout form,
             FormStyle style,
             Context context,
             ViewGroup parent,
-            View contentLayout,
             View.OnClickListener clickOnNextButton,
             View.OnClickListener clickOnHeader,
             int position,
@@ -64,15 +50,10 @@ class ExtendedStep extends Step {
 
         if (stepLayout == null) {
             this.formStyle = style;
-            this.stepLayout = createAndSetupStepLayout(
-                    context,
-                    parent,
-                    position,
-                    clickOnNextButton,
-                    clickOnHeader);
-            this.contentLayout = contentLayout;
+            this.stepLayout = createStepLayout(context, parent, clickOnNextButton, clickOnHeader);
+            this.contentLayout = step.getStepContentLayout(context, form, position);
 
-            init(style, isLast, contentLayout);
+            finishInitialization(position, isLast);
         } else {
             throw new IllegalStateException("This step has already been initialized");
         }
@@ -80,20 +61,30 @@ class ExtendedStep extends Step {
         return stepLayout;
     }
 
-    private void init(FormStyle style, boolean isLast, View contentLayout) {
+    private void finishInitialization(int position, boolean isLast) {
 
-        // Update button view
+        // Setup step number text
+        TextView stepNumberTextView = stepLayout.findViewById(R.id.step_number);
+        stepNumberTextView.setText(String.valueOf(position + 1));
+
+        // Setup title and subtitle
+        String title = !isConfirmationStep ? step.getTitle() : formStyle.confirmationStepTitle;
+        String subtitle = step.getSubtitle() != null ? step.getSubtitle() : "";
+        step.updateTitle(position, title, false);
+        step.updateSubtitle(position, subtitle, false);
+
+        // Setup button view
         MaterialButton button = stepLayout.findViewById(R.id.step_button);
-        if (style.displayStepButtons || isConfirmationStep) {
-            String stepButtonText = getButtonText() != null && !getButtonText().isEmpty()
-                    ? getButtonText()
-                    : isLast ? style.lastStepButtonText : style.stepButtonText;
-            button.setText(stepButtonText);
+        if (formStyle.displayStepButtons || isConfirmationStep) {
+            String stepButtonText = step.getButtonText() != null && !step.getButtonText().isEmpty()
+                    ? step.getButtonText()
+                    : isLast ? formStyle.lastStepButtonText : formStyle.stepButtonText;
+            step.updateButtonText(position, stepButtonText, false);
         } else {
             button.setVisibility(View.GONE);
         }
 
-        // Update line view
+        // Setup line view
         if (isLast) {
             View lineView1 = stepLayout.findViewById(R.id.line1);
             View lineView2 = stepLayout.findViewById(R.id.line2);
@@ -112,10 +103,9 @@ class ExtendedStep extends Step {
         }
     }
 
-    private View createAndSetupStepLayout(
+    private View createStepLayout(
             Context context,
             ViewGroup parent,
-            int position,
             View.OnClickListener clickOnNextButton,
             View.OnClickListener clickOnHeader) {
 
@@ -149,13 +139,6 @@ class ExtendedStep extends Step {
                 formStyle.buttonPressedBackgroundColor,
                 formStyle.buttonPressedTextColor);
 
-        if (isConfirmationStep) {
-            title = formStyle.confirmationStepTitle;
-        }
-        stepTitle.setText(getTitle());
-        stepSubtitle.setText(getSubtitle());
-        stepNumberTextView.setText(String.valueOf(position + 1));
-
         stepHeader.setOnClickListener(clickOnHeader);
         stepNextButton.setOnClickListener(clickOnNextButton);
 
@@ -167,14 +150,6 @@ class ExtendedStep extends Step {
         return inflater.inflate(VerticalStepperFormLayout.getInternalStepLayout(), parent, false);
     }
 
-    public void setContentLayout(View contentLayout) {
-        ViewGroup contentContainerLayout = stepLayout.findViewById(R.id.step_content);
-        if (contentContainerLayout != null && contentLayout != null) {
-            contentContainerLayout.removeAllViews();
-            contentContainerLayout.addView(contentLayout);
-        }
-    }
-
     void markAsCompleted(boolean useAnimations) {
         updateStepCompletion(true, null, useAnimations);
     }
@@ -183,7 +158,11 @@ class ExtendedStep extends Step {
         updateStepCompletion(false, errorMessage, useAnimations);
     }
 
-    private void updateStepCompletion(boolean completed, String errorMessage, boolean useAnimations) {
+    private void updateStepCompletion(
+            boolean completed,
+            String errorMessage,
+            boolean useAnimations) {
+
         isCompleted = completed;
 
         TextView errorTextView = stepLayout.findViewById(R.id.step_error_message);
@@ -199,12 +178,20 @@ class ExtendedStep extends Step {
         updateHeaderAppearance(useAnimations);
     }
 
-    void open(boolean useAnimations) {
+    void open(VerticalStepperFormLayout form, int position, boolean useAnimations) {
         toggleStep(true, useAnimations);
+
+        if (!isConfirmationStep) {
+            step.onStepOpenedImpl(form, position,useAnimations);
+        }
     }
 
-    void close(boolean useAnimations) {
+    void close(VerticalStepperFormLayout form, int position, boolean useAnimations) {
         toggleStep(false, useAnimations);
+
+        if (!isConfirmationStep) {
+            step.onStepClosed(form, position, useAnimations);
+        }
     }
 
     private void toggleStep(boolean open, boolean useAnimations) {
@@ -239,8 +226,7 @@ class ExtendedStep extends Step {
         subtitle.setAlpha(subtitleAlpha);
         stepPosition.setAlpha(alpha);
 
-        boolean showSubtitle = updateSubtitleVisibility(useAnimations);
-        updateSpacingViewVisibility(useAnimations, showSubtitle);
+        updateSubtitleAndSpacingVisibility(useAnimations);
         updateErrorMessageVisibility(useAnimations);
 
         // Update step position circle indicator layout
@@ -292,20 +278,17 @@ class ExtendedStep extends Step {
         nextButton.setAlpha(formStyle.alphaOfDisabledElements);
     }
 
-    void updateSubtitle(String subtitle, boolean useAnimations) {
-        subtitle = subtitle == null ? "" : subtitle;
-        this.subtitle = subtitle;
-
-        TextView subtitleView = stepLayout.findViewById(R.id.step_subtitle);
-        subtitleView.setText(subtitle);
-
-        updateHeaderAppearance(useAnimations);
+    private void updateSubtitleAndSpacingVisibility(boolean useAnimations) {
+        boolean showSubtitle = updateSubtitleVisibility(useAnimations);
+        updateSpacingViewVisibility(useAnimations, showSubtitle);
     }
 
     private boolean updateSubtitleVisibility(boolean useAnimations) {
         TextView subtitle = stepLayout.findViewById(R.id.step_subtitle);
 
-        boolean showSubtitle = !getSubtitle().isEmpty() && (isOpen || isCompleted);
+        boolean showSubtitle = step.getSubtitle() != null
+                && !step.getSubtitle().isEmpty()
+                && (isOpen || isCompleted);
         if (showSubtitle) {
             Animations.slideDownIfNecessary(subtitle, useAnimations);
         } else {
@@ -318,7 +301,8 @@ class ExtendedStep extends Step {
     private void updateSpacingViewVisibility(boolean useAnimations, boolean showSubtitle) {
         View spacingView = stepLayout.findViewById(R.id.spacing_to_show_left_line);
 
-        boolean showLineBetweenCollapsedSteps = !showSubtitle && formStyle.displayVerticalLineWhenStepsAreCollapsed && !isOpen;
+        boolean showLineBetweenCollapsedSteps =
+                !showSubtitle && formStyle.displayVerticalLineWhenStepsAreCollapsed && !isOpen;
         if (showLineBetweenCollapsedSteps) {
             Animations.slideDownIfNecessary(spacingView, useAnimations);
         } else {
@@ -354,5 +338,101 @@ class ExtendedStep extends Step {
 
     View getContentLayout() {
         return contentLayout;
+    }
+
+    String getTitle() {
+        return step.getTitle();
+    }
+
+    String getSubtitle() {
+        return step.getSubtitle();
+    }
+
+    String getButtonText() {
+        return step.getButtonText();
+    }
+
+    void restoreTitle(int stepPosition, String title) {
+        step.updateTitle(stepPosition, title, false);
+    }
+
+    void restoreSubtitle(int stepPosition, String subtitle) {
+        step.updateSubtitle(stepPosition, subtitle, false);
+    }
+
+    void restoreButtonText(int stepPosition, String buttonText) {
+        step.updateButtonText(stepPosition, buttonText, false);
+    }
+
+    @Override
+    public void onUpdatedTitle(int stepPosition, boolean useAnimations) {
+        String title = step.getTitle();
+
+        if (stepLayout != null) {
+            TextView subtitleView = stepLayout.findViewById(R.id.step_title);
+            subtitleView.setText(title);
+        }
+    }
+
+    @Override
+    public void onUpdatedSubtitle(int stepPosition, boolean useAnimations) {
+        String subtitle = step.getSubtitle();
+        subtitle = subtitle == null ? "" : subtitle;
+
+        if (stepLayout != null) {
+            TextView subtitleView = stepLayout.findViewById(R.id.step_subtitle);
+            subtitleView.setText(subtitle);
+
+            updateSubtitleAndSpacingVisibility(useAnimations);
+        }
+    }
+
+    @Override
+    public void onUpdatedButtonText(int stepPosition, boolean useAnimations) {
+        String buttonText = step.getButtonText();
+
+        if (stepLayout != null) {
+            MaterialButton subtitleView = stepLayout.findViewById(R.id.step_button);
+            subtitleView.setText(buttonText);
+        }
+    }
+
+    // Useless, empty implementation of FormStep to be used for the confirmation step
+    private class EmptyFormStep extends FormStep<Object> {
+
+        EmptyFormStep() {
+            super("");
+        }
+
+        @Override
+        public Object getStepData() {
+            return null;
+        }
+
+        @Override
+        public void restoreStepData(Object data) {
+            // Do nothing
+        }
+
+        @Override
+        protected IsDataValid isStepDataValid(Object stepData) {
+            return null;
+        }
+
+        @NonNull
+        @Override
+        protected View getStepContentLayout(Context context, VerticalStepperFormLayout form, int stepPosition) {
+            return null;
+        }
+
+        @Override
+        protected void onStepOpened(VerticalStepperFormLayout form, int stepPosition, boolean animated) {
+            // Do nothing
+        }
+
+        @Override
+        protected void onStepClosed(VerticalStepperFormLayout form, int stepPosition, boolean animated) {
+            // Do nothing
+        }
     }
 }

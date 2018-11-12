@@ -1,4 +1,4 @@
-package ernestoyaquello.com.verticalstepperform.util;
+package ernestoyaquello.com.verticalstepperform;
 
 import android.view.View;
 import android.view.WindowManager;
@@ -6,19 +6,19 @@ import android.view.animation.Animation;
 import android.view.animation.Transformation;
 import android.widget.LinearLayout;
 
-public class Animations {
+class Animations {
 
     private static long minDurationMillis = 150;
 
-    public static Animation slideDownIfNecessary(final View v, boolean animate) {
+    static Animation slideDownIfNecessary(final View v, boolean animate) {
         return slideDownIfNecessary(v, animate, true, 0);
     }
 
-    public static Animation slideDownIfNecessary(final View v, boolean animate, long durationMillis) {
+    static Animation slideDownIfNecessary(final View v, boolean animate, long durationMillis) {
         return slideDownIfNecessary(v, animate, true, durationMillis);
     }
 
-    public static Animation slideDownIfNecessary(final View v, boolean animate, boolean startAnimation, long durationMillis) {
+    static Animation slideDownIfNecessary(final View v, boolean animate, boolean startAnimation, long durationMillis) {
         if(v.getVisibility() != View.VISIBLE) {
 
             if (!animate) {
@@ -44,15 +44,15 @@ public class Animations {
         return null;
     }
 
-    public static Animation slideUpIfNecessary(final View v, boolean animate) {
+    static Animation slideUpIfNecessary(final View v, boolean animate) {
         return slideUpIfNecessary(v, animate, true, 0);
     }
 
-    public static Animation slideUpIfNecessary(final View v, boolean animate, long durationMillis) {
+    static Animation slideUpIfNecessary(final View v, boolean animate, long durationMillis) {
         return slideUpIfNecessary(v, animate, true, durationMillis);
     }
 
-    public static Animation slideUpIfNecessary(final View v, boolean animate, boolean startAnimation, long durationMillis) {
+    static Animation slideUpIfNecessary(final View v, boolean animate, boolean startAnimation, long durationMillis) {
         if(v.getVisibility() == View.VISIBLE) {
 
             if (!animate) {
@@ -77,7 +77,7 @@ public class Animations {
         return null;
     }
 
-    public static Animation getSlideDownAnimation(final View v, final int targetHeight, long durationMillis) {
+    static Animation getSlideDownAnimation(final View v, final int targetHeight, long durationMillis) {
 
         // Older versions of android (pre API 21) cancel animations for views with a height of 0,
         // so we set it to 1 instead
@@ -120,7 +120,7 @@ public class Animations {
         return animation;
     }
 
-    public static Animation getSlideUpAnimation(final View v, final int initialHeight, long durationMillis) {
+    static Animation getSlideUpAnimation(final View v, final int initialHeight, long durationMillis) {
         Animation animation = new Animation() {
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
