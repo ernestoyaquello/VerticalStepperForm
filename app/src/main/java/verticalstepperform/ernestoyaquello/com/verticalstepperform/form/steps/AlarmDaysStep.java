@@ -1,6 +1,5 @@
 package verticalstepperform.ernestoyaquello.com.verticalstepperform.form.steps;
 
-import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
@@ -15,15 +14,13 @@ import java.util.List;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
-import ernestoyaquello.com.verticalstepperform.FormStep;
+import ernestoyaquello.com.verticalstepperform.Step;
 import verticalstepperform.ernestoyaquello.com.verticalstepperform.R;
 
-public class AlarmDaysStep extends FormStep<boolean[]> {
+public class AlarmDaysStep extends Step<boolean[]> {
 
     private boolean[] alarmDays;
     private View daysStepContent;
-    private boolean dataRestored;
 
     public AlarmDaysStep(String stepTitle) {
         super(stepTitle);
@@ -31,30 +28,25 @@ public class AlarmDaysStep extends FormStep<boolean[]> {
 
     @NonNull
     @Override
-    protected View getStepContentLayout(Context context, VerticalStepperFormLayout form, int stepPosition) {
+    protected View createStepContentLayout() {
 
         // We create this step view by inflating an XML layout
-        LayoutInflater inflater = LayoutInflater.from(context);
+        LayoutInflater inflater = LayoutInflater.from(getContext());
         daysStepContent = inflater.inflate(R.layout.step_days_of_week_layout, null, false);
-        setupAlarmDays(form, stepPosition);
+        setupAlarmDays();
 
         return daysStepContent;
     }
 
     @Override
-    protected void onStepOpened(VerticalStepperFormLayout form, int stepPosition, boolean animated) {
-        updateSubtitle(stepPosition, "", animated);
-        if (dataRestored) {
-            dataRestored = false;
-            setupAlarmDays(form, stepPosition);
-        }
+    protected void onStepOpened(boolean animated) {
+        updateSubtitle("", animated);
     }
 
     @Override
-    protected void onStepClosed(VerticalStepperFormLayout form, int stepPosition, boolean animated) {
-        Context context = form.getContext();
-        String selectedDaysAsString = getSelectedWeekDaysAsString(context);
-        updateSubtitle(stepPosition, selectedDaysAsString, animated);
+    protected void onStepClosed(boolean animated) {
+        String selectedDaysAsString = getSelectedWeekDaysAsString();
+        updateSubtitle(selectedDaysAsString, animated);
     }
 
     @Override
@@ -65,7 +57,7 @@ public class AlarmDaysStep extends FormStep<boolean[]> {
     @Override
     public void restoreStepData(boolean[] data) {
         alarmDays = data;
-        dataRestored = true;
+        setupAlarmDays();
     }
 
     @Override
@@ -81,28 +73,29 @@ public class AlarmDaysStep extends FormStep<boolean[]> {
         return new IsDataValid(thereIsAtLeastOneDaySelected);
     }
 
-    private void setupAlarmDays(final VerticalStepperFormLayout form, final int stepPosition) {
+    private void setupAlarmDays() {
         boolean firstSetup = alarmDays == null;
         alarmDays = firstSetup ? new boolean[7] : alarmDays;
 
-        final String[] weekDays = form.getContext().getResources().getStringArray(R.array.week_days);
+        final String[] weekDays = getContext().getResources().getStringArray(R.array.week_days);
         for(int i = 0; i < weekDays.length; i++) {
             final int index = i;
-            final View dayLayout = getDayLayout(form.getContext(), index);
+            final View dayLayout = getDayLayout(index);
 
             if (firstSetup) {
                 // By default, we only mark the working days as activated
                 alarmDays[index] = index < 5;
             }
 
-            updateDayLayout(form, index, dayLayout, false);
+            updateDayLayout(index, dayLayout, false);
 
             if (dayLayout != null) {
                 dayLayout.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
                         alarmDays[index] = !alarmDays[index];
-                        updateDayLayout(form, index, dayLayout, true);
+                        updateDayLayout(index, dayLayout, true);
+                        markAsCompletedOrUncompleted(true);
                     }
                 });
 
@@ -112,50 +105,46 @@ public class AlarmDaysStep extends FormStep<boolean[]> {
         }
     }
 
-    private View getDayLayout(Context context, int i) {
+    private View getDayLayout(int i) {
         int id = daysStepContent.getResources().getIdentifier(
-                "day_" + i, "id", context.getPackageName());
+                "day_" + i, "id", getContext().getPackageName());
         return daysStepContent.findViewById(id);
     }
 
-    private void updateDayLayout(VerticalStepperFormLayout form, int dayIndex, View dayLayout, boolean useAnimations) {
+    private void updateDayLayout(int dayIndex, View dayLayout, boolean useAnimations) {
         if (alarmDays[dayIndex]) {
-            markAlarmDay(form, dayIndex, dayLayout, useAnimations);
+            markAlarmDay(dayIndex, dayLayout, useAnimations);
         } else {
-            unmarkAlarmDay(form, dayIndex, dayLayout, useAnimations);
+            unmarkAlarmDay(dayIndex, dayLayout, useAnimations);
         }
     }
 
-    private void markAlarmDay(VerticalStepperFormLayout form, int dayIndex, View dayLayout, boolean useAnimations) {
+    private void markAlarmDay(int dayIndex, View dayLayout, boolean useAnimations) {
         alarmDays[dayIndex] = true;
 
         if (dayLayout != null) {
-            Drawable bg = ContextCompat.getDrawable(form.getContext(), ernestoyaquello.com.verticalstepperform.R.drawable.circle_step_done);
-            int colorPrimary = ContextCompat.getColor(form.getContext(), R.color.colorPrimary);
+            Drawable bg = ContextCompat.getDrawable(getContext(), ernestoyaquello.com.verticalstepperform.R.drawable.circle_step_done);
+            int colorPrimary = ContextCompat.getColor(getContext(), R.color.colorPrimary);
             bg.setColorFilter(new PorterDuffColorFilter(colorPrimary, PorterDuff.Mode.SRC_IN));
             dayLayout.setBackground(bg);
 
             TextView dayText = dayLayout.findViewById(R.id.day);
             dayText.setTextColor(Color.rgb(255, 255, 255));
         }
-
-        markStepAsCompletedOrUncompleted(form, useAnimations);
     }
 
-    private void unmarkAlarmDay(VerticalStepperFormLayout form, int dayIndex, View dayLayout, boolean useAnimations) {
+    private void unmarkAlarmDay(int dayIndex, View dayLayout, boolean useAnimations) {
         alarmDays[dayIndex] = false;
 
         dayLayout.setBackgroundResource(0);
 
         TextView dayText = dayLayout.findViewById(R.id.day);
-        int colour = ContextCompat.getColor(form.getContext(), R.color.colorPrimary);
+        int colour = ContextCompat.getColor(getContext(), R.color.colorPrimary);
         dayText.setTextColor(colour);
-
-        markStepAsCompletedOrUncompleted(form, useAnimations);
     }
 
-    private String getSelectedWeekDaysAsString(Context context) {
-        String[] weekDayStrings = context.getResources().getStringArray(R.array.week_days_extended);
+    private String getSelectedWeekDaysAsString() {
+        String[] weekDayStrings = getContext().getResources().getStringArray(R.array.week_days_extended);
         List<String> selectedWeekDayStrings = new ArrayList<>();
         for (int i = 0; i < weekDayStrings.length; i++) {
             if (alarmDays[i]) {

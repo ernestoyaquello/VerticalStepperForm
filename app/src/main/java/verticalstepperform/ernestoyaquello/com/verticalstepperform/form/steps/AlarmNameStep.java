@@ -1,6 +1,5 @@
 package verticalstepperform.ernestoyaquello.com.verticalstepperform.form.steps;
 
-import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
@@ -10,11 +9,10 @@ import android.widget.TextView;
 import com.google.android.material.textfield.TextInputEditText;
 
 import androidx.annotation.NonNull;
-import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
-import ernestoyaquello.com.verticalstepperform.FormStep;
+import ernestoyaquello.com.verticalstepperform.Step;
 import verticalstepperform.ernestoyaquello.com.verticalstepperform.R;
 
-public class AlarmNameStep extends FormStep<String> {
+public class AlarmNameStep extends Step<String> {
 
     private static final int MIN_CHARACTERS_ALARM_NAME = 3;
 
@@ -27,10 +25,10 @@ public class AlarmNameStep extends FormStep<String> {
 
     @NonNull
     @Override
-    protected View getStepContentLayout(Context context, final VerticalStepperFormLayout form, final int stepPosition) {
+    protected View createStepContentLayout() {
 
         // We create this step view programmatically
-        alarmNameEditText = new TextInputEditText(context);
+        alarmNameEditText = new TextInputEditText(getContext());
         alarmNameEditText.setHint(R.string.form_hint_title);
         alarmNameEditText.setSingleLine(true);
         alarmNameEditText.addTextChangedListener(new TextWatcher() {
@@ -39,7 +37,7 @@ public class AlarmNameStep extends FormStep<String> {
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                markStepAsCompletedOrUncompleted(form, true);
+                markAsCompletedOrUncompleted(true);
             }
 
             @Override
@@ -48,24 +46,24 @@ public class AlarmNameStep extends FormStep<String> {
         alarmNameEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                form.goToNextStep(true);
+                getFormLayout().goToNextStep(true);
                 return false;
             }
         });
 
-        unformattedErrorString = form.getResources().getString(R.string.error_alarm_name_min_characters);
+        unformattedErrorString = getContext().getResources().getString(R.string.error_alarm_name_min_characters);
 
         return alarmNameEditText;
     }
 
     @Override
-    protected void onStepOpened(VerticalStepperFormLayout form, int stepPosition, boolean animated) {
-        updateSubtitle(stepPosition, "", animated);
+    protected void onStepOpened(boolean animated) {
+        updateSubtitle("", animated);
     }
 
     @Override
-    protected void onStepClosed(VerticalStepperFormLayout form, int stepPosition, boolean animated) {
-        updateSubtitle(stepPosition, getStepData(), animated);
+    protected void onStepClosed(boolean animated) {
+        updateSubtitle(getStepData(), animated);
     }
 
     @Override

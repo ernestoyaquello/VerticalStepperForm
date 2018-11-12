@@ -1,18 +1,16 @@
 package verticalstepperform.ernestoyaquello.com.verticalstepperform.form.steps;
 
 import android.app.TimePickerDialog;
-import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
-import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
-import ernestoyaquello.com.verticalstepperform.FormStep;
+import ernestoyaquello.com.verticalstepperform.Step;
 import verticalstepperform.ernestoyaquello.com.verticalstepperform.R;
 
-public class AlarmTimeStep extends FormStep<AlarmTimeStep.TimeHolder> {
+public class AlarmTimeStep extends Step<AlarmTimeStep.TimeHolder> {
 
     private TextView alarmTimeTextView;
 
@@ -29,20 +27,20 @@ public class AlarmTimeStep extends FormStep<AlarmTimeStep.TimeHolder> {
 
     @NonNull
     @Override
-    protected View getStepContentLayout(Context context, VerticalStepperFormLayout form, int stepPosition) {
+    protected View createStepContentLayout() {
 
         // We create this step view by inflating an XML layout
-        LayoutInflater inflater = LayoutInflater.from(context);
+        LayoutInflater inflater = LayoutInflater.from(getContext());
         View timeStepContent = inflater.inflate(R.layout.step_time_layout, null, false);
         alarmTimeTextView = timeStepContent.findViewById(R.id.time);
-        setupAlarmTime(context);
+        setupAlarmTime();
 
         return timeStepContent;
     }
 
-    private void setupAlarmTime(Context context) {
+    private void setupAlarmTime() {
         if (alarmTimePicker == null) {
-            alarmTimePicker = new TimePickerDialog(context,
+            alarmTimePicker = new TimePickerDialog(getContext(),
                     new TimePickerDialog.OnTimeSetListener() {
                         @Override
                         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
@@ -67,13 +65,13 @@ public class AlarmTimeStep extends FormStep<AlarmTimeStep.TimeHolder> {
     }
 
     @Override
-    protected void onStepOpened(VerticalStepperFormLayout form, int stepPosition, boolean animated) {
-        updateSubtitle(stepPosition, "", animated);
+    protected void onStepOpened(boolean animated) {
+        updateSubtitle("", animated);
     }
 
     @Override
-    protected void onStepClosed(VerticalStepperFormLayout form, int stepPosition, boolean animated) {
-        updateSubtitle(stepPosition, getAlarmTimeAsString(), animated);
+    protected void onStepClosed(boolean animated) {
+        updateSubtitle(getAlarmTimeAsString(), animated);
     }
 
     @Override

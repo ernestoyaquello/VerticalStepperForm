@@ -11,8 +11,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 
 import androidx.fragment.app.DialogFragment;
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;

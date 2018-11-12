@@ -26,9 +26,11 @@ import ernestoyaquello.com.verticalstepperform.listener.StepperFormListener;
  */
 public class VerticalStepperFormLayout extends LinearLayout {
 
+    FormStepListener internalListener;
+
     private FormStyle style;
     private StepperFormListener listener;
-    private List<StepWrapper> steps;
+    private List<StepHelper> stepHelpers;
 
     private LinearLayout formContentView;
     private ScrollView stepsScrollView;
@@ -63,8 +65,8 @@ public class VerticalStepperFormLayout extends LinearLayout {
      * @param steps An array with the steps that will be displayed in the form.
      * @return An instance of the stepper form builder. Use it to configure and initialize the form.
      */
-    public FormBuilder setup(StepperFormListener stepperFormListener, FormStep... steps) {
-        return new FormBuilder(this, stepperFormListener, steps);
+    public Builder setup(StepperFormListener stepperFormListener, Step... steps) {
+        return new Builder(this, stepperFormListener, steps);
     }
 
     /**
@@ -74,60 +76,82 @@ public class VerticalStepperFormLayout extends LinearLayout {
      * @param steps A list with the steps that will be displayed in the form.
      * @return An instance of the stepper form builder. Use it to configure and initialize the form.
      */
-    public FormBuilder setup(StepperFormListener stepperFormListener, List<FormStep> steps) {
-        FormStep[] stepsArray = steps.toArray(new FormStep[steps.size()]);
-        return new FormBuilder(this, stepperFormListener, stepsArray);
+    public Builder setup(StepperFormListener stepperFormListener, List<Step> steps) {
+        Step[] stepsArray = steps.toArray(new Step[steps.size()]);
+        return new Builder(this, stepperFormListener, stepsArray);
     }
 
     /**
-     * Marks the currently open step, if any, as completed.
+     * Marks the currently open step as completed or uncompleted depending on whether the step data
+     * is valid or not.
      *
-     * @param useAnimations Indicates whether or not the step layout will be updated using animations.
+     * @param useAnimations True to animate the changes in the views, false to not.
+     * @return True if the step was found and marked as completed; false otherwise.
+     */
+    public boolean markOpenStepAsCompletedOrUncompleted(boolean useAnimations) {
+        return markStepAsCompletedOrUncompleted(getOpenStepPosition(), useAnimations);
+    }
+
+    /**
+     * Marks the specified step as completed or uncompleted depending on whether the step data is 
+     * valid or not.
+     *
+     * @param stepPosition The step position.
+     * @param useAnimations True to animate the changes in the views, false to not.
+     * @return True if the step was found and marked as completed; false otherwise.
+     */
+    public boolean markStepAsCompletedOrUncompleted(int stepPosition, boolean useAnimations) {
+        if (stepPosition >= 0 && stepPosition < stepHelpers.size()) {
+            StepHelper stepHelper = stepHelpers.get(stepPosition);
+            return stepHelper.getStepInstance().markAsCompletedOrUncompleted(useAnimations);
+        }
+
+        return false;
+    }
+
+    /**
+     * Marks the currently open step as completed.
+     *
+     * @param useAnimations True to animate the changes in the views, false to not.
      */
     public void markOpenStepAsCompleted(boolean useAnimations) {
         markStepAsCompleted(getOpenStepPosition(), useAnimations);
     }
 
     /**
-     * Marks the currently open step, if any, as uncompleted.
-     *
-     * @param errorMessage The error message to display. Null or empty to not show any.
-     * @param useAnimations Indicates whether or not the step layout will be updated using animations.
-     */
-    public void markOpenStepAsUncompleted(String errorMessage, boolean useAnimations) {
-        markStepAsUncompleted(getOpenStepPosition(), errorMessage, useAnimations);
-    }
-
-    /**
      * Marks the specified step as completed.
      *
      * @param stepPosition The step position.
-     * @param useAnimations Indicates whether or not the step layout will be updated using animations.
+     * @param useAnimations True to animate the changes in the views, false to not.
      */
     public void markStepAsCompleted(int stepPosition, boolean useAnimations) {
-        if (stepPosition >= 0 && stepPosition < steps.size()) {
-            StepWrapper step = steps.get(stepPosition);
-            step.markAsCompleted(useAnimations);
-
-            updateBottomNavigationButtons();
-            refreshFormProgress();
+        if (stepPosition >= 0 && stepPosition < stepHelpers.size()) {
+            StepHelper stepHelper = stepHelpers.get(stepPosition);
+            stepHelper.getStepInstance().markAsCompleted(useAnimations);
         }
     }
 
     /**
-     * Marks the specified step as uncompleted and displays an error message if required.
+     * Marks the currently open step as uncompleted.
+     *
+     * @param errorMessage The error message.
+     * @param useAnimations True to animate the changes in the views, false to not.
+     */
+    public void markOpenStepAsUncompleted(boolean useAnimations, String errorMessage) {
+        markStepAsUncompleted(getOpenStepPosition(), errorMessage, useAnimations);
+    }
+
+    /**
+     * Marks the specified step as uncompleted.
      *
      * @param stepPosition The step position.
-     * @param errorMessage The error message to display. Null or empty to not show any.
-     * @param useAnimations Indicates whether or not the step layout will be updated using animations.
+     * @param errorMessage The error message.
+     * @param useAnimations True to animate the changes in the views, false to not.
      */
     public void markStepAsUncompleted(int stepPosition, String errorMessage, boolean useAnimations) {
-        if (stepPosition >= 0 && stepPosition < steps.size()) {
-            StepWrapper step = steps.get(stepPosition);
-            step.markAsUncompleted(errorMessage, useAnimations);
-
-            updateBottomNavigationButtons();
-            refreshFormProgress();
+        if (stepPosition >= 0 && stepPosition < stepHelpers.size()) {
+            StepHelper stepHelper = stepHelpers.get(stepPosition);
+            stepHelper.getStepInstance().markAsUncompleted(errorMessage, useAnimations);
         }
     }
 
@@ -147,8 +171,8 @@ public class VerticalStepperFormLayout extends LinearLayout {
      * @return True if the step is currently marked as completed; false otherwise.
      */
     public boolean isStepCompleted(int stepPosition) {
-        if (stepPosition >= 0 && stepPosition < steps.size()) {
-            return steps.get(stepPosition).isCompleted();
+        if (stepPosition >= 0 && stepPosition < stepHelpers.size()) {
+            return stepHelpers.get(stepPosition).getStepInstance().isCompleted();
         }
 
         return false;
@@ -160,8 +184,8 @@ public class VerticalStepperFormLayout extends LinearLayout {
      * @return True if at least one step has been marked as completed; false otherwise.
      */
     public boolean isAnyStepCompleted() {
-        for (int i = 0; i < steps.size(); i++) {
-            if (steps.get(i).isCompleted()) {
+        for (int i = 0; i < stepHelpers.size(); i++) {
+            if (stepHelpers.get(i).getStepInstance().isCompleted()) {
                 return true;
             }
         }
@@ -178,7 +202,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
     public boolean areAllPreviousStepsCompleted(int stepPosition) {
         boolean previousStepsAreCompleted = true;
         for (int i = stepPosition - 1; i >= 0; i--) {
-            previousStepsAreCompleted &= steps.get(i).isCompleted();
+            previousStepsAreCompleted &= stepHelpers.get(i).getStepInstance().isCompleted();
         }
 
         return previousStepsAreCompleted;
@@ -225,7 +249,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
         }
 
         int openStepPosition = getOpenStepPosition();
-        if (openStepPosition != stepPosition && stepPosition >= 0 && stepPosition <= steps.size()) {
+        if (openStepPosition != stepPosition && stepPosition >= 0 && stepPosition <= stepHelpers.size()) {
             boolean previousStepsAreCompleted = areAllPreviousStepsCompleted(stepPosition);
             if (previousStepsAreCompleted) {
                 openStep(stepPosition, useAnimations);
@@ -242,9 +266,9 @@ public class VerticalStepperFormLayout extends LinearLayout {
      * @return The position of the currently open step, counting from 0. -1 if not found.
      */
     public int getOpenStepPosition() {
-        for (int i = 0; i < steps.size(); i++) {
-            StepWrapper step = steps.get(i);
-            if (step.isOpen()) {
+        for (int i = 0; i < stepHelpers.size(); i++) {
+            StepHelper stepHelper = stepHelpers.get(i);
+            if (stepHelper.getStepInstance().isOpen()) {
                 return i;
             }
         }
@@ -253,13 +277,19 @@ public class VerticalStepperFormLayout extends LinearLayout {
     }
 
     /**
-     * Gets the content layout of the currently open step (i.e., the layout which was provided at
-     * start to setup the step).
+     * Gets the currently open step.
      *
-     * @return If found, the layout. If not, null.
+     * @return The currently open step, or null if not found.
      */
-    public View getOpenStepContentLayout() {
-        return getStepContentLayout(getOpenStepPosition());
+    public Step getOpenStep() {
+        for (int i = 0; i < stepHelpers.size(); i++) {
+            StepHelper stepHelper = stepHelpers.get(i);
+            if (stepHelper.getStepInstance().isOpen()) {
+                return stepHelper.getStepInstance();
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -270,8 +300,8 @@ public class VerticalStepperFormLayout extends LinearLayout {
      * @return If found, the layout. If not, null.
      */
     public View getStepContentLayout(int stepPosition) {
-        if (stepPosition >= 0 && stepPosition < steps.size()) {
-            return steps.get(stepPosition).getContentLayout();
+        if (stepPosition >= 0 && stepPosition < stepHelpers.size()) {
+            return stepHelpers.get(stepPosition).getStepInstance().getContentLayout();
         }
 
         return null;
@@ -298,13 +328,13 @@ public class VerticalStepperFormLayout extends LinearLayout {
      * @param smoothScroll Determines whether the scrolling should be smooth or abrupt.
      */
     public void scrollToStep(final int stepPosition, final boolean smoothScroll) {
-        if (stepPosition >= 0 && stepPosition < steps.size()) {
+        if (stepPosition >= 0 && stepPosition < stepHelpers.size()) {
             stepsScrollView.post(new Runnable() {
                 public void run() {
                     if (smoothScroll) {
-                        stepsScrollView.smoothScrollTo(0, steps.get(stepPosition).getStepLayout().getTop());
+                        stepsScrollView.smoothScrollTo(0, stepHelpers.get(stepPosition).getStepInstance().getEntireStepLayout().getTop());
                     } else {
-                        stepsScrollView.scrollTo(0, steps.get(stepPosition).getStepLayout().getTop());
+                        stepsScrollView.scrollTo(0, stepHelpers.get(stepPosition).getStepInstance().getEntireStepLayout().getTop());
                     }
                 }
             });
@@ -328,7 +358,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
      * @return True if the form was completed; false otherwise.
      */
     public boolean completeForm() {
-        return goToStep(steps.size(), true);
+        return goToStep(stepHelpers.size(), true);
     }
 
     /**
@@ -339,9 +369,9 @@ public class VerticalStepperFormLayout extends LinearLayout {
      */
     public void cancelFormCompletionAttempt() {
         int openedStepPosition = getOpenStepPosition();
-        if (openedStepPosition >= 0 && openedStepPosition < steps.size()) {
-            StepWrapper step = steps.get(openedStepPosition);
-            step.enableNextButton();
+        if (openedStepPosition >= 0 && openedStepPosition < stepHelpers.size()) {
+            StepHelper stepHelper = stepHelpers.get(openedStepPosition);
+            stepHelper.enableNextButton();
 
             formCompleted = false;
             updateBottomNavigationButtons();
@@ -356,8 +386,8 @@ public class VerticalStepperFormLayout extends LinearLayout {
      */
     public int refreshFormProgress() {
         int numberOfCompletedSteps = 0;
-        for (int i = 0; i < steps.size(); i++) {
-            if (steps.get(i).isCompleted()) {
+        for (int i = 0; i < stepHelpers.size(); i++) {
+            if (stepHelpers.get(i).getStepInstance().isCompleted()) {
                 ++numberOfCompletedSteps;
             }
         }
@@ -372,7 +402,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
      * @return The total number of steps, including the confirmation step, if any.
      */
     public int getTotalNumberOfSteps() {
-        return steps.size();
+        return stepHelpers.size();
     }
 
     private void onConstructed(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -401,14 +431,16 @@ public class VerticalStepperFormLayout extends LinearLayout {
         FormStyle.defaultDisplayVerticalLineWhenStepsAreCollapsed = true;
         FormStyle.defaultDisplayStepButtons = true;
         FormStyle.defaultIncludeConfirmationStep = true;
+
+        internalListener = new FormStepListener();
     }
 
-    private void initializeForm(StepperFormListener listener, FormStyle style, StepWrapper[] stepsArray) {
+    void initializeForm(StepperFormListener listener, FormStyle style, StepHelper[] stepsArray) {
         this.listener = listener;
         this.style = style;
-        this.steps = Arrays.asList(stepsArray);
+        this.stepHelpers = Arrays.asList(stepsArray);
 
-        progressBar.setMax(steps.size());
+        progressBar.setMax(stepHelpers.size());
 
         if (!style.displayBottomNavigation) {
             hideBottomNavigation();
@@ -416,17 +448,17 @@ public class VerticalStepperFormLayout extends LinearLayout {
 
         setObserverForKeyboard();
 
-        for (int i = 0; i < steps.size(); i++) {
-            View stepLayout = initializeStep(i);
+        for (int i = 0; i < stepHelpers.size(); i++) {
+            View stepLayout = initializeStepHelper(i);
             formContentView.addView(stepLayout);
         }
 
         goToStep(0, false);
     }
 
-    private View initializeStep(int position) {
+    private View initializeStepHelper(int position) {
         final int stepPosition = position;
-        StepWrapper step = steps.get(stepPosition);
+        StepHelper stepHelper = stepHelpers.get(stepPosition);
 
         OnClickListener clickOnNextButtonListener = new OnClickListener() {
             @Override
@@ -440,38 +472,25 @@ public class VerticalStepperFormLayout extends LinearLayout {
                 goToStep(stepPosition, true);
             }
         };
-        boolean isLast = (stepPosition + 1) == steps.size();
 
-        return step.initialize(
-                this,
-                style,
-                getContext(),
-                formContentView,
-                clickOnNextButtonListener,
-                clickOnHeaderListener,
-                stepPosition,
-                isLast);
+        boolean isLast = (stepPosition + 1) == stepHelpers.size();
+
+        return stepHelper.initialize(this, style, formContentView, stepPosition, isLast);
     }
 
     private void openStep(int stepToOpenPosition, boolean useAnimations) {
-        if (stepToOpenPosition >= 0 && stepToOpenPosition < steps.size()) {
+        if (stepToOpenPosition >= 0 && stepToOpenPosition < stepHelpers.size()) {
 
             int stepToClosePosition = getOpenStepPosition();
             if (stepToClosePosition != -1) {
-                StepWrapper stepToClose = steps.get(stepToClosePosition);
-                stepToClose.close(this, stepToClosePosition, useAnimations);
+                StepHelper stepToClose = stepHelpers.get(stepToClosePosition);
+                stepToClose.getStepInstance().close(useAnimations);
             }
 
-            StepWrapper stepToOpen = steps.get(stepToOpenPosition);
-            stepToOpen.open(this, stepToOpenPosition, useAnimations);
+            StepHelper stepToOpen = stepHelpers.get(stepToOpenPosition);
+            stepToOpen.getStepInstance().open(useAnimations);
 
-            updateBottomNavigationButtons();
-            scrollToOpenStep(useAnimations);
-
-            if (stepToOpen.isConfirmationStep()) {
-                refreshFormProgress();
-            }
-        } else if (stepToOpenPosition == steps.size()) {
+        } else if (stepToOpenPosition == stepHelpers.size()) {
             attemptToCompleteForm();
         }
     }
@@ -495,18 +514,20 @@ public class VerticalStepperFormLayout extends LinearLayout {
 
     protected void updateBottomNavigationButtons() {
         int stepPosition = getOpenStepPosition();
-        StepWrapper step = steps.get(stepPosition);
+        if (stepPosition >= 0 && stepPosition < stepHelpers.size()) {
+            StepHelper stepHelper = stepHelpers.get(stepPosition);
 
-        if (stepPosition == 0 || formCompleted) {
-            disablePreviousButtonInBottomNavigation();
-        } else {
-            enablePreviousButtonInBottomNavigation();
-        }
+            if (stepPosition == 0 || formCompleted) {
+                disablePreviousButtonInBottomNavigation();
+            } else {
+                enablePreviousButtonInBottomNavigation();
+            }
 
-        if (!formCompleted && (step.isCompleted() && (stepPosition + 1) < steps.size())) {
-            enableNextButtonInBottomNavigation();
-        } else {
-            disableNextButtonInBottomNavigation();
+            if (!formCompleted && (stepHelper.getStepInstance().isCompleted() && (stepPosition + 1) < stepHelpers.size())) {
+                enableNextButtonInBottomNavigation();
+            } else {
+                disableNextButtonInBottomNavigation();
+            }
         }
     }
 
@@ -537,7 +558,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
     }
 
     private void setProgress(int numberOfCompletedSteps) {
-        if (numberOfCompletedSteps >= 0 && numberOfCompletedSteps <= steps.size()) {
+        if (numberOfCompletedSteps >= 0 && numberOfCompletedSteps <= stepHelpers.size()) {
             progressBar.setProgress(numberOfCompletedSteps);
         }
     }
@@ -548,9 +569,9 @@ public class VerticalStepperFormLayout extends LinearLayout {
         }
 
         int openStepPosition = getOpenStepPosition();
-        if (openStepPosition >= 0 && openStepPosition < steps.size()) {
+        if (openStepPosition >= 0 && openStepPosition < stepHelpers.size()) {
             formCompleted = true;
-            steps.get(openStepPosition).disableNextButton();
+            stepHelpers.get(openStepPosition).disableNextButton();
             updateBottomNavigationButtons();
 
             if (listener != null) {
@@ -568,16 +589,15 @@ public class VerticalStepperFormLayout extends LinearLayout {
             String[] errorMessages) {
 
         for (int i = 0; i < completedSteps.length; i++) {
-            StepWrapper step = steps.get(i);
+            StepHelper stepHelper = stepHelpers.get(i);
 
-            step.restoreTitle(i, titles[i]);
-            step.restoreSubtitle(i, subtitles[i]);
-            step.restoreButtonText(i, buttonTexts[i]);
-
+            stepHelper.getStepInstance().updateTitle(titles[i], false);
+            stepHelper.getStepInstance().updateSubtitle(subtitles[i], false);
+            stepHelper.getStepInstance().updateButtonText(buttonTexts[i], false);
             if (completedSteps[i]) {
-                markStepAsCompleted(i, false);
+                stepHelper.getStepInstance().markAsCompleted(false);
             } else {
-                markStepAsUncompleted(i, errorMessages[i], false);
+                stepHelper.getStepInstance().markAsUncompleted(errorMessages[i], false);
             }
         }
 
@@ -621,19 +641,19 @@ public class VerticalStepperFormLayout extends LinearLayout {
     public Parcelable onSaveInstanceState() {
         Bundle bundle = new Bundle();
 
-        boolean[] completedSteps = new boolean[steps.size()];
-        String[] titles = new String[steps.size()];
-        String[] subtitles = new String[steps.size()];
-        String[] buttonTexts = new String[steps.size()];
-        String[] errorMessages = new String[steps.size()];
+        boolean[] completedSteps = new boolean[stepHelpers.size()];
+        String[] titles = new String[stepHelpers.size()];
+        String[] subtitles = new String[stepHelpers.size()];
+        String[] buttonTexts = new String[stepHelpers.size()];
+        String[] errorMessages = new String[stepHelpers.size()];
         for (int i = 0; i < completedSteps.length; i++) {
-            StepWrapper step = steps.get(i);
-            completedSteps[i] = step.isCompleted();
-            titles[i] = step.getTitle();
-            subtitles[i] = step.getSubtitle();
-            buttonTexts[i] = step.getButtonText();
-            if (!step.isCompleted()) {
-                errorMessages[i] = step.getCurrentErrorMessage();
+            StepHelper stepHelper = stepHelpers.get(i);
+            completedSteps[i] = stepHelper.getStepInstance().isCompleted();
+            titles[i] = stepHelper.getStepInstance().getTitle();
+            subtitles[i] = stepHelper.getStepInstance().getSubtitle();
+            buttonTexts[i] = stepHelper.getStepInstance().getButtonText();
+            if (!stepHelper.getStepInstance().isCompleted()) {
+                errorMessages[i] = stepHelper.getStepInstance().getErrorMessage();
             }
         }
 
@@ -666,294 +686,38 @@ public class VerticalStepperFormLayout extends LinearLayout {
         super.onRestoreInstanceState(state);
     }
 
-    /**
-     * This method returns the layout ID that will be used to inflate the entire step layout.
-     *
-     * Please note that this is not the layout ID of the step's content layout; this layout ID
-     * references the entire step layout, which includes the header, the "Next" button, etc.
-     *
-     * Even though it is only for internal use of the library, it can be extended to force the use
-     * of a modified version of the original layout.
-     *
-     * @return The step layout ID.
-     */
-    protected static int getInternalStepLayout() {
-        return R.layout.step_layout;
-    }
+    class FormStepListener implements Step.InternalFormStepListener {
 
-    public class FormBuilder {
-
-        private VerticalStepperFormLayout formLayout;
-        private StepperFormListener listener;
-        private StepWrapper[] steps;
-
-        private VerticalStepperFormLayout.FormStyle style;
-
-        FormBuilder(VerticalStepperFormLayout formLayout, StepperFormListener listener, FormStep[] steps) {
-            this.formLayout = formLayout;
-            this.listener = listener;
-            this.style = new VerticalStepperFormLayout.FormStyle();
-            this.steps = new StepWrapper[steps.length];
-            for (int i = 0; i < steps.length; i++) {
-                this.steps[i] = new StepWrapper(steps[i]);
-            }
+        @Override
+        public void onUpdatedTitle(int stepPosition, boolean useAnimations) {
+            // Do nothing
         }
 
-        /**
-         * Sets the text to be displayed in the button of all the steps but the last one.
-         *
-         * @param stepButtonText The text to display in the button of all the steps but the last one.
-         * @return The builder instance.
-         */
-        public FormBuilder stepButtonText(String stepButtonText) {
-            style.stepButtonText = stepButtonText;
-
-            return this;
+        @Override
+        public void onUpdatedSubtitle(int stepPosition, boolean useAnimations) {
+            // Do nothing
         }
 
-        /**
-         * Sets the text to be displayed in the last step's button.
-         *
-         * @param lastStepButtonText The text to display in the last step's button.
-         * @return The builder instance.
-         */
-        public FormBuilder lastStepButtonText(String lastStepButtonText) {
-            style.lastStepButtonText = lastStepButtonText;
-
-            return this;
+        @Override
+        public void onUpdatedButtonText(int stepPosition, boolean useAnimations) {
+            // Do nothing
         }
 
-        /**
-         * Sets the title to be displayed on the confirmation step.
-         *
-         * @param confirmationStepTitle The title of the confirmation step.
-         * @return The builder instance.
-         */
-        public FormBuilder confirmationStepTitle(String confirmationStepTitle) {
-            style.confirmationStepTitle = confirmationStepTitle;
-
-            return this;
+        @Override
+        public void onUpdatedErrorMessage(int stepPosition, boolean useAnimations) {
+            // Do nothing
         }
 
-        /**
-         * Sets the primary color of the form. Will be used for the left circles and the buttons.
-         * To set a different background color for buttons and left circles, please use
-         * stepNumberBackgroundColor() and buttonBackgroundColor().
-         *
-         * @param colorPrimary The primary color.
-         * @return The builder instance.
-         */
-        public FormBuilder primaryColor(int colorPrimary) {
-            style.stepNumberBackgroundColor = colorPrimary;
-            style.buttonBackgroundColor = colorPrimary;
-
-            return this;
+        @Override
+        public void onUpdatedStepCompletionState(int stepPosition, boolean useAnimations) {
+            updateBottomNavigationButtons();
+            refreshFormProgress();
         }
 
-        /**
-         * Sets the dark primary color. Will be displayed as the background color of the buttons
-         * while clicked.
-         *
-         * @param colorPrimaryDark Primary color (dark)
-         * @return The builder instance.
-         */
-        public FormBuilder primaryDarkColor(int colorPrimaryDark) {
-            style.buttonPressedBackgroundColor = colorPrimaryDark;
-
-            return this;
-        }
-
-        /**
-         * Sets the background color of the left circles.
-         *
-         * @param stepNumberBackgroundColor Background color of the left circles.
-         * @return The builder instance.
-         */
-        public FormBuilder stepNumberBackgroundColor(int stepNumberBackgroundColor) {
-            style.stepNumberBackgroundColor = stepNumberBackgroundColor;
-
-            return this;
-        }
-
-        /**
-         * Sets the background color of the buttons.
-         *
-         * @param buttonBackgroundColor Background color of the buttons.
-         * @return The builder instance.
-         */
-        public FormBuilder buttonBackgroundColor(int buttonBackgroundColor) {
-            style.buttonBackgroundColor = buttonBackgroundColor;
-
-            return this;
-        }
-
-        /**
-         * Sets the background color of the buttons when pressed.
-         *
-         * @param buttonPressedBackgroundColor Background color of the buttons when pressed.
-         * @return The builder instance.
-         */
-        public FormBuilder buttonPressedBackgroundColor(int buttonPressedBackgroundColor) {
-            style.buttonPressedBackgroundColor = buttonPressedBackgroundColor;
-
-            return this;
-        }
-
-        /**
-         * Sets the text color of the left circles.
-         *
-         * @param stepNumberTextColor Text color of the left circles.
-         * @return The builder instance.
-         */
-        public FormBuilder stepNumberTextColor(int stepNumberTextColor) {
-            style.stepNumberTextColor = stepNumberTextColor;
-
-            return this;
-        }
-
-        /**
-         * Sets the text color of the step title.
-         *
-         * @param stepTitleTextColor The color of the step title.
-         * @return This builder instance.
-         */
-        public FormBuilder stepTitleTextColor(int stepTitleTextColor) {
-            style.stepTitleTextColor = stepTitleTextColor;
-
-            return this;
-        }
-
-        /**
-         * Sets the text color of the step subtitle.
-         *
-         * @param stepSubtitleTextColor The color of the step subtitle.
-         * @return This builder instance.
-         */
-        public FormBuilder stepSubtitleTextColor(int stepSubtitleTextColor) {
-            style.stepSubtitleTextColor = stepSubtitleTextColor;
-
-            return this;
-        }
-
-        /**
-         * Sets the text color of the buttons.
-         *
-         * @param buttonTextColor Text color of the buttons.
-         * @return The builder instance.
-         */
-        public FormBuilder buttonTextColor(int buttonTextColor) {
-            style.buttonTextColor = buttonTextColor;
-
-            return this;
-        }
-
-        /**
-         * Sets the text color of the buttons when clicked.
-         *
-         * @param buttonPressedTextColor Text color of the buttons when clicked.
-         * @return The builder instance.
-         */
-        public FormBuilder buttonPressedTextColor(int buttonPressedTextColor) {
-            style.buttonPressedTextColor = buttonPressedTextColor;
-
-            return this;
-        }
-
-        /**
-         * Sets the error message color.
-         *
-         * @param errorMessageTextColor Error message color.
-         * @return The builder instance.
-         */
-        public FormBuilder errorMessageTextColor(int errorMessageTextColor) {
-            style.errorMessageTextColor = errorMessageTextColor;
-
-            return this;
-        }
-
-        /**
-         * Specifies whether or not the bottom navigation bar will be displayed.
-         *
-         * @param displayBottomNavigationBar True to display it; false otherwise.
-         * @return The builder instance.
-         */
-        public FormBuilder displayBottomNavigation(boolean displayBottomNavigationBar) {
-            style.displayBottomNavigation = displayBottomNavigationBar;
-
-            return this;
-        }
-
-        /**
-         * Specifies whether or not the vertical lines should be displayed when the steps are
-         * collapsed.
-         *
-         * @param displayVerticalLineWhenStepsAreCollapsed True to show the lines on collapsed steps;
-         *                                                 false to not.
-         * @return The builder instance.
-         */
-        public FormBuilder displayVerticalLineWhenStepsAreCollapsed(boolean displayVerticalLineWhenStepsAreCollapsed) {
-            style.displayVerticalLineWhenStepsAreCollapsed = displayVerticalLineWhenStepsAreCollapsed;
-
-            return this;
-        }
-
-        /**
-         * Sets the alpha of the disabled elements.
-         *
-         * @param alpha Alpha level of disabled elements.
-         * @return The builder instance.
-         */
-        public FormBuilder alphaOfDisabledElements(float alpha) {
-            style.alphaOfDisabledElements = alpha;
-
-            return this;
-        }
-
-        /**
-         * Specifies whether or not a "Next" button should be automatically displayed within each step.
-         * If set to false, the step buttons will be missing and manual calls to
-         * goToStep(stepPosition + 1, true) will be required in order to move to the next step.
-         *
-         * @param displayStepButtons True to display a button on each step; false to not.
-         * @return The builder instance.
-         */
-        public FormBuilder displayStepButtons(boolean displayStepButtons) {
-            style.displayStepButtons = displayStepButtons;
-
-            return this;
-        }
-
-        /**
-         * Specifies whether or not a confirmation step should be added as an extra step at the end of
-         * the form.
-         *
-         * @param includeConfirmationStep True to add a confirmation step as the final step of the form;
-         *                                false to not.
-         * @return The builder instance.
-         */
-        public FormBuilder includeConfirmationStep(boolean includeConfirmationStep) {
-            style.includeConfirmationStep = includeConfirmationStep;
-
-            return this;
-        }
-
-        /**
-         * Sets up the form and initializes it.
-         */
-        public void init() {
-
-            if (style.includeConfirmationStep) {
-                StepWrapper[] currentSteps = steps;
-
-                steps = new StepWrapper[steps.length + 1];
-                for (int i = 0; i < currentSteps.length; i++) {
-                    steps[i] = currentSteps[i];
-                }
-
-                steps[currentSteps.length] = new StepWrapper(null, true);
-            }
-
-            formLayout.initializeForm(listener, style, steps);
+        @Override
+        public void onUpdatedStepVisibility(int stepPosition, boolean useAnimations) {
+            updateBottomNavigationButtons();
+            scrollToStep(stepPosition, useAnimations);
         }
     }
 

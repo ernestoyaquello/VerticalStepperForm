@@ -1,6 +1,5 @@
 package verticalstepperform.ernestoyaquello.com.verticalstepperform.form.steps;
 
-import android.content.Context;
 import android.text.Editable;
 import android.view.KeyEvent;
 import android.view.View;
@@ -9,11 +8,10 @@ import android.widget.TextView;
 import com.google.android.material.textfield.TextInputEditText;
 
 import androidx.annotation.NonNull;
-import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
-import ernestoyaquello.com.verticalstepperform.FormStep;
+import ernestoyaquello.com.verticalstepperform.Step;
 import verticalstepperform.ernestoyaquello.com.verticalstepperform.R;
 
-public class AlarmDescriptionStep extends FormStep<String> {
+public class AlarmDescriptionStep extends Step<String> {
 
     private TextInputEditText alarmDescriptionEditText;
 
@@ -23,16 +21,16 @@ public class AlarmDescriptionStep extends FormStep<String> {
 
     @NonNull
     @Override
-    protected View getStepContentLayout(Context context, final VerticalStepperFormLayout form, int stepPosition) {
+    protected View createStepContentLayout() {
 
         // We create this step view programmatically
-        alarmDescriptionEditText = new TextInputEditText(context);
+        alarmDescriptionEditText = new TextInputEditText(getContext());
         alarmDescriptionEditText.setHint(R.string.form_hint_description);
         alarmDescriptionEditText.setSingleLine(true);
         alarmDescriptionEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                form.goToNextStep(true);
+                getFormLayout().goToNextStep(true);
                 return false;
             }
         });
@@ -41,17 +39,17 @@ public class AlarmDescriptionStep extends FormStep<String> {
     }
 
     @Override
-    protected void onStepOpened(VerticalStepperFormLayout form, int stepPosition, boolean animated) {
-        updateSubtitle(stepPosition, "", animated);
+    protected void onStepOpened(boolean animated) {
+        updateSubtitle("", animated);
     }
 
     @Override
-    protected void onStepClosed(VerticalStepperFormLayout form, int stepPosition, boolean animated) {
+    protected void onStepClosed(boolean animated) {
         String description = getStepData();
         description = description == null || description.isEmpty()
-                ? form.getContext().getString(R.string.form_empty_field)
+                ? getContext().getString(R.string.form_empty_field)
                 : description;
-        updateSubtitle(stepPosition, description, animated);
+        updateSubtitle(description, animated);
     }
 
     @Override
