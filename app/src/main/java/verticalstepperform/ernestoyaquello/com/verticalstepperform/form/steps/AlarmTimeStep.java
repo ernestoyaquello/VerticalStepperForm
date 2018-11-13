@@ -66,17 +66,26 @@ public class AlarmTimeStep extends Step<AlarmTimeStep.TimeHolder> {
 
     @Override
     protected void onStepOpened(boolean animated) {
-        updateSubtitle("", animated);
+        // Do nothing
     }
 
     @Override
     protected void onStepClosed(boolean animated) {
-        updateSubtitle(getAlarmTimeAsString(), animated);
+        // Do nothing
     }
 
     @Override
     public TimeHolder getStepData() {
         return new TimeHolder(alarmTimeHour, alarmTimeMinutes);
+    }
+
+    @Override
+    public String getStepDataAsString() {
+        String hourString = ((alarmTimeHour > 9) ?
+                String.valueOf(alarmTimeHour) : ("0" + alarmTimeHour));
+        String minutesString = ((alarmTimeMinutes > 9) ?
+                String.valueOf(alarmTimeMinutes) : ("0" + alarmTimeMinutes));
+        return hourString + ":" + minutesString;
     }
 
     @Override
@@ -94,15 +103,7 @@ public class AlarmTimeStep extends Step<AlarmTimeStep.TimeHolder> {
     }
 
     private void updatedAlarmTimeText() {
-        alarmTimeTextView.setText(getAlarmTimeAsString());
-    }
-
-    private String getAlarmTimeAsString() {
-        String hourString = ((alarmTimeHour > 9) ?
-                String.valueOf(alarmTimeHour) : ("0" + alarmTimeHour));
-        String minutesString = ((alarmTimeMinutes > 9) ?
-                String.valueOf(alarmTimeMinutes) : ("0" + alarmTimeMinutes));
-        return hourString + ":" + minutesString;
+        alarmTimeTextView.setText(getStepDataAsString());
     }
 
     public static class TimeHolder {

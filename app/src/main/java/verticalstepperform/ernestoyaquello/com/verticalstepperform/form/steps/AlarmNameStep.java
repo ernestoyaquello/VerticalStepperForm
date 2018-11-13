@@ -58,12 +58,12 @@ public class AlarmNameStep extends Step<String> {
 
     @Override
     protected void onStepOpened(boolean animated) {
-        updateSubtitle("", animated);
+        // Do nothing
     }
 
     @Override
     protected void onStepClosed(boolean animated) {
-        updateSubtitle(getStepData(), animated);
+        // Do nothing
     }
 
     @Override
@@ -74,6 +74,14 @@ public class AlarmNameStep extends Step<String> {
         }
 
         return "";
+    }
+
+    @Override
+    public String getStepDataAsString() {
+        String name = getStepData();
+        return name == null || name.isEmpty()
+                ? getContext().getString(R.string.form_empty_field)
+                : name;
     }
 
     @Override

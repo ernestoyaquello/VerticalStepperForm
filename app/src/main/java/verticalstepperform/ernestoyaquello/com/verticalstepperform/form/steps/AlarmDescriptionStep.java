@@ -40,16 +40,12 @@ public class AlarmDescriptionStep extends Step<String> {
 
     @Override
     protected void onStepOpened(boolean animated) {
-        updateSubtitle("", animated);
+        // Do nothing
     }
 
     @Override
     protected void onStepClosed(boolean animated) {
-        String description = getStepData();
-        description = description == null || description.isEmpty()
-                ? getContext().getString(R.string.form_empty_field)
-                : description;
-        updateSubtitle(description, animated);
+        // Do nothing
     }
 
     @Override
@@ -60,6 +56,14 @@ public class AlarmDescriptionStep extends Step<String> {
         }
 
         return "";
+    }
+
+    @Override
+    public String getStepDataAsString() {
+        String description = getStepData();
+        return description == null || description.isEmpty()
+                ? getContext().getString(R.string.form_empty_field)
+                : description;
     }
 
     @Override

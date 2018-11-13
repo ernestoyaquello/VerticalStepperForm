@@ -8,46 +8,42 @@ import android.widget.LinearLayout;
 
 class Animations {
 
-    private static long minDurationMillis = 150;
+    private static final long MIN_DURATION_MILLIS = 150;
 
-    static Animation slideDownIfNecessary(final View v, boolean animate) {
+    void slideDownIfNecessary(final View v, boolean animate) {
         if (!animate) {
             v.setVisibility(View.VISIBLE);
-            return null;
+            return;
         }
 
         v.measure(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
         int targetHeight = v.getMeasuredHeight();
         long durationMillis = ((int) (targetHeight / v.getContext().getResources().getDisplayMetrics().density)) * 2;
-        durationMillis = durationMillis < minDurationMillis ? minDurationMillis : durationMillis;
+        durationMillis = durationMillis < MIN_DURATION_MILLIS ? MIN_DURATION_MILLIS : durationMillis;
         Animation slideDownAnimation = getSlideDownAnimation(v, targetHeight, durationMillis);
 
         v.startAnimation(slideDownAnimation);
-
-        return slideDownAnimation;
     }
 
-    static Animation slideUpIfNecessary(final View v, boolean animate) {
+    void slideUpIfNecessary(final View v, boolean animate) {
         if (!animate) {
             v.setVisibility(View.GONE);
-            return null;
+            return;
         }
 
         int initialHeight = v.getMeasuredHeight();
         long durationMillis = ((int) (initialHeight / v.getContext().getResources().getDisplayMetrics().density)) * 2;
-        durationMillis = durationMillis < minDurationMillis ? minDurationMillis : durationMillis;
+        durationMillis = durationMillis < MIN_DURATION_MILLIS ? MIN_DURATION_MILLIS : durationMillis;
         Animation slideUpAnimation = getSlideUpAnimation(v, initialHeight, durationMillis);
 
         v.startAnimation(slideUpAnimation);
-
-        return slideUpAnimation;
     }
 
-    static Animation getSlideDownAnimation(final View v, final int targetHeight, long durationMillis) {
+    private Animation getSlideDownAnimation(final View v, final int targetHeight, long durationMillis) {
 
         setHeight(v, v.getVisibility() != View.VISIBLE ? 1 : v.getMeasuredHeight());
         v.setVisibility(View.VISIBLE);
-        
+
         Animation animation = new Animation() {
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
@@ -84,7 +80,7 @@ class Animations {
         return animation;
     }
 
-    static Animation getSlideUpAnimation(final View v, final int initialHeight, long durationMillis) {
+    private Animation getSlideUpAnimation(final View v, final int initialHeight, long durationMillis) {
         Animation animation = new Animation() {
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
@@ -121,7 +117,7 @@ class Animations {
         return animation;
     }
 
-    private static void setHeight(View v, int newHeight) {
+    private void setHeight(View v, int newHeight) {
         v.setLayoutParams(new LinearLayout.LayoutParams(v.getLayoutParams().width, newHeight));
     }
 }

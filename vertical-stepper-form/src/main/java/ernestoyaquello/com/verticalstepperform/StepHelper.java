@@ -27,6 +27,7 @@ class StepHelper implements Step.InternalFormStepListener {
 
     private Step step;
     private FormStyle formStyle;
+    private Animations animations;
 
     private View stepNumberCircleView;
     private TextView titleView;
@@ -51,6 +52,7 @@ class StepHelper implements Step.InternalFormStepListener {
         this.step = !isConfirmationStep ? step : new ConfirmationStep();
         this.step.addListenerInternal(formListener);
         this.step.addListenerInternal(this);
+        this.animations = new Animations();
     }
 
     View initialize(
@@ -168,18 +170,14 @@ class StepHelper implements Step.InternalFormStepListener {
     @Override
     public void onUpdatedTitle(int stepPosition, boolean useAnimations) {
         if (step.getEntireStepLayout() != null) {
-            String title = step.getTitle();
-
-            titleView.setText(title);
+            updateTitleTextViewValue();
         }
     }
 
     @Override
     public void onUpdatedSubtitle(int stepPosition, boolean useAnimations) {
         if (step.getEntireStepLayout() != null) {
-            String subtitle = step.getSubtitle();
-            subtitle = subtitle == null ? "" : subtitle;
-            subtitleView.setText(subtitle);
+            updateSubtitleTextViewValue();
             updateSubtitleAndSpacingVisibility(useAnimations);
         }
     }
@@ -187,16 +185,14 @@ class StepHelper implements Step.InternalFormStepListener {
     @Override
     public void onUpdatedButtonText(int stepPosition, boolean useAnimations) {
         if (step.getEntireStepLayout() != null) {
-            String buttonText = step.getButtonText();
-            nextButtonView.setText(buttonText);
+            updateButtonTextValue();
         }
     }
 
     @Override
     public void onUpdatedErrorMessage(int stepPosition, boolean useAnimations) {
         if (step.getEntireStepLayout() != null) {
-            String errorMessage = step.getErrorMessage() != null ? step.getErrorMessage() : "";
-            errorMessageView.setText(errorMessage);
+            updateErrorMessageTextViewValue();
             updateErrorMessageVisibility(useAnimations);
         }
     }
@@ -204,11 +200,10 @@ class StepHelper implements Step.InternalFormStepListener {
     @Override
     public void onUpdatedStepVisibility(int stepPosition, boolean useAnimations) {
         if (step.getEntireStepLayout() != null) {
-
             if (step.isOpen()) {
-                Animations.slideDownIfNecessary(stepAndButtonView, useAnimations);
+                animations.slideDownIfNecessary(stepAndButtonView, useAnimations);
             } else {
-                Animations.slideUpIfNecessary(stepAndButtonView, useAnimations);
+                animations.slideUpIfNecessary(stepAndButtonView, useAnimations);
             }
 
             if (step.isOpen()) {
@@ -283,13 +278,15 @@ class StepHelper implements Step.InternalFormStepListener {
     }
 
     private boolean updateSubtitleVisibility(boolean useAnimations) {
+        updateSubtitleTextViewValue();
+
         boolean showSubtitle = step.getSubtitle() != null
-                && !step.getSubtitle().isEmpty()
+                && !subtitleView.getText().toString().isEmpty()
                 && (step.isOpen() || step.isCompleted());
         if (showSubtitle) {
-            Animations.slideDownIfNecessary(subtitleView, useAnimations);
+            animations.slideDownIfNecessary(subtitleView, useAnimations);
         } else {
-            Animations.slideUpIfNecessary(subtitleView, useAnimations);
+            animations.slideUpIfNecessary(subtitleView, useAnimations);
         }
 
         return showSubtitle;
@@ -299,21 +296,46 @@ class StepHelper implements Step.InternalFormStepListener {
         boolean showLineBetweenCollapsedSteps =
                 !showSubtitle && formStyle.displayVerticalLineWhenStepsAreCollapsed && !step.isOpen();
         if (showLineBetweenCollapsedSteps) {
-            Animations.slideDownIfNecessary(spacingView, useAnimations);
+            animations.slideDownIfNecessary(spacingView, useAnimations);
         } else {
-            Animations.slideUpIfNecessary(spacingView, useAnimations);
+            animations.slideUpIfNecessary(spacingView, useAnimations);
         }
     }
 
     private void updateErrorMessageVisibility(boolean useAnimations) {
+        updateErrorMessageTextViewValue();
+
         if (step.isOpen()
                 && !step.isCompleted()
                 && step.getErrorMessage() != null
-                && !step.getErrorMessage().isEmpty()) {
-            Animations.slideDownIfNecessary(errorMessageContainerView, useAnimations);
+                && !errorMessageView.getText().toString().isEmpty()) {
+            animations.slideDownIfNecessary(errorMessageContainerView, useAnimations);
         } else {
-            Animations.slideUpIfNecessary(errorMessageContainerView, useAnimations);
+            animations.slideUpIfNecessary(errorMessageContainerView, useAnimations);
         }
+    }
+
+    private void updateTitleTextViewValue() {
+        String title = step.getTitle() == null ? "" : step.getTitle();
+        titleView.setText(title);
+    }
+
+    private void updateButtonTextValue() {
+        String buttonText = step.getButtonText() == null ? "" : step.getButtonText();
+        nextButtonView.setText(buttonText);
+    }
+
+    private void updateSubtitleTextViewValue() {
+        String subtitle = formStyle.displayStepDataInSubtitleOfClosedSteps && !step.isOpen()
+                ? step.getStepDataAsString()
+                : step.getSubtitle();
+        subtitle = subtitle == null ? "" : subtitle;
+        subtitleView.setText(subtitle);
+    }
+
+    private void updateErrorMessageTextViewValue() {
+        String errorMessage = step.getErrorMessage() != null ? step.getErrorMessage() : "";
+        errorMessageView.setText(errorMessage);
     }
 
     private boolean isConfirmationStep() {
@@ -331,6 +353,11 @@ class StepHelper implements Step.InternalFormStepListener {
 
         @Override
         public Object getStepData() {
+            return null;
+        }
+
+        @Override
+        public String getStepDataAsString() {
             return null;
         }
 

@@ -64,6 +64,14 @@ public abstract class Step<T> {
     public abstract T getStepData();
 
     /**
+     * Gets the data of this step (i.e., the information that the user has filled in for this field)
+     * as a string.
+     *
+     * @return The step data as a string.
+     */
+    public abstract String getStepDataAsString();
+
+    /**
      * Restores the step data. Useful for when restoring the state of the form.
      *
      * @param data The step data to restore.

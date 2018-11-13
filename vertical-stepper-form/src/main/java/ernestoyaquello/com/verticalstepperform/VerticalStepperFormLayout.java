@@ -431,6 +431,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
         FormStyle.defaultDisplayVerticalLineWhenStepsAreCollapsed = true;
         FormStyle.defaultDisplayStepButtons = true;
         FormStyle.defaultIncludeConfirmationStep = true;
+        FormStyle.defaultDisplayStepDataInSubtitleOfClosedSteps = true;
 
         internalListener = new FormStepListener();
     }
@@ -591,17 +592,20 @@ public class VerticalStepperFormLayout extends LinearLayout {
         for (int i = 0; i < completedSteps.length; i++) {
             StepHelper stepHelper = stepHelpers.get(i);
 
-            stepHelper.getStepInstance().updateTitle(titles[i], false);
-            stepHelper.getStepInstance().updateSubtitle(subtitles[i], false);
-            stepHelper.getStepInstance().updateButtonText(buttonTexts[i], false);
             if (completedSteps[i]) {
                 stepHelper.getStepInstance().markAsCompleted(false);
             } else {
                 stepHelper.getStepInstance().markAsUncompleted(errorMessages[i], false);
             }
+            stepHelper.getStepInstance().updateTitle(titles[i], false);
+            stepHelper.getStepInstance().updateSubtitle(subtitles[i], false);
+            stepHelper.getStepInstance().updateButtonText(buttonTexts[i], false);
         }
 
-        goToStep(positionToOpen, false);
+        for (int i = 0; i <= positionToOpen; i++) {
+            goToStep(i, false);
+        }
+
         refreshFormProgress();
     }
 
@@ -740,6 +744,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
         private static boolean defaultDisplayVerticalLineWhenStepsAreCollapsed;
         private static boolean defaultDisplayStepButtons;
         private static boolean defaultIncludeConfirmationStep;
+        private static boolean defaultDisplayStepDataInSubtitleOfClosedSteps;
 
         String stepButtonText;
         String lastStepButtonText;
@@ -759,6 +764,9 @@ public class VerticalStepperFormLayout extends LinearLayout {
         boolean displayStepButtons;
         boolean includeConfirmationStep;
 
+        // TODO Add method in builder
+        boolean displayStepDataInSubtitleOfClosedSteps;
+
         FormStyle() {
             this.stepButtonText = defaultStepButtonText;
             this.lastStepButtonText = defaultLastStepButtonText;
@@ -777,6 +785,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
             this.displayVerticalLineWhenStepsAreCollapsed = defaultDisplayVerticalLineWhenStepsAreCollapsed;
             this.displayStepButtons = defaultDisplayStepButtons;
             this.includeConfirmationStep = defaultIncludeConfirmationStep;
+            this.displayStepDataInSubtitleOfClosedSteps = defaultDisplayStepDataInSubtitleOfClosedSteps;
         }
     }
 }

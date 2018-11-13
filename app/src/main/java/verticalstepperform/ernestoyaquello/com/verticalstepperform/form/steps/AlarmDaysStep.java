@@ -40,18 +40,30 @@ public class AlarmDaysStep extends Step<boolean[]> {
 
     @Override
     protected void onStepOpened(boolean animated) {
-        updateSubtitle("", animated);
+        // Do nothing
     }
 
     @Override
     protected void onStepClosed(boolean animated) {
-        String selectedDaysAsString = getSelectedWeekDaysAsString();
-        updateSubtitle(selectedDaysAsString, animated);
+        // Do nothing
     }
 
     @Override
     public boolean[] getStepData() {
         return alarmDays;
+    }
+
+    @Override
+    public String getStepDataAsString() {
+        String[] weekDayStrings = getContext().getResources().getStringArray(R.array.week_days_extended);
+        List<String> selectedWeekDayStrings = new ArrayList<>();
+        for (int i = 0; i < weekDayStrings.length; i++) {
+            if (alarmDays[i]) {
+                selectedWeekDayStrings.add(weekDayStrings[i]);
+            }
+        }
+
+        return TextUtils.join(", ", selectedWeekDayStrings);
     }
 
     @Override
@@ -141,17 +153,5 @@ public class AlarmDaysStep extends Step<boolean[]> {
         TextView dayText = dayLayout.findViewById(R.id.day);
         int colour = ContextCompat.getColor(getContext(), R.color.colorPrimary);
         dayText.setTextColor(colour);
-    }
-
-    private String getSelectedWeekDaysAsString() {
-        String[] weekDayStrings = getContext().getResources().getStringArray(R.array.week_days_extended);
-        List<String> selectedWeekDayStrings = new ArrayList<>();
-        for (int i = 0; i < weekDayStrings.length; i++) {
-            if (alarmDays[i]) {
-                selectedWeekDayStrings.add(weekDayStrings[i]);
-            }
-        }
-
-        return TextUtils.join(", ", selectedWeekDayStrings);
     }
 }
