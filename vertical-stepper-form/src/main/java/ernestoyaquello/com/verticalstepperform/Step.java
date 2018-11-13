@@ -260,34 +260,6 @@ public abstract class Step<T> {
     }
 
     /**
-     * Opens the step in case it was closed.
-     *
-     * @param useAnimations Indicates whether view changes should be animated or not.
-     */
-    void open(boolean useAnimations) {
-        if (!open) {
-            open = true;
-
-            onUpdatedStepVisibility(useAnimations);
-            onStepOpened(useAnimations);
-        }
-    }
-
-    /**
-     * Closes the step in case it was opened.
-     *
-     * @param useAnimations Indicates whether view changes should be animated or not.
-     */
-    void close(boolean useAnimations) {
-        if (open) {
-            open = false;
-
-            onUpdatedStepVisibility(useAnimations);
-            onStepClosed(useAnimations);
-        }
-    }
-
-    /**
      * Sets the title of the step, updating the view if necessary,
      *
      * @param title The new title of the step.
@@ -383,6 +355,24 @@ public abstract class Step<T> {
     void addListenerInternal(InternalFormStepListener listener) {
         if (!internalListeners.contains(listener)) {
             internalListeners.add(listener);
+        }
+    }
+
+    void openInternal(boolean useAnimations) {
+        if (!open) {
+            open = true;
+
+            onUpdatedStepVisibility(useAnimations);
+            onStepOpened(useAnimations);
+        }
+    }
+
+    void closeInternal(boolean useAnimations) {
+        if (open) {
+            open = false;
+
+            onUpdatedStepVisibility(useAnimations);
+            onStepClosed(useAnimations);
         }
     }
 

@@ -88,7 +88,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
      * @param useAnimations True to animate the changes in the views, false to not.
      * @return True if the step was found and marked as completed; false otherwise.
      */
-    public boolean markOpenStepAsCompletedOrUncompleted(boolean useAnimations) {
+    public synchronized boolean markOpenStepAsCompletedOrUncompleted(boolean useAnimations) {
         return markStepAsCompletedOrUncompleted(getOpenStepPosition(), useAnimations);
     }
 
@@ -114,7 +114,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
      *
      * @param useAnimations True to animate the changes in the views, false to not.
      */
-    public void markOpenStepAsCompleted(boolean useAnimations) {
+    public synchronized void markOpenStepAsCompleted(boolean useAnimations) {
         markStepAsCompleted(getOpenStepPosition(), useAnimations);
     }
 
@@ -137,7 +137,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
      * @param errorMessage The error message.
      * @param useAnimations True to animate the changes in the views, false to not.
      */
-    public void markOpenStepAsUncompleted(boolean useAnimations, String errorMessage) {
+    public synchronized void markOpenStepAsUncompleted(boolean useAnimations, String errorMessage) {
         markStepAsUncompleted(getOpenStepPosition(), errorMessage, useAnimations);
     }
 
@@ -160,7 +160,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
      *
      * @return True if the open step is currently marked as completed; false otherwise.
      */
-    public boolean isOpenStepCompleted() {
+    public synchronized boolean isOpenStepCompleted() {
         return isStepCompleted(getOpenStepPosition());
     }
 
@@ -217,7 +217,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
      *                      animations.
      * @return True if the navigation to the step was performed; false otherwise.
      */
-    public boolean goToNextStep(boolean useAnimations) {
+    public synchronized boolean goToNextStep(boolean useAnimations) {
         return goToStep(getOpenStepPosition() + 1, useAnimations);
     }
 
@@ -230,7 +230,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
      *                      animations.
      * @return True if the navigation to the step was performed; false otherwise.
      */
-    public boolean goToPreviousStep(boolean useAnimations) {
+    public synchronized boolean goToPreviousStep(boolean useAnimations) {
         return goToStep(getOpenStepPosition() - 1, useAnimations);
     }
 
@@ -265,7 +265,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
      *
      * @return The position of the currently open step, counting from 0. -1 if not found.
      */
-    public int getOpenStepPosition() {
+    public synchronized int getOpenStepPosition() {
         for (int i = 0; i < stepHelpers.size(); i++) {
             StepHelper stepHelper = stepHelpers.get(i);
             if (stepHelper.getStepInstance().isOpen()) {
@@ -281,7 +281,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
      *
      * @return The currently open step, or null if not found.
      */
-    public Step getOpenStep() {
+    public synchronized Step getOpenStep() {
         for (int i = 0; i < stepHelpers.size(); i++) {
             StepHelper stepHelper = stepHelpers.get(i);
             if (stepHelper.getStepInstance().isOpen()) {
@@ -346,7 +346,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
      *
      * @param smoothScroll Determines whether the scrolling should be smooth or abrupt.
      */
-    public void scrollToOpenStep(boolean smoothScroll) {
+    public synchronized void scrollToOpenStep(boolean smoothScroll) {
         scrollToStep(getOpenStepPosition(), smoothScroll);
     }
 
@@ -367,7 +367,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
      * Useful when saving the form data fails and you want to allow the user to use the form again
      * in order to re-send the data.
      */
-    public void cancelFormCompletionAttempt() {
+    public synchronized void cancelFormCompletionAttempt() {
         int openedStepPosition = getOpenStepPosition();
         if (openedStepPosition >= 0 && openedStepPosition < stepHelpers.size()) {
             StepHelper stepHelper = stepHelpers.get(openedStepPosition);
@@ -478,17 +478,17 @@ public class VerticalStepperFormLayout extends LinearLayout {
         return stepHelper.initialize(this, style, formContentView, stepPosition, isLast);
     }
 
-    private void openStep(int stepToOpenPosition, boolean useAnimations) {
+    private synchronized void openStep(int stepToOpenPosition, boolean useAnimations) {
         if (stepToOpenPosition >= 0 && stepToOpenPosition < stepHelpers.size()) {
 
             int stepToClosePosition = getOpenStepPosition();
             if (stepToClosePosition != -1) {
                 StepHelper stepToClose = stepHelpers.get(stepToClosePosition);
-                stepToClose.getStepInstance().close(useAnimations);
+                stepToClose.getStepInstance().closeInternal(useAnimations);
             }
 
             StepHelper stepToOpen = stepHelpers.get(stepToOpenPosition);
-            stepToOpen.getStepInstance().open(useAnimations);
+            stepToOpen.getStepInstance().openInternal(useAnimations);
 
         } else if (stepToOpenPosition == stepHelpers.size()) {
             attemptToCompleteForm();
@@ -512,7 +512,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
         });
     }
 
-    protected void updateBottomNavigationButtons() {
+    protected synchronized void updateBottomNavigationButtons() {
         int stepPosition = getOpenStepPosition();
         if (stepPosition >= 0 && stepPosition < stepHelpers.size()) {
             StepHelper stepHelper = stepHelpers.get(stepPosition);
@@ -563,7 +563,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
         }
     }
 
-    private void attemptToCompleteForm() {
+    private synchronized void attemptToCompleteForm() {
         if (formCompleted) {
             return;
         }

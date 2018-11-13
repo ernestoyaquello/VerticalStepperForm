@@ -19,6 +19,9 @@ import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout.FormSty
 /**
  * This class holds a step instance and deals with updating its views so they reflect its state.
  * It can also handle the logic of the optional confirmation step.
+ *
+ * All this logic could certainly be in the base class of the step, but by keeping it here we make
+ * that class cleaner, helping anyone taking a look at it to understand it better.
  */
 class StepHelper implements Step.InternalFormStepListener {
 
@@ -128,7 +131,7 @@ class StepHelper implements Step.InternalFormStepListener {
         nextButtonView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                form.goToNextStep(true);
+                form.goToStep(position + 1, true);
             }
         });
 
