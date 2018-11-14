@@ -77,7 +77,7 @@ public class AlarmNameStep extends Step<String> {
     }
 
     @Override
-    public String getStepDataAsString() {
+    public String getStepDataAsHumanReadableString() {
         String name = getStepData();
         return name == null || name.isEmpty()
                 ? getContext().getString(R.string.form_empty_field)

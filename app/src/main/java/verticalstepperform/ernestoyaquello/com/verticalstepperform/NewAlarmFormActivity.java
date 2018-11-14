@@ -82,6 +82,11 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
         });
     }
 
+    @Override
+    public void onCancelledForm() {
+        finishIfPossible();
+    }
+
     private Thread saveData() {
 
         // Fake data saving effect

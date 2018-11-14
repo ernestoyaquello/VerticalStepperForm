@@ -59,7 +59,7 @@ public class AlarmDescriptionStep extends Step<String> {
     }
 
     @Override
-    public String getStepDataAsString() {
+    public String getStepDataAsHumanReadableString() {
         String description = getStepData();
         return description == null || description.isEmpty()
                 ? getContext().getString(R.string.form_empty_field)

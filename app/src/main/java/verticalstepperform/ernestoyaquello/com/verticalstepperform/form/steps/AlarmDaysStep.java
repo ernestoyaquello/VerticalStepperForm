@@ -54,7 +54,7 @@ public class AlarmDaysStep extends Step<boolean[]> {
     }
 
     @Override
-    public String getStepDataAsString() {
+    public String getStepDataAsHumanReadableString() {
         String[] weekDayStrings = getContext().getResources().getStringArray(R.array.week_days_extended);
         List<String> selectedWeekDayStrings = new ArrayList<>();
         for (int i = 0; i < weekDayStrings.length; i++) {

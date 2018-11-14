@@ -10,7 +10,7 @@ class Animations {
 
     private static final long MIN_DURATION_MILLIS = 150;
 
-    void slideDownIfNecessary(final View v, boolean animate) {
+    static void slideDownIfNecessary(final View v, boolean animate) {
         if (!animate) {
             v.clearAnimation();
             v.setVisibility(View.VISIBLE);
@@ -26,7 +26,7 @@ class Animations {
         v.startAnimation(slideDownAnimation);
     }
 
-    void slideUpIfNecessary(final View v, boolean animate) {
+    static void slideUpIfNecessary(final View v, boolean animate) {
         if (!animate) {
             v.clearAnimation();
             v.setVisibility(View.GONE);
@@ -41,7 +41,7 @@ class Animations {
         v.startAnimation(slideUpAnimation);
     }
 
-    private Animation getSlideDownAnimation(final View v, final int targetHeight, long durationMillis) {
+    static private Animation getSlideDownAnimation(final View v, final int targetHeight, long durationMillis) {
 
         setHeight(v, v.getVisibility() != View.VISIBLE ? 1 : v.getMeasuredHeight());
         v.setVisibility(View.VISIBLE);
@@ -82,7 +82,7 @@ class Animations {
         return animation;
     }
 
-    private Animation getSlideUpAnimation(final View v, final int initialHeight, long durationMillis) {
+    static private Animation getSlideUpAnimation(final View v, final int initialHeight, long durationMillis) {
         Animation animation = new Animation() {
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
@@ -119,7 +119,7 @@ class Animations {
         return animation;
     }
 
-    private void setHeight(View v, int newHeight) {
+    static private void setHeight(View v, int newHeight) {
         v.setLayoutParams(new LinearLayout.LayoutParams(v.getLayoutParams().width, newHeight));
     }
 }

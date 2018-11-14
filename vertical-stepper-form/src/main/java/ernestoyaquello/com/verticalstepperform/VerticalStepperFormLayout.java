@@ -708,11 +708,6 @@ public class VerticalStepperFormLayout extends LinearLayout {
         }
 
         @Override
-        public void onUpdatedErrorMessage(int stepPosition, boolean useAnimations) {
-            // Do nothing
-        }
-
-        @Override
         public void onUpdatedStepCompletionState(int stepPosition, boolean useAnimations) {
             updateBottomNavigationButtons();
             refreshFormProgress();

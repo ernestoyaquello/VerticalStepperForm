@@ -14,19 +14,6 @@ import java.util.List;
  */
 public abstract class Step<T> {
 
-    /**
-     * Internal listener that will be used to notify both the form and the step helper
-     * about any changes on this step so they can update accordingly.
-     */
-    interface InternalFormStepListener {
-        void onUpdatedTitle(int stepPosition, boolean useAnimations);
-        void onUpdatedSubtitle(int stepPosition, boolean useAnimations);
-        void onUpdatedButtonText(int stepPosition, boolean useAnimations);
-        void onUpdatedErrorMessage(int stepPosition, boolean useAnimations);
-        void onUpdatedStepCompletionState(int stepPosition, boolean useAnimations);
-        void onUpdatedStepVisibility(int stepPosition, boolean useAnimations);
-    }
-
     private List<InternalFormStepListener> internalListeners;
 
     private String title;
@@ -65,11 +52,12 @@ public abstract class Step<T> {
 
     /**
      * Gets the data of this step (i.e., the information that the user has filled in for this field)
-     * as a string.
+     * as a human-readable string. When the option displayStepDataInSubtitleOfClosedSteps is
+     * activated, the text returned by this method will be the one displayed in the step's subtitle.
      *
      * @return The step data as a string.
      */
-    public abstract String getStepDataAsString();
+    public abstract String getStepDataAsHumanReadableString();
 
     /**
      * Restores the step data. Useful for when restoring the state of the form.
@@ -138,7 +126,7 @@ public abstract class Step<T> {
     }
 
     /**
-     * Gets the error message of this step.
+     * Gets the current error message of this step.
      *
      * @return The error message.
      */
@@ -243,7 +231,7 @@ public abstract class Step<T> {
                 markAsUncompleted(isDataValid.getErrorMessage(), useAnimations);
             }
         } else {
-            updateErrorMessageIfNecessary(isDataValid.getErrorMessage(), useAnimations);
+            updateErrorMessage(isDataValid.isValid() ? "" : isDataValid.getErrorMessage());
         }
 
         return isDataValid.isValid();
@@ -255,16 +243,19 @@ public abstract class Step<T> {
      * @param useAnimations True to animate the changes in the views, false to not.
      */
     public void markAsCompleted(boolean useAnimations) {
-        updateStepCompletionState(true, "", useAnimations);
+        updateErrorMessage("");
+        updateStepCompletionState(true, useAnimations);
     }
 
     /**
      * Marks the step as uncompleted.
      *
+     * @param errorMessage The optional error message that explains why the step is uncompleted.
      * @param useAnimations True to animate the changes in the views, false to not.
      */
     public void markAsUncompleted(String errorMessage, boolean useAnimations) {
-        updateStepCompletionState(false, errorMessage, useAnimations);
+        updateErrorMessage(errorMessage);
+        updateStepCompletionState(false, useAnimations);
     }
 
     /**
@@ -274,7 +265,7 @@ public abstract class Step<T> {
      * @param useAnimations Determines whether or not the necessary layout changes should be animated.
      */
     protected void updateTitle(String title, boolean useAnimations) {
-        this.title = title;
+        this.title = title == null ? "" : title;
 
         onUpdatedTitle(useAnimations);
     }
@@ -286,7 +277,7 @@ public abstract class Step<T> {
      * @param useAnimations Determines whether or not the necessary layout changes should be animated.
      */
     protected void updateSubtitle(String subtitle, boolean useAnimations) {
-        this.subtitle = subtitle;
+        this.subtitle = subtitle == null ? "" : subtitle;
 
         onUpdatedSubtitle(useAnimations);
     }
@@ -298,30 +289,19 @@ public abstract class Step<T> {
      * @param useAnimations Determines whether or not the necessary layout changes should be animated.
      */
     protected void updateButtonText(String buttonText, boolean useAnimations) {
-        this.buttonText = buttonText;
+        this.buttonText = buttonText == null ? "" : buttonText;
 
         onUpdatedButtonText(useAnimations);
     }
 
-    private void updateStepCompletionState(boolean completed, String errorMessage, boolean useAnimations) {
+    private void updateStepCompletionState(boolean completed, boolean useAnimations) {
         this.completed = completed;
 
-        updateErrorMessageIfNecessary(errorMessage, useAnimations);
         onUpdatedStepCompletionState(useAnimations);
     }
 
-    private void updateErrorMessageIfNecessary(String errorMessage, boolean useAnimations) {
-        errorMessage = errorMessage == null ? "" : errorMessage;
-
-        if (!this.errorMessage.equals(errorMessage)) {
-            updateErrorMessage(!completed ? errorMessage : "", useAnimations);
-        }
-    }
-
-    private void updateErrorMessage(String errorMessage, boolean useAnimations) {
-        this.errorMessage = errorMessage;
-
-        onUpdatedErrorMessage(useAnimations);
+    private void updateErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage == null ? "" : errorMessage;
     }
 
     private void onUpdatedTitle(boolean useAnimations) {
@@ -339,12 +319,6 @@ public abstract class Step<T> {
     private void onUpdatedButtonText(boolean useAnimations) {
         for (InternalFormStepListener listener: internalListeners) {
             listener.onUpdatedButtonText(getPosition(), useAnimations);
-        }
-    }
-
-    private void onUpdatedErrorMessage(boolean useAnimations) {
-        for (InternalFormStepListener listener: internalListeners) {
-            listener.onUpdatedErrorMessage(getPosition(), useAnimations);
         }
     }
 
@@ -394,6 +368,10 @@ public abstract class Step<T> {
         this.contentLayout = contentLayout;
     }
 
+    /**
+     * This class holds information about whether the data is valid in a boolean. It also includes
+     * an optional error message for when the data turns out to be invalid.
+     */
     protected static class IsDataValid {
 
         private boolean isValid;
@@ -408,12 +386,34 @@ public abstract class Step<T> {
             this.errorMessage = errorMessage;
         }
 
+        /**
+         * Determines whether the data is valid or not.
+         *
+         * @return True if the data is valid; false otherwise.
+         */
         public boolean isValid() {
             return isValid;
         }
 
+        /**
+         * Gets the optional error message, if any.
+         *
+         * @return The optional error message, or null if none.
+         */
         public String getErrorMessage() {
             return errorMessage;
         }
+    }
+
+    /**
+     * Internal listener that will be used to notify both the form and the step helper
+     * about any changes on this step so they can update accordingly.
+     */
+    interface InternalFormStepListener {
+        void onUpdatedTitle(int stepPosition, boolean useAnimations);
+        void onUpdatedSubtitle(int stepPosition, boolean useAnimations);
+        void onUpdatedButtonText(int stepPosition, boolean useAnimations);
+        void onUpdatedStepCompletionState(int stepPosition, boolean useAnimations);
+        void onUpdatedStepVisibility(int stepPosition, boolean useAnimations);
     }
 }

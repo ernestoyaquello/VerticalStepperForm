@@ -80,7 +80,7 @@ public class AlarmTimeStep extends Step<AlarmTimeStep.TimeHolder> {
     }
 
     @Override
-    public String getStepDataAsString() {
+    public String getStepDataAsHumanReadableString() {
         String hourString = ((alarmTimeHour > 9) ?
                 String.valueOf(alarmTimeHour) : ("0" + alarmTimeHour));
         String minutesString = ((alarmTimeMinutes > 9) ?
@@ -103,7 +103,7 @@ public class AlarmTimeStep extends Step<AlarmTimeStep.TimeHolder> {
     }
 
     private void updatedAlarmTimeText() {
-        alarmTimeTextView.setText(getStepDataAsString());
+        alarmTimeTextView.setText(getStepDataAsHumanReadableString());
     }
 
     public static class TimeHolder {
