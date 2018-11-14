@@ -12,6 +12,7 @@ class Animations {
 
     void slideDownIfNecessary(final View v, boolean animate) {
         if (!animate) {
+            v.clearAnimation();
             v.setVisibility(View.VISIBLE);
             return;
         }
@@ -27,6 +28,7 @@ class Animations {
 
     void slideUpIfNecessary(final View v, boolean animate) {
         if (!animate) {
+            v.clearAnimation();
             v.setVisibility(View.GONE);
             return;
         }
