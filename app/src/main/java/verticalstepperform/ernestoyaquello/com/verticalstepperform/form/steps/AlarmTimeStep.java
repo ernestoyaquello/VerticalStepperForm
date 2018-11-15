@@ -12,17 +12,24 @@ import verticalstepperform.ernestoyaquello.com.verticalstepperform.R;
 
 public class AlarmTimeStep extends Step<AlarmTimeStep.TimeHolder> {
 
-    private TextView alarmTimeTextView;
+    private static final int DEFAULT_HOURS = 8;
+    private static final int DEFAULT_MINUTES = 30;
 
+    private TextView alarmTimeTextView;
     private TimePickerDialog alarmTimePicker;
+
     private int alarmTimeHour;
     private int alarmTimeMinutes;
 
-    public AlarmTimeStep(String stepTitle) {
-        super(stepTitle);
+    public AlarmTimeStep(String title) {
+        this(title, "");
+    }
 
-        alarmTimeHour = 8;
-        alarmTimeMinutes = 30;
+    public AlarmTimeStep(String title, String subtitle) {
+        super(title, subtitle);
+
+        alarmTimeHour = DEFAULT_HOURS;
+        alarmTimeMinutes = DEFAULT_MINUTES;
     }
 
     @NonNull
@@ -66,12 +73,12 @@ public class AlarmTimeStep extends Step<AlarmTimeStep.TimeHolder> {
 
     @Override
     protected void onStepOpened(boolean animated) {
-        // Do nothing
+        // No need to do anything here
     }
 
     @Override
     protected void onStepClosed(boolean animated) {
-        // Do nothing
+        // No need to do anything here
     }
 
     @Override

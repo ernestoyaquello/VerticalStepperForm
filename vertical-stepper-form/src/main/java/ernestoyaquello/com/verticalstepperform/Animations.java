@@ -23,7 +23,9 @@ class Animations {
         durationMillis = durationMillis < MIN_DURATION_MILLIS ? MIN_DURATION_MILLIS : durationMillis;
         Animation slideDownAnimation = getSlideDownAnimation(v, targetHeight, durationMillis);
 
-        v.startAnimation(slideDownAnimation);
+        if (slideDownAnimation != null) {
+            v.startAnimation(slideDownAnimation);
+        }
     }
 
     static void slideUpIfNecessary(final View v, boolean animate) {
@@ -38,12 +40,23 @@ class Animations {
         durationMillis = durationMillis < MIN_DURATION_MILLIS ? MIN_DURATION_MILLIS : durationMillis;
         Animation slideUpAnimation = getSlideUpAnimation(v, initialHeight, durationMillis);
 
-        v.startAnimation(slideUpAnimation);
+        if (slideUpAnimation != null) {
+            v.startAnimation(slideUpAnimation);
+        }
     }
 
     static private Animation getSlideDownAnimation(final View v, final int targetHeight, long durationMillis) {
 
-        setHeight(v, v.getVisibility() != View.VISIBLE ? 1 : v.getMeasuredHeight());
+        int initialHeight = v.getVisibility() != View.VISIBLE ? 1 : v.getMeasuredHeight();
+
+        if (initialHeight == targetHeight) {
+            v.clearAnimation();
+            setHeight(v, targetHeight);
+            v.setVisibility(View.VISIBLE);
+            return null;
+        }
+
+        setHeight(v, initialHeight);
         v.setVisibility(View.VISIBLE);
 
         Animation animation = new Animation() {
@@ -64,7 +77,7 @@ class Animations {
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-                // Do nothing here
+                // No need to do anything here
             }
 
             @Override
@@ -74,7 +87,7 @@ class Animations {
 
             @Override
             public void onAnimationRepeat(Animation animation) {
-                // Do nothing here
+                // No need to do anything here
             }
         });
         animation.setDuration(durationMillis);
@@ -83,6 +96,14 @@ class Animations {
     }
 
     static private Animation getSlideUpAnimation(final View v, final int initialHeight, long durationMillis) {
+
+        if (initialHeight <= 1) {
+            v.clearAnimation();
+            setHeight(v, 0);
+            v.setVisibility(View.GONE);
+            return null;
+        }
+
         Animation animation = new Animation() {
             @Override
             protected void applyTransformation(float interpolatedTime, Transformation t) {
@@ -101,7 +122,7 @@ class Animations {
         animation.setAnimationListener(new Animation.AnimationListener() {
             @Override
             public void onAnimationStart(Animation animation) {
-                // Do nothing here
+                // No need to do anything here
             }
 
             @Override
@@ -111,7 +132,7 @@ class Animations {
 
             @Override
             public void onAnimationRepeat(Animation animation) {
-                // Do nothing here
+                // No need to do anything here
             }
         });
         animation.setDuration(durationMillis);
@@ -120,6 +141,7 @@ class Animations {
     }
 
     static private void setHeight(View v, int newHeight) {
-        v.setLayoutParams(new LinearLayout.LayoutParams(v.getLayoutParams().width, newHeight));
+        int width = v.getLayoutParams().width;
+        v.setLayoutParams(new LinearLayout.LayoutParams(width, newHeight));
     }
 }

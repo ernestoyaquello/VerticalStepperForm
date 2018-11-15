@@ -19,8 +19,12 @@ public class AlarmNameStep extends Step<String> {
     private TextInputEditText alarmNameEditText;
     private String unformattedErrorString;
 
-    public AlarmNameStep(String stepTitle) {
-        super(stepTitle);
+    public AlarmNameStep(String title) {
+        this(title, "");
+    }
+
+    public AlarmNameStep(String title, String subtitle) {
+        super(title, subtitle);
     }
 
     @NonNull
@@ -58,12 +62,12 @@ public class AlarmNameStep extends Step<String> {
 
     @Override
     protected void onStepOpened(boolean animated) {
-        // Do nothing
+        // No need to do anything here
     }
 
     @Override
     protected void onStepClosed(boolean animated) {
-        // Do nothing
+        // No need to do anything here
     }
 
     @Override

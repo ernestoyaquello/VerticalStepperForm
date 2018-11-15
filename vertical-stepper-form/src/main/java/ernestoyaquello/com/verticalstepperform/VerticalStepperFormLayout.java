@@ -39,6 +39,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
     private View bottomNavigationView;
 
     private boolean formCompleted;
+    private boolean keyboardIsOpen;
 
     public VerticalStepperFormLayout(Context context) {
         super(context);
@@ -322,19 +323,25 @@ public class VerticalStepperFormLayout extends LinearLayout {
     }
 
     /**
-     * Scrolls to the specified step.
+     * Scrolls to the top of the specified step, but only in case its content is not visible.
      *
      * @param stepPosition The step position.
      * @param smoothScroll Determines whether the scrolling should be smooth or abrupt.
      */
-    public void scrollToStep(final int stepPosition, final boolean smoothScroll) {
+    public void scrollToStepIfNecessary(final int stepPosition, final boolean smoothScroll) {
         if (stepPosition >= 0 && stepPosition < stepHelpers.size()) {
             stepsScrollView.post(new Runnable() {
                 public void run() {
-                    if (smoothScroll) {
-                        stepsScrollView.smoothScrollTo(0, stepHelpers.get(stepPosition).getStepInstance().getEntireStepLayout().getTop());
-                    } else {
-                        stepsScrollView.scrollTo(0, stepHelpers.get(stepPosition).getStepInstance().getEntireStepLayout().getTop());
+                    View stepEntireLayout = stepHelpers.get(stepPosition).getStepInstance().getEntireStepLayout();
+                    View stepContentLayout = stepHelpers.get(stepPosition).getStepInstance().getContentLayout();
+                    Rect scrollBounds = new Rect();
+                    stepsScrollView.getDrawingRect(scrollBounds);
+                    if (stepContentLayout == null || scrollBounds.top > stepContentLayout.getY()) {
+                        if (smoothScroll) {
+                            stepsScrollView.smoothScrollTo(0, stepEntireLayout.getTop());
+                        } else {
+                            stepsScrollView.scrollTo(0, stepEntireLayout.getTop());
+                        }
                     }
                 }
             });
@@ -342,12 +349,12 @@ public class VerticalStepperFormLayout extends LinearLayout {
     }
 
     /**
-     * Scrolls to the open step.
+     * Scrolls to the top of the currently open step, but only in case its content is not visible.
      *
      * @param smoothScroll Determines whether the scrolling should be smooth or abrupt.
      */
-    public synchronized void scrollToOpenStep(boolean smoothScroll) {
-        scrollToStep(getOpenStepPosition(), smoothScroll);
+    public synchronized void scrollToOpenStepIfNecessary(boolean smoothScroll) {
+        scrollToStepIfNecessary(getOpenStepPosition(), smoothScroll);
     }
 
     /**
@@ -428,7 +435,6 @@ public class VerticalStepperFormLayout extends LinearLayout {
         FormStyle.defaultButtonPressedTextColor = Color.rgb(255, 255, 255);
         FormStyle.defaultErrorMessageTextColor = Color.rgb(175, 18, 18);
         FormStyle.defaultDisplayBottomNavigation = true;
-        FormStyle.defaultDisplayVerticalLineWhenStepsAreCollapsed = true;
         FormStyle.defaultDisplayStepButtons = true;
         FormStyle.defaultIncludeConfirmationStep = true;
         FormStyle.defaultDisplayStepDataInSubtitleOfClosedSteps = true;
@@ -447,6 +453,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
             hideBottomNavigation();
         }
 
+        keyboardIsOpen = isKeyboardOpen();
         setObserverForKeyboard();
 
         for (int i = 0; i < stepHelpers.size(); i++) {
@@ -458,25 +465,10 @@ public class VerticalStepperFormLayout extends LinearLayout {
     }
 
     private View initializeStepHelper(int position) {
-        final int stepPosition = position;
-        StepHelper stepHelper = stepHelpers.get(stepPosition);
+        StepHelper stepHelper = stepHelpers.get(position);
+        boolean isLast = (position + 1) == stepHelpers.size();
 
-        OnClickListener clickOnNextButtonListener = new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToStep((stepPosition + 1), true);
-            }
-        };
-        OnClickListener clickOnHeaderListener = new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                goToStep(stepPosition, true);
-            }
-        };
-
-        boolean isLast = (stepPosition + 1) == stepHelpers.size();
-
-        return stepHelper.initialize(this, style, formContentView, stepPosition, isLast);
+        return stepHelper.initialize(this, style, formContentView, position, isLast);
     }
 
     private synchronized void openStep(int stepToOpenPosition, boolean useAnimations) {
@@ -494,23 +486,6 @@ public class VerticalStepperFormLayout extends LinearLayout {
         } else if (stepToOpenPosition == stepHelpers.size()) {
             attemptToCompleteForm();
         }
-    }
-
-    private void setObserverForKeyboard() {
-        formContentView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                Rect r = new Rect();
-                formContentView.getWindowVisibleDisplayFrame(r);
-                int screenHeight = formContentView.getRootView().getHeight();
-                int keypadHeight = screenHeight - r.bottom;
-
-                if (keypadHeight > screenHeight * 0.15) {
-                    // The keyboard has probably been opened, so we scroll to the step to keep it in sight
-                    scrollToOpenStep(true);
-                }
-            }
-        });
     }
 
     protected synchronized void updateBottomNavigationButtons() {
@@ -564,6 +539,28 @@ public class VerticalStepperFormLayout extends LinearLayout {
         }
     }
 
+    private void setObserverForKeyboard() {
+        getRootView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                boolean keyboardWasOpen = keyboardIsOpen;
+                keyboardIsOpen = isKeyboardOpen();
+                if (keyboardIsOpen != keyboardWasOpen) {
+                    scrollToOpenStepIfNecessary(true);
+                }
+            }
+        });
+    }
+
+    private boolean isKeyboardOpen() {
+        Rect r = new Rect();
+        formContentView.getWindowVisibleDisplayFrame(r);
+        int screenHeight = formContentView.getRootView().getHeight();
+        int keyboardHeigh = screenHeight - r.bottom;
+
+        return keyboardHeigh > screenHeight * 0.2;
+    }
+
     private synchronized void attemptToCompleteForm() {
         if (formCompleted) {
             return;
@@ -579,34 +576,6 @@ public class VerticalStepperFormLayout extends LinearLayout {
                 listener.onCompletedForm();
             }
         }
-    }
-
-    private void restoreFromState(
-            int positionToOpen,
-            boolean[] completedSteps,
-            String[] titles,
-            String[] subtitles,
-            String[] buttonTexts,
-            String[] errorMessages) {
-
-        for (int i = 0; i < completedSteps.length; i++) {
-            StepHelper stepHelper = stepHelpers.get(i);
-
-            if (completedSteps[i]) {
-                stepHelper.getStepInstance().markAsCompleted(false);
-            } else {
-                stepHelper.getStepInstance().markAsUncompleted(errorMessages[i], false);
-            }
-            stepHelper.getStepInstance().updateTitle(titles[i], false);
-            stepHelper.getStepInstance().updateSubtitle(subtitles[i], false);
-            stepHelper.getStepInstance().updateButtonText(buttonTexts[i], false);
-        }
-
-        for (int i = 0; i <= positionToOpen; i++) {
-            goToStep(i, false);
-        }
-
-        refreshFormProgress();
     }
 
     @Override
@@ -639,6 +608,36 @@ public class VerticalStepperFormLayout extends LinearLayout {
                 goToNextStep(true);
             }
         });
+    }
+
+    private void restoreFromState(
+            int positionToOpen,
+            boolean[] completedSteps,
+            String[] titles,
+            String[] subtitles,
+            String[] buttonTexts,
+            String[] errorMessages) {
+
+        for (int i = 0; i < completedSteps.length; i++) {
+            StepHelper stepHelper = stepHelpers.get(i);
+
+            if (completedSteps[i]) {
+                stepHelper.getStepInstance().markAsCompleted(false);
+            } else {
+                stepHelper.getStepInstance().markAsUncompleted(errorMessages[i], false);
+            }
+            stepHelper.getStepInstance().updateTitle(titles[i], false);
+            stepHelper.getStepInstance().updateSubtitle(subtitles[i], false);
+            stepHelper.getStepInstance().updateButtonText(buttonTexts[i], false);
+            stepHelper.onUpdatedStepCompletionState(i, false);
+            stepHelper.onUpdatedStepVisibility(i, false);
+        }
+
+        for (int i = 0; i <= positionToOpen; i++) {
+            goToStep(i, false);
+        }
+
+        refreshFormProgress();
     }
 
     @Override
@@ -694,17 +693,22 @@ public class VerticalStepperFormLayout extends LinearLayout {
 
         @Override
         public void onUpdatedTitle(int stepPosition, boolean useAnimations) {
-            // Do nothing
+            // No need to do anything here
         }
 
         @Override
         public void onUpdatedSubtitle(int stepPosition, boolean useAnimations) {
-            // Do nothing
+            // No need to do anything here
         }
 
         @Override
         public void onUpdatedButtonText(int stepPosition, boolean useAnimations) {
-            // Do nothing
+            // No need to do anything here
+        }
+
+        @Override
+        public void onUpdatedErrorMessage(int stepPosition, boolean useAnimations) {
+            // No need to do anything here
         }
 
         @Override
@@ -716,7 +720,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
         @Override
         public void onUpdatedStepVisibility(int stepPosition, boolean useAnimations) {
             updateBottomNavigationButtons();
-            scrollToStep(stepPosition, useAnimations);
+            scrollToOpenStepIfNecessary(useAnimations);
         }
     }
 
@@ -736,7 +740,6 @@ public class VerticalStepperFormLayout extends LinearLayout {
         private static int defaultButtonPressedTextColor;
         private static int defaultErrorMessageTextColor;
         private static boolean defaultDisplayBottomNavigation;
-        private static boolean defaultDisplayVerticalLineWhenStepsAreCollapsed;
         private static boolean defaultDisplayStepButtons;
         private static boolean defaultIncludeConfirmationStep;
         private static boolean defaultDisplayStepDataInSubtitleOfClosedSteps;
@@ -755,7 +758,6 @@ public class VerticalStepperFormLayout extends LinearLayout {
         int buttonPressedTextColor;
         int errorMessageTextColor;
         boolean displayBottomNavigation;
-        boolean displayVerticalLineWhenStepsAreCollapsed;
         boolean displayStepButtons;
         boolean includeConfirmationStep;
 
@@ -777,7 +779,6 @@ public class VerticalStepperFormLayout extends LinearLayout {
             this.buttonPressedTextColor = defaultButtonPressedTextColor;
             this.errorMessageTextColor = defaultErrorMessageTextColor;
             this.displayBottomNavigation = defaultDisplayBottomNavigation;
-            this.displayVerticalLineWhenStepsAreCollapsed = defaultDisplayVerticalLineWhenStepsAreCollapsed;
             this.displayStepButtons = defaultDisplayStepButtons;
             this.includeConfirmationStep = defaultIncludeConfirmationStep;
             this.displayStepDataInSubtitleOfClosedSteps = defaultDisplayStepDataInSubtitleOfClosedSteps;

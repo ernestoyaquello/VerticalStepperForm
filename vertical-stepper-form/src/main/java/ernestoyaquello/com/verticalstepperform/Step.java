@@ -104,7 +104,7 @@ public abstract class Step<T> {
      * @return The title.
      */
     public String getTitle() {
-        return title;
+        return title == null ? "" : title;
     }
 
     /**
@@ -113,7 +113,7 @@ public abstract class Step<T> {
      * @return The subtitle.
      */
     public String getSubtitle() {
-        return subtitle;
+        return subtitle == null ? "" : subtitle;
     }
 
     /**
@@ -122,7 +122,7 @@ public abstract class Step<T> {
      * @return The button text.
      */
     public String getButtonText() {
-        return buttonText;
+        return buttonText == null ? "" : buttonText;
     }
 
     /**
@@ -131,7 +131,7 @@ public abstract class Step<T> {
      * @return The error message.
      */
     public String getErrorMessage() {
-        return errorMessage;
+        return errorMessage == null ? "" : errorMessage;
     }
 
     /**
@@ -214,8 +214,8 @@ public abstract class Step<T> {
     }
 
     /**
-     * Marks the step as completed or uncompleted automatically depending on whether the step data
-     * is valid or not.
+     * Marks the step as completed or uncompleted depending on whether the step data is valid or not.
+     * It should be called every time the step data changes.
      *
      * @param useAnimations True to animate the changes in the views, false to not.
      * @return True if the step was marked as completed; false otherwise.
@@ -231,7 +231,7 @@ public abstract class Step<T> {
                 markAsUncompleted(isDataValid.getErrorMessage(), useAnimations);
             }
         } else {
-            updateErrorMessage(isDataValid.isValid() ? "" : isDataValid.getErrorMessage());
+            updateErrorMessage(isDataValid.isValid() ? "" : isDataValid.getErrorMessage(), useAnimations);
         }
 
         return isDataValid.isValid();
@@ -243,8 +243,8 @@ public abstract class Step<T> {
      * @param useAnimations True to animate the changes in the views, false to not.
      */
     public void markAsCompleted(boolean useAnimations) {
-        updateErrorMessage("");
-        updateStepCompletionState(true, useAnimations);
+        updateStepCompletionState(true, "", useAnimations);
+
     }
 
     /**
@@ -254,8 +254,7 @@ public abstract class Step<T> {
      * @param useAnimations True to animate the changes in the views, false to not.
      */
     public void markAsUncompleted(String errorMessage, boolean useAnimations) {
-        updateErrorMessage(errorMessage);
-        updateStepCompletionState(false, useAnimations);
+        updateStepCompletionState(false, errorMessage, useAnimations);
     }
 
     /**
@@ -294,14 +293,28 @@ public abstract class Step<T> {
         onUpdatedButtonText(useAnimations);
     }
 
-    private void updateStepCompletionState(boolean completed, boolean useAnimations) {
+    private void updateErrorMessage(String errorMessage, boolean useAnimations) {
+        this.errorMessage = errorMessage == null ? "" : errorMessage;
+
+        onUpdatedErrorMessage(useAnimations);
+    }
+
+    private void updateStepCompletionState(boolean completed, String errorMessage, boolean useAnimations) {
         this.completed = completed;
 
+        updateErrorMessage(errorMessage, useAnimations);
         onUpdatedStepCompletionState(useAnimations);
     }
 
-    private void updateErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage == null ? "" : errorMessage;
+    private void updateStepVisibility(boolean visibility, boolean useAnimations) {
+        open = visibility;
+
+        onUpdatedStepVisibility(useAnimations);
+        if (visibility) {
+            onStepOpened(useAnimations);
+        } else {
+            onStepClosed(useAnimations);
+        }
     }
 
     private void onUpdatedTitle(boolean useAnimations) {
@@ -319,6 +332,12 @@ public abstract class Step<T> {
     private void onUpdatedButtonText(boolean useAnimations) {
         for (InternalFormStepListener listener: internalListeners) {
             listener.onUpdatedButtonText(getPosition(), useAnimations);
+        }
+    }
+
+    private void onUpdatedErrorMessage(boolean useAnimations) {
+        for (InternalFormStepListener listener: internalListeners) {
+            listener.onUpdatedErrorMessage(getPosition(), useAnimations);
         }
     }
 
@@ -342,19 +361,13 @@ public abstract class Step<T> {
 
     void openInternal(boolean useAnimations) {
         if (!open) {
-            open = true;
-
-            onUpdatedStepVisibility(useAnimations);
-            onStepOpened(useAnimations);
+            updateStepVisibility(true, useAnimations);
         }
     }
 
     void closeInternal(boolean useAnimations) {
         if (open) {
-            open = false;
-
-            onUpdatedStepVisibility(useAnimations);
-            onStepClosed(useAnimations);
+            updateStepVisibility(false, useAnimations);
         }
     }
 
@@ -413,6 +426,7 @@ public abstract class Step<T> {
         void onUpdatedTitle(int stepPosition, boolean useAnimations);
         void onUpdatedSubtitle(int stepPosition, boolean useAnimations);
         void onUpdatedButtonText(int stepPosition, boolean useAnimations);
+        void onUpdatedErrorMessage(int stepPosition, boolean useAnimations);
         void onUpdatedStepCompletionState(int stepPosition, boolean useAnimations);
         void onUpdatedStepVisibility(int stepPosition, boolean useAnimations);
     }

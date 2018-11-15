@@ -15,8 +15,12 @@ public class AlarmDescriptionStep extends Step<String> {
 
     private TextInputEditText alarmDescriptionEditText;
 
-    public AlarmDescriptionStep(String stepTitle) {
-        super(stepTitle);
+    public AlarmDescriptionStep(String title) {
+        this(title, "");
+    }
+
+    public AlarmDescriptionStep(String title, String subtitle) {
+        super(title, subtitle);
     }
 
     @NonNull
@@ -40,12 +44,12 @@ public class AlarmDescriptionStep extends Step<String> {
 
     @Override
     protected void onStepOpened(boolean animated) {
-        // Do nothing
+        // No need to do anything here
     }
 
     @Override
     protected void onStepClosed(boolean animated) {
-        // Do nothing
+        // No need to do anything here
     }
 
     @Override

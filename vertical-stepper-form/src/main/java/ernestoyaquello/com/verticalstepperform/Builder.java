@@ -208,20 +208,6 @@ public class Builder {
     }
 
     /**
-     * Specifies whether or not the vertical lines should be displayed when the steps are
-     * collapsed.
-     *
-     * @param displayVerticalLineWhenStepsAreCollapsed True to show the lines on collapsed steps;
-     *                                                 false to not.
-     * @return The builder instance.
-     */
-    public Builder displayVerticalLineWhenStepsAreCollapsed(boolean displayVerticalLineWhenStepsAreCollapsed) {
-        style.displayVerticalLineWhenStepsAreCollapsed = displayVerticalLineWhenStepsAreCollapsed;
-
-        return this;
-    }
-
-    /**
      * Sets the alpha of the disabled elements.
      *
      * @param alpha Alpha level of disabled elements.

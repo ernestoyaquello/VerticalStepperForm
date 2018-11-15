@@ -22,8 +22,12 @@ public class AlarmDaysStep extends Step<boolean[]> {
     private boolean[] alarmDays;
     private View daysStepContent;
 
-    public AlarmDaysStep(String stepTitle) {
-        super(stepTitle);
+    public AlarmDaysStep(String title) {
+        this(title, "");
+    }
+
+    public AlarmDaysStep(String title, String subtitle) {
+        super(title, subtitle);
     }
 
     @NonNull
@@ -40,12 +44,12 @@ public class AlarmDaysStep extends Step<boolean[]> {
 
     @Override
     protected void onStepOpened(boolean animated) {
-        // Do nothing
+        // No need to do anything here
     }
 
     @Override
     protected void onStepClosed(boolean animated) {
-        // Do nothing
+        // No need to do anything here
     }
 
     @Override

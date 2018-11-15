@@ -79,29 +79,28 @@
                 android:ellipsize="end"
                 tools:text="Step 1" />
 
-            <TextView
-                android:id="@+id/step_subtitle"
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="@dimen/vertical_stepper_subtitle_text_size"
-                android:textColor="#A2A2A2"
-                android:visibility="gone"
-                android:maxLines="1"
-                android:ellipsize="end"
-                tools:visibility="visible"
-                tools:text="Little description of this step" />
+                android:orientation="horizontal">
 
-            <FrameLayout
-                android:id="@+id/spacing_to_show_left_line"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone">
+                <TextView
+                    android:id="@+id/step_subtitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="@dimen/vertical_stepper_subtitle_text_size"
+                    android:textColor="#A2A2A2"
+                    android:visibility="gone"
+                    android:maxLines="1"
+                    android:ellipsize="end"
+                    tools:visibility="visible"
+                    tools:text="Little description of this step" />
 
                 <View
-                    android:layout_width="match_parent"
+                    android:layout_width="1dp"
                     android:layout_height="10dp" />
 
-            </FrameLayout>
+            </LinearLayout>
 
         </LinearLayout>
 
