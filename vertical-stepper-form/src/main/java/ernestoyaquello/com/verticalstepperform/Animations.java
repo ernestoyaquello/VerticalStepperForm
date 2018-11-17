@@ -1,147 +1,132 @@
 package ernestoyaquello.com.verticalstepperform;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.animation.Animation;
-import android.view.animation.Transformation;
-import android.widget.LinearLayout;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 class Animations {
 
     private static final long MIN_DURATION_MILLIS = 150;
 
-    static void slideDownIfNecessary(final View v, boolean animate) {
+    private static final Map<View, ObjectAnimator> _runningObjectAnimators = new ConcurrentHashMap<>();
+
+    static void slideDownIfNecessary(View view, boolean animate) {
+
         if (!animate) {
-            v.clearAnimation();
-            v.setVisibility(View.VISIBLE);
+            endPreviousAnimationIfNecessary(view);
+            view.measure(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+            setViewHeight(view, view.getMeasuredHeight());
+            setFinalAlphaAndVisibility(view, false);
+
             return;
         }
 
-        v.measure(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-        int targetHeight = v.getMeasuredHeight();
-        long durationMillis = ((int) (targetHeight / v.getContext().getResources().getDisplayMetrics().density)) * 2;
-        durationMillis = durationMillis < MIN_DURATION_MILLIS ? MIN_DURATION_MILLIS : durationMillis;
-        Animation slideDownAnimation = getSlideDownAnimation(v, targetHeight, durationMillis);
-
-        if (slideDownAnimation != null) {
-            v.startAnimation(slideDownAnimation);
-        }
+        performSlideAnimation(view, false);
     }
 
-    static void slideUpIfNecessary(final View v, boolean animate) {
+    static void slideUpIfNecessary(View view, boolean animate) {
+
         if (!animate) {
-            v.clearAnimation();
-            v.setVisibility(View.GONE);
+            endPreviousAnimationIfNecessary(view);
+            setViewHeight(view, 0);
+            setFinalAlphaAndVisibility(view, true);
+
             return;
         }
 
-        int initialHeight = v.getMeasuredHeight();
-        long durationMillis = ((int) (initialHeight / v.getContext().getResources().getDisplayMetrics().density)) * 2;
+        performSlideAnimation(view, true);
+    }
+
+    private static void performSlideAnimation(final View view, final boolean slideUp) {
+
+        int currentHeight = view.getHeight();
+        view.measure(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        final int expandedHeight = view.getMeasuredHeight();
+
+        if (currentHeight < 0) {
+            // A negative current height means the view's height hasn't been measured yet, so we
+            // assign this value manually depending on whether the animation slides up or down
+            currentHeight = slideUp ? expandedHeight : 0;
+            setViewHeight(view, currentHeight);
+        }
+
+        final float initialValue = currentHeight / (float) expandedHeight;
+        final float finalValue = slideUp ? 0 : 1;
+
+        if (initialValue == finalValue) {
+
+            // No need to animate anything because initial value and final value match
+            endPreviousAnimationIfNecessary(view);
+            setViewHeight(view, (int) (finalValue * expandedHeight));
+            setFinalAlphaAndVisibility(view, slideUp);
+
+            return;
+        }
+
+        long durationMillis = ((int) (expandedHeight * (Math.abs(finalValue - initialValue)) / view.getContext().getResources().getDisplayMetrics().density)) * 2;
         durationMillis = durationMillis < MIN_DURATION_MILLIS ? MIN_DURATION_MILLIS : durationMillis;
-        Animation slideUpAnimation = getSlideUpAnimation(v, initialHeight, durationMillis);
 
-        if (slideUpAnimation != null) {
-            v.startAnimation(slideUpAnimation);
-        }
-    }
+        final ObjectAnimator animator = ObjectAnimator.ofFloat(view, View.ALPHA, initialValue, finalValue);
+        animator.setDuration(durationMillis);
 
-    static private Animation getSlideDownAnimation(final View v, final int targetHeight, long durationMillis) {
-
-        int initialHeight = v.getVisibility() != View.VISIBLE ? 1 : v.getMeasuredHeight();
-
-        if (initialHeight == targetHeight) {
-            v.clearAnimation();
-            setHeight(v, targetHeight);
-            v.setVisibility(View.VISIBLE);
-            return null;
-        }
-
-        setHeight(v, initialHeight);
-        v.setVisibility(View.VISIBLE);
-
-        Animation animation = new Animation() {
+        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
             @Override
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                int newHeight = interpolatedTime == 1
-                        ? WindowManager.LayoutParams.WRAP_CONTENT
-                        : (int) (targetHeight * interpolatedTime);
-                setHeight(v, newHeight);
-                v.requestLayout();
-            }
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                float scaleYCurrentValue = (float) valueAnimator.getAnimatedValue();
+                int newHeight = (int) (expandedHeight * scaleYCurrentValue);
 
-            @Override
-            public boolean willChangeBounds() {
-                return true;
-            }
-        };
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-                // No need to do anything here
-            }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                v.setVisibility(View.VISIBLE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-                // No need to do anything here
+                setViewHeight(view, newHeight);
+                view.requestLayout();
             }
         });
-        animation.setDuration(durationMillis);
-
-        return animation;
-    }
-
-    static private Animation getSlideUpAnimation(final View v, final int initialHeight, long durationMillis) {
-
-        if (initialHeight <= 1) {
-            v.clearAnimation();
-            setHeight(v, 0);
-            v.setVisibility(View.GONE);
-            return null;
-        }
-
-        Animation animation = new Animation() {
+        animator.addListener(new AnimatorListenerAdapter() {
             @Override
-            protected void applyTransformation(float interpolatedTime, Transformation t) {
-                if (interpolatedTime != 1) {
-                    int newHeight = initialHeight - (int) (initialHeight * interpolatedTime);
-                    setHeight(v, newHeight);
-                    v.requestLayout();
-                }
+            public void onAnimationStart(Animator animation) {
+                super.onAnimationEnd(animation);
+
+                view.setAlpha(initialValue);
+                view.setVisibility(View.VISIBLE);
             }
 
             @Override
-            public boolean willChangeBounds() {
-                return true;
-            }
-        };
-        animation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) {
-                // No need to do anything here
-            }
+            public void onAnimationEnd(Animator animation) {
+                super.onAnimationEnd(animation);
 
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                v.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) {
-                // No need to do anything here
+                _runningObjectAnimators.remove(view);
+                setFinalAlphaAndVisibility(view, slideUp);
             }
         });
-        animation.setDuration(durationMillis);
 
-        return animation;
+        endPreviousAnimationIfNecessary(view);
+
+        _runningObjectAnimators.put(view, animator);
+        animator.start();
     }
 
-    static private void setHeight(View v, int newHeight) {
-        int width = v.getLayoutParams().width;
-        v.setLayoutParams(new LinearLayout.LayoutParams(width, newHeight));
+    private static void setFinalAlphaAndVisibility(View view, boolean slideUp) {
+        view.setAlpha(slideUp ? 0f : 1f);
+        view.setVisibility(slideUp ? View.GONE : View.VISIBLE);
+    }
+
+    private static void endPreviousAnimationIfNecessary(View view) {
+        if (_runningObjectAnimators.containsKey(view)) {
+            ObjectAnimator previousAnimator = _runningObjectAnimators.get(view);
+            if (previousAnimator != null) {
+                previousAnimator.end();
+            }
+        }
+    }
+
+    private static void setViewHeight(View view, int currentHeight) {
+        ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
+        layoutParams.height = currentHeight;
+        view.setLayoutParams(layoutParams);
     }
 }
