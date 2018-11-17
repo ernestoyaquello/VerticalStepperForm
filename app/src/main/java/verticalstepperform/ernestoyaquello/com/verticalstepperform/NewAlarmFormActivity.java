@@ -132,7 +132,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
     }
 
     private void showCloseConfirmationDialog(DialogInterface.OnClickListener dialogCancellationAction) {
-        final DiscardAlarmConfirmationFragment closeConfirmation = new DiscardAlarmConfirmationFragment();
+        DiscardAlarmConfirmationFragment closeConfirmation = new DiscardAlarmConfirmationFragment();
         closeConfirmation.setOnConfirmDiscardAlarm(new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -245,17 +245,27 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle(R.string.form_discard_question)
                     .setMessage(R.string.form_info_will_be_lost)
-                    .setPositiveButton(R.string.form_discard, onConfirmDiscardAlarm)
-                    .setNegativeButton(R.string.form_discard_cancel, onCancelDialog != null
-                            ? onCancelDialog
-                            : new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    // By default we do nothing if the user clicks "Cancel"
-                                }
-                            });
+                    .setPositiveButton(R.string.form_discard, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            if (onConfirmDiscardAlarm != null) {
+                                onConfirmDiscardAlarm.onClick(dialogInterface, i);
+                            }
+                        }
+                    })
+                    .setNegativeButton(R.string.form_discard_cancel, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            if (onCancelDialog != null) {
+                                onCancelDialog.onClick(dialogInterface, i);
+                            }
+                        }
+                    })
+            .setCancelable(false);
+            Dialog dialog = builder.create();
+            dialog.setCanceledOnTouchOutside(false);
 
-            return builder.create();
+            return dialog;
         }
     }
 }
