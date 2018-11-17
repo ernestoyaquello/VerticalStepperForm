@@ -2,6 +2,7 @@ package ernestoyaquello.com.verticalstepperform;
 
 import android.content.res.ColorStateList;
 import androidx.appcompat.widget.AppCompatButton;
+import androidx.core.view.ViewCompat;
 
 class UIHelpers {
 
@@ -31,7 +32,7 @@ class UIHelpers {
                         buttonPressedTextColor,
                         buttonTextColor
                 });
-        button.setBackgroundTintList(buttonColours);
+        ViewCompat.setBackgroundTintList(button, buttonColours);
         button.setTextColor(buttonTextColours);
     }
 }

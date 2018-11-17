@@ -16,7 +16,6 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 
-import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.List;
 
@@ -640,7 +639,8 @@ public class VerticalStepperFormLayout extends LinearLayout {
             String[] titles,
             String[] subtitles,
             String[] buttonTexts,
-            String[] errorMessages) {
+            String[] errorMessages,
+            boolean formCompleted) {
 
         for (int i = 0; i < completedSteps.length; i++) {
             StepHelper stepHelper = stepHelpers.get(i);
@@ -657,6 +657,12 @@ public class VerticalStepperFormLayout extends LinearLayout {
 
         for (int i = 0; i <= positionToOpen; i++) {
             goToStep(i, false);
+        }
+
+        if (formCompleted) {
+            this.formCompleted = true;
+            stepHelpers.get(getOpenStepPosition()).disableButtons();
+            updateBottomNavigationButtons();
         }
 
         refreshFormProgress();
@@ -689,6 +695,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
         bundle.putStringArray("subtitles", subtitles);
         bundle.putStringArray("buttonTexts", buttonTexts);
         bundle.putStringArray("errorMessages", errorMessages);
+        bundle.putBoolean("formCompleted", formCompleted);
 
         return bundle;
     }
@@ -698,6 +705,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
         if (state instanceof Bundle) {
             Bundle bundle = (Bundle) state;
 
+            boolean formCompleted = bundle.getBoolean("formCompleted");
             String[] errorMessages = bundle.getStringArray("errorMessages");
             String[] buttonTexts = bundle.getStringArray("buttonTexts");
             String[] subtitles = bundle.getStringArray("subtitles");
@@ -706,7 +714,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
             int positionToOpen = bundle.getInt("openStep");
             state = bundle.getParcelable("superState");
 
-            restoreFromState(positionToOpen, completedSteps, titles, subtitles, buttonTexts, errorMessages);
+            restoreFromState(positionToOpen, completedSteps, titles, subtitles, buttonTexts, errorMessages, formCompleted);
         }
         super.onRestoreInstanceState(state);
     }
