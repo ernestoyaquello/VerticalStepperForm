@@ -16,6 +16,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 
+import java.text.Normalizer;
 import java.util.Arrays;
 import java.util.List;
 
@@ -359,13 +360,25 @@ public class VerticalStepperFormLayout extends LinearLayout {
 
     /**
      * If all the steps are currently marked as completed, it completes the form, disabling the
-     * step navigation and the button of the currently open step. To revert these changes, call
-     * cancelFormCompletionAttempt().
+     * step navigation and the button of the currently open step and invoking onCompletedForm() on
+     * the listener.
+     * To revert these changes (for example, because saving or sending the data has failed and you
+     * want the form to go back to normal so the user can use it), call cancelFormCompletionAttempt().
      *
      * @return True if the form was completed; false otherwise.
      */
     public boolean completeForm() {
         return goToStep(stepHelpers.size(), true);
+    }
+
+    /**
+     * Cancels the form, disabling the step navigation and the button of the currently open step
+     * and invoking onCompletedForm() on the listener.
+     * To revert these changes (for example, because the user has dismissed the cancellation and you
+     * want the form to go back to normal), call cancelFormCompletionAttempt().
+     */
+    public void cancelForm() {
+        attemptToCompleteForm(true);
     }
 
     /**
@@ -378,7 +391,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
         int openedStepPosition = getOpenStepPosition();
         if (openedStepPosition >= 0 && openedStepPosition < stepHelpers.size()) {
             StepHelper stepHelper = stepHelpers.get(openedStepPosition);
-            stepHelper.enableNextButton();
+            stepHelper.enableButtons();
 
             formCompleted = false;
             updateBottomNavigationButtons();
@@ -418,12 +431,16 @@ public class VerticalStepperFormLayout extends LinearLayout {
 
         // TODO Move all these default style values to resource files
         // TODO Get these values from XML attributes whenever possible
-        FormStyle.defaultStepButtonText =
+        FormStyle.defaultNextStepButtonText =
                 getResources().getString(R.string.vertical_form_stepper_form_continue_button);
-        FormStyle.defaultLastStepButtonText =
+        FormStyle.defaultLastStepNextButtonText =
                 getResources().getString(R.string.vertical_form_stepper_form_confirm_button);
+        FormStyle.defaultLastStepCancelButtonText =
+                getResources().getString(R.string.vertical_form_stepper_form_cancel_button);
         FormStyle.defaultConfirmationStepTitle =
                 getResources().getString(R.string.vertical_form_stepper_form_confirmation_step_title);
+        FormStyle.defaultConfirmationStepSubtitle =
+                getResources().getString(R.string.vertical_form_stepper_form_confirmation_step_subtitle);
         FormStyle.defaultAlphaOfDisabledElements = 0.25f;
         FormStyle.defaultStepNumberBackgroundColor = Color.rgb(63, 81, 181);
         FormStyle.defaultButtonBackgroundColor = Color.rgb(63, 81, 181);
@@ -436,8 +453,9 @@ public class VerticalStepperFormLayout extends LinearLayout {
         FormStyle.defaultErrorMessageTextColor = Color.rgb(175, 18, 18);
         FormStyle.defaultDisplayBottomNavigation = true;
         FormStyle.defaultDisplayStepButtons = true;
+        FormStyle.defaultDisplayCancelButtonInLastStep = false;
         FormStyle.defaultIncludeConfirmationStep = true;
-        FormStyle.defaultDisplayStepDataInSubtitleOfClosedSteps = true;
+        FormStyle.defaultDisplayStepDataInSubtitleOfClosedSteps = false;
 
         internalListener = new FormStepListener();
     }
@@ -484,7 +502,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
             stepToOpen.getStepInstance().openInternal(useAnimations);
 
         } else if (stepToOpenPosition == stepHelpers.size()) {
-            attemptToCompleteForm();
+            attemptToCompleteForm(false);
         }
     }
 
@@ -493,13 +511,15 @@ public class VerticalStepperFormLayout extends LinearLayout {
         if (stepPosition >= 0 && stepPosition < stepHelpers.size()) {
             StepHelper stepHelper = stepHelpers.get(stepPosition);
 
-            if (stepPosition == 0 || formCompleted) {
-                disablePreviousButtonInBottomNavigation();
-            } else {
+            if (!formCompleted && stepPosition > 0) {
                 enablePreviousButtonInBottomNavigation();
+            } else {
+                disablePreviousButtonInBottomNavigation();
             }
 
-            if (!formCompleted && (stepHelper.getStepInstance().isCompleted() && (stepPosition + 1) < stepHelpers.size())) {
+            if (!formCompleted
+                    && stepHelper.getStepInstance().isCompleted()
+                    && (stepPosition + 1) < stepHelpers.size()) {
                 enableNextButtonInBottomNavigation();
             } else {
                 disableNextButtonInBottomNavigation();
@@ -561,7 +581,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
         return keyboardHeigh > screenHeight * 0.2;
     }
 
-    private synchronized void attemptToCompleteForm() {
+    private synchronized void attemptToCompleteForm(boolean isCancellation) {
         if (formCompleted) {
             return;
         }
@@ -569,11 +589,15 @@ public class VerticalStepperFormLayout extends LinearLayout {
         int openStepPosition = getOpenStepPosition();
         if (openStepPosition >= 0 && openStepPosition < stepHelpers.size()) {
             formCompleted = true;
-            stepHelpers.get(openStepPosition).disableNextButton();
+            stepHelpers.get(openStepPosition).disableButtons();
             updateBottomNavigationButtons();
 
             if (listener != null) {
-                listener.onCompletedForm();
+                if (!isCancellation) {
+                    listener.onCompletedForm();
+                } else {
+                    listener.onCancelledForm();
+                }
             }
         }
     }
@@ -621,16 +645,14 @@ public class VerticalStepperFormLayout extends LinearLayout {
         for (int i = 0; i < completedSteps.length; i++) {
             StepHelper stepHelper = stepHelpers.get(i);
 
+            stepHelper.getStepInstance().updateTitle(titles[i], false);
+            stepHelper.getStepInstance().updateSubtitle(subtitles[i], false);
+            stepHelper.getStepInstance().updateNextButtonText(buttonTexts[i], false);
             if (completedSteps[i]) {
                 stepHelper.getStepInstance().markAsCompleted(false);
             } else {
                 stepHelper.getStepInstance().markAsUncompleted(errorMessages[i], false);
             }
-            stepHelper.getStepInstance().updateTitle(titles[i], false);
-            stepHelper.getStepInstance().updateSubtitle(subtitles[i], false);
-            stepHelper.getStepInstance().updateButtonText(buttonTexts[i], false);
-            stepHelper.onUpdatedStepCompletionState(i, false);
-            stepHelper.onUpdatedStepVisibility(i, false);
         }
 
         for (int i = 0; i <= positionToOpen; i++) {
@@ -654,7 +676,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
             completedSteps[i] = stepHelper.getStepInstance().isCompleted();
             titles[i] = stepHelper.getStepInstance().getTitle();
             subtitles[i] = stepHelper.getStepInstance().getSubtitle();
-            buttonTexts[i] = stepHelper.getStepInstance().getButtonText();
+            buttonTexts[i] = stepHelper.getStepInstance().getNextButtonText();
             if (!stepHelper.getStepInstance().isCompleted()) {
                 errorMessages[i] = stepHelper.getStepInstance().getErrorMessage();
             }
@@ -726,9 +748,11 @@ public class VerticalStepperFormLayout extends LinearLayout {
 
     static class FormStyle {
 
-        private static String defaultStepButtonText;
-        private static String defaultLastStepButtonText;
+        private static String defaultNextStepButtonText;
+        private static String defaultLastStepNextButtonText;
+        private static String defaultLastStepCancelButtonText;
         private static String defaultConfirmationStepTitle;
+        private static String defaultConfirmationStepSubtitle;
         private static float defaultAlphaOfDisabledElements;
         private static int defaultStepNumberBackgroundColor;
         private static int defaultButtonBackgroundColor;
@@ -741,12 +765,15 @@ public class VerticalStepperFormLayout extends LinearLayout {
         private static int defaultErrorMessageTextColor;
         private static boolean defaultDisplayBottomNavigation;
         private static boolean defaultDisplayStepButtons;
+        private static boolean defaultDisplayCancelButtonInLastStep;
         private static boolean defaultIncludeConfirmationStep;
         private static boolean defaultDisplayStepDataInSubtitleOfClosedSteps;
 
-        String stepButtonText;
-        String lastStepButtonText;
+        String stepNextButtonText;
+        String lastStepNextButtonText;
+        String lastStepCancelButtonText;
         String confirmationStepTitle;
+        String confirmationStepSubtitle;
         float alphaOfDisabledElements;
         int stepNumberBackgroundColor;
         int buttonBackgroundColor;
@@ -759,15 +786,16 @@ public class VerticalStepperFormLayout extends LinearLayout {
         int errorMessageTextColor;
         boolean displayBottomNavigation;
         boolean displayStepButtons;
+        boolean displayCancelButtonInLastStep;
         boolean includeConfirmationStep;
-
-        // TODO Add method in builder
         boolean displayStepDataInSubtitleOfClosedSteps;
 
         FormStyle() {
-            this.stepButtonText = defaultStepButtonText;
-            this.lastStepButtonText = defaultLastStepButtonText;
+            this.stepNextButtonText = defaultNextStepButtonText;
+            this.lastStepNextButtonText = defaultLastStepNextButtonText;
+            this.lastStepCancelButtonText = defaultLastStepCancelButtonText;
             this.confirmationStepTitle = defaultConfirmationStepTitle;
+            this.confirmationStepSubtitle = defaultConfirmationStepSubtitle;
             this.alphaOfDisabledElements = defaultAlphaOfDisabledElements;
             this.stepNumberBackgroundColor = defaultStepNumberBackgroundColor;
             this.buttonBackgroundColor = defaultButtonBackgroundColor;
@@ -780,6 +808,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
             this.errorMessageTextColor = defaultErrorMessageTextColor;
             this.displayBottomNavigation = defaultDisplayBottomNavigation;
             this.displayStepButtons = defaultDisplayStepButtons;
+            this.displayCancelButtonInLastStep = defaultDisplayCancelButtonInLastStep;
             this.includeConfirmationStep = defaultIncludeConfirmationStep;
             this.displayStepDataInSubtitleOfClosedSteps = defaultDisplayStepDataInSubtitleOfClosedSteps;
         }

@@ -57,7 +57,9 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
         verticalStepperForm.setup(this, nameStep, descriptionStep, timeStep, daysStep)
                 .primaryColor(colorPrimary)
                 .primaryDarkColor(colorPrimaryDark)
-                .lastStepButtonText(getString(R.string.add_alarm))
+                .lastStepNextButtonText(getString(R.string.add_alarm))
+                .displayCancelButtonInLastStep(true)
+                .displayStepDataInSubtitleOfClosedSteps(true)
                 .init();
     }
 
@@ -85,7 +87,12 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
 
     @Override
     public void onCancelledForm() {
-        finishIfPossible();
+        showCloseConfirmationDialog(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                verticalStepperForm.cancelFormCompletionAttempt();
+            }
+        });
     }
 
     private Thread saveData() {
@@ -118,17 +125,22 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
 
     private void finishIfPossible() {
         if(verticalStepperForm.isAnyStepCompleted()) {
-            final CloseConfirmationFragment closeConfirmation = new CloseConfirmationFragment();
-            closeConfirmation.setOnConfirmClose(new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialog, int which) {
-                    finish();
-                }
-            });
-            closeConfirmation.show(getSupportFragmentManager(), null);
+            showCloseConfirmationDialog(null);
         } else {
             finish();
         }
+    }
+
+    private void showCloseConfirmationDialog(DialogInterface.OnClickListener dialogCancellationAction) {
+        final DiscardAlarmConfirmationFragment closeConfirmation = new DiscardAlarmConfirmationFragment();
+        closeConfirmation.setOnConfirmDiscardAlarm(new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                finish();
+            }
+        });
+        closeConfirmation.setOnCancelDialog(dialogCancellationAction);
+        closeConfirmation.show(getSupportFragmentManager(), null);
     }
 
     private void dismissDialogIfNecessary() {
@@ -214,12 +226,17 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
         super.onRestoreInstanceState(savedInstanceState);
     }
 
-    public static class CloseConfirmationFragment extends DialogFragment {
+    public static class DiscardAlarmConfirmationFragment extends DialogFragment {
 
-        private DialogInterface.OnClickListener onConfirmClose;
+        private DialogInterface.OnClickListener onConfirmDiscardAlarm;
+        private DialogInterface.OnClickListener onCancelDialog;
 
-        void setOnConfirmClose(DialogInterface.OnClickListener onConfirmClose) {
-            this.onConfirmClose = onConfirmClose;
+        void setOnConfirmDiscardAlarm(DialogInterface.OnClickListener onConfirmDiscardAlarm) {
+            this.onConfirmDiscardAlarm = onConfirmDiscardAlarm;
+        }
+
+        void setOnCancelDialog(DialogInterface.OnClickListener onCancelDialog) {
+            this.onCancelDialog = onCancelDialog;
         }
 
         @Override
@@ -228,13 +245,15 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle(R.string.form_discard_question)
                     .setMessage(R.string.form_info_will_be_lost)
-                    .setPositiveButton(R.string.form_discard, onConfirmClose)
-                    .setNegativeButton(R.string.form_discard_cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            // Do nothing if the user clicks "Cancel"
-                        }
-                    });
+                    .setPositiveButton(R.string.form_discard, onConfirmDiscardAlarm)
+                    .setNegativeButton(R.string.form_discard_cancel, onCancelDialog != null
+                            ? onCancelDialog
+                            : new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialogInterface, int i) {
+                                    // By default we do nothing if the user clicks "Cancel"
+                                }
+                            });
 
             return builder.create();
         }

@@ -18,7 +18,7 @@ public abstract class Step<T> {
 
     private String title;
     private String subtitle;
-    private String buttonText;
+    private String nextButtonText;
     private String errorMessage;
     private boolean completed;
     private boolean open;
@@ -35,10 +35,10 @@ public abstract class Step<T> {
         this(title, subtitle, "");
     }
 
-    protected Step(String title, String subtitle, String buttonText) {
+    protected Step(String title, String subtitle, String nextButtonText) {
         this.title = title;
         this.subtitle = subtitle;
-        this.buttonText = buttonText;
+        this.nextButtonText = nextButtonText;
         this.errorMessage = "";
         this.internalListeners = new ArrayList<>();
     }
@@ -55,7 +55,7 @@ public abstract class Step<T> {
      * as a human-readable string. When the option displayStepDataInSubtitleOfClosedSteps is
      * activated, the text returned by this method will be the one displayed in the step's subtitle.
      *
-     * @return The step data as a string.
+     * @return The step data as a human-readable string.
      */
     public abstract String getStepDataAsHumanReadableString();
 
@@ -121,8 +121,8 @@ public abstract class Step<T> {
      *
      * @return The button text.
      */
-    public String getButtonText() {
-        return buttonText == null ? "" : buttonText;
+    public String getNextButtonText() {
+        return nextButtonText == null ? "" : nextButtonText;
     }
 
     /**
@@ -244,7 +244,6 @@ public abstract class Step<T> {
      */
     public void markAsCompleted(boolean useAnimations) {
         updateStepCompletionState(true, "", useAnimations);
-
     }
 
     /**
@@ -287,8 +286,8 @@ public abstract class Step<T> {
      * @param buttonText The new text for the button of the step.
      * @param useAnimations Determines whether or not the necessary layout changes should be animated.
      */
-    protected void updateButtonText(String buttonText, boolean useAnimations) {
-        this.buttonText = buttonText == null ? "" : buttonText;
+    protected void updateNextButtonText(String buttonText, boolean useAnimations) {
+        this.nextButtonText = buttonText == null ? "" : buttonText;
 
         onUpdatedButtonText(useAnimations);
     }

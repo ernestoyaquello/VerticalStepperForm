@@ -24,37 +24,64 @@ public class Builder {
     }
 
     /**
-     * Sets the text to be displayed in the button of all the steps but the last one.
+     * Sets the text to be displayed in the "Continue" button of all the steps but the last one.
+     * To set up the text of the last step's button, use lastStepNextButtonText().
      *
-     * @param stepButtonText The text to display in the button of all the steps but the last one.
+     * @param stepNextButtonText The text to display in the "Continue" button of all the steps but
+     *                           the last one.
      * @return The builder instance.
      */
-    public Builder stepButtonText(String stepButtonText) {
-        style.stepButtonText = stepButtonText;
+    public Builder stepNextButtonText(String stepNextButtonText) {
+        style.stepNextButtonText = stepNextButtonText;
 
         return this;
     }
 
     /**
-     * Sets the text to be displayed in the last step's button.
+     * Sets the text to be displayed in the last step's "Confirm" button.
      *
-     * @param lastStepButtonText The text to display in the last step's button.
+     * @param lastStepNextButtonText The text to display in the last step's "Confirm" button.
      * @return The builder instance.
      */
-    public Builder lastStepButtonText(String lastStepButtonText) {
-        style.lastStepButtonText = lastStepButtonText;
+    public Builder lastStepNextButtonText(String lastStepNextButtonText) {
+        style.lastStepNextButtonText = lastStepNextButtonText;
 
         return this;
     }
 
     /**
-     * Sets the title to be displayed on the confirmation step.getStepInstance().
+     * Sets the text to be displayed in the last step's "Cancel" button.
+     * To display this button in the last step, set displayCancelButtonInLastStep to true.
      *
-     * @param confirmationStepTitle The title of the confirmation step.getStepInstance().
+     * @param lastStepCancelButtonText The text to display in the last step's "Cancel" button.
+     * @return The builder instance.
+     */
+    public Builder lastStepCancelButtonText(String lastStepCancelButtonText) {
+        style.lastStepCancelButtonText = lastStepCancelButtonText;
+
+        return this;
+    }
+
+    /**
+     * Sets the title to be displayed on the confirmation step.
+     *
+     * @param confirmationStepTitle The title of the confirmation step.
      * @return The builder instance.
      */
     public Builder confirmationStepTitle(String confirmationStepTitle) {
         style.confirmationStepTitle = confirmationStepTitle;
+
+        return this;
+    }
+
+    /**
+     * Sets the subtitle to be displayed on the confirmation step.
+     *
+     * @param confirmationStepSubtitle The subtitle of the confirmation step.
+     * @return The builder instance.
+     */
+    public Builder confirmationStepSubtitle(String confirmationStepSubtitle) {
+        style.confirmationStepSubtitle = confirmationStepSubtitle;
 
         return this;
     }
@@ -220,15 +247,29 @@ public class Builder {
     }
 
     /**
-     * Specifies whether or not a "Next" button should be automatically displayed within each step.getStepInstance().
+     * Specifies whether or not a "Next" button should be automatically displayed within each step.
      * If set to false, the step buttons will be missing and manual calls to
-     * goToStep(stepPosition + 1, true) will be required in order to move to the next step.getStepInstance().
+     * goToStep(stepPosition + 1, true) will be required in order to move to the next step.
      *
      * @param displayStepButtons True to display a button on each step; false to not.
      * @return The builder instance.
      */
     public Builder displayStepButtons(boolean displayStepButtons) {
         style.displayStepButtons = displayStepButtons;
+
+        return this;
+    }
+
+    /**
+     * Specifies whether or not a cancellation button should be displayed in the last step.
+     * If displayed, this button will invoke the callback onCancelledForm().
+     *
+     * @param displayCancelButtonInLastStep True to display a cancellation button in the last step;
+     *                                      false to not.
+     * @return The builder instance.
+     */
+    public Builder displayCancelButtonInLastStep(boolean displayCancelButtonInLastStep) {
+        style.displayCancelButtonInLastStep = displayCancelButtonInLastStep;
 
         return this;
     }
@@ -243,6 +284,20 @@ public class Builder {
      */
     public Builder includeConfirmationStep(boolean includeConfirmationStep) {
         style.includeConfirmationStep = includeConfirmationStep;
+
+        return this;
+    }
+
+    /**
+     * Specifies whether or not the step's data will be displayed as a human-readable string in the
+     * step subtitle of the closed, completed steps.
+     *
+     * @param displayStepDataInSubtitleOfClosedSteps True to show the step's data as a string in the
+     *                                               subtitle view of closed, completed steps.
+     * @return The builder instance.
+     */
+    public Builder displayStepDataInSubtitleOfClosedSteps(boolean displayStepDataInSubtitleOfClosedSteps) {
+        style.displayStepDataInSubtitleOfClosedSteps = displayStepDataInSubtitleOfClosedSteps;
 
         return this;
     }

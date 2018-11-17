@@ -37,6 +37,7 @@ class StepHelper implements Step.InternalFormStepListener {
     private ImageView errorIconView;
     private View headerView;
     private MaterialButton nextButtonView;
+    private MaterialButton cancelButtonView;
     private View lineView1;
     private View lineView2;
     private View stepAndButtonView;
@@ -98,6 +99,7 @@ class StepHelper implements Step.InternalFormStepListener {
         errorIconView = stepLayout.findViewById(R.id.step_error_icon);
         headerView = stepLayout.findViewById(R.id.step_header);
         nextButtonView = stepLayout.findViewById(R.id.step_button);
+        cancelButtonView = stepLayout.findViewById(R.id.step_cancel_button);
         lineView1 = stepLayout.findViewById(R.id.line1);
         lineView2 = stepLayout.findViewById(R.id.line2);
         stepAndButtonView = step.getEntireStepLayout().findViewById(R.id.step_content_and_button);
@@ -131,19 +133,32 @@ class StepHelper implements Step.InternalFormStepListener {
                 form.goToStep(position + 1, true);
             }
         });
+        cancelButtonView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                form.cancelForm();
+            }
+        });
 
         String title = !isConfirmationStep()
                 ? step.getTitle()
                 : formStyle.confirmationStepTitle;
-        String subtitle = step.getSubtitle();
-        String stepButtonText = !step.getButtonText().isEmpty()
-                ? step.getButtonText()
-                : isLast ? formStyle.lastStepButtonText : formStyle.stepButtonText;
+        String subtitle = !isConfirmationStep()
+                ? step.getSubtitle()
+                : formStyle.confirmationStepSubtitle;
+        String stepNextButtonText = !step.getNextButtonText().isEmpty()
+                ? step.getNextButtonText()
+                : isLast ? formStyle.lastStepNextButtonText : formStyle.stepNextButtonText;
 
         stepNumberTextView.setText(String.valueOf(position + 1));
         step.updateTitle(title, false);
         step.updateSubtitle(subtitle, false);
-        step.updateButtonText(stepButtonText, false);
+        step.updateNextButtonText(stepNextButtonText, false);
+
+        if (formStyle.displayCancelButtonInLastStep && isLast) {
+            cancelButtonView.setVisibility(View.VISIBLE);
+            cancelButtonView.setText(formStyle.lastStepCancelButtonText);
+        }
 
         if (!formStyle.displayStepButtons && !isConfirmationStep()) {
             nextButtonView.setVisibility(View.GONE);
@@ -208,19 +223,11 @@ class StepHelper implements Step.InternalFormStepListener {
                 boolean wasCompleted = step.isCompleted();
                 boolean isCompleted = step.markAsCompletedOrUncompleted(useAnimations);
                 if (isCompleted == wasCompleted) {
-                    updateHeaderAppearance(useAnimations);
+                    updateHeader(useAnimations);
                 }
             } else {
-                updateHeaderAppearance(useAnimations);
+                updateHeader(useAnimations);
             }
-
-            // Update the text to show in the subtitle view if necessary
-            String textToShowOnSubtitleView = formStyle.displayStepDataInSubtitleOfClosedSteps && !step.isOpen()
-                    ? step.getStepDataAsHumanReadableString()
-                    : step.getSubtitle();
-            textToShowOnSubtitleView = textToShowOnSubtitleView == null ? "" : textToShowOnSubtitleView;
-            subtitleView.setText(textToShowOnSubtitleView);
-            updateSubtitleVisibility(useAnimations);
         }
     }
 
@@ -232,12 +239,12 @@ class StepHelper implements Step.InternalFormStepListener {
             } else {
                 disableNextButton();
             }
-            updateHeaderAppearance(useAnimations);
-            updateSubtitleVisibility(useAnimations);
+            updateHeader(useAnimations);
+            updateErrorMessageVisibility(useAnimations);
         }
     }
 
-    private void updateHeaderAppearance(boolean useAnimations) {
+    private void updateHeader(boolean useAnimations) {
 
         // Update alpha of header elements
         boolean enableHeader = step.isOpen() || step.isCompleted();
@@ -253,6 +260,9 @@ class StepHelper implements Step.InternalFormStepListener {
         } else {
             showDoneIconAndHideStepNumber();
         }
+
+        updateSubtitleTextViewValue();
+        updateSubtitleVisibility(useAnimations);
     }
 
     private void showDoneIconAndHideStepNumber() {
@@ -265,14 +275,28 @@ class StepHelper implements Step.InternalFormStepListener {
         stepNumberTextView.setVisibility(View.VISIBLE);
     }
 
-    void enableNextButton() {
+    private void enableNextButton() {
         nextButtonView.setEnabled(true);
         nextButtonView.setAlpha(1f);
     }
 
-    void disableNextButton() {
+    private void disableNextButton() {
         nextButtonView.setEnabled(false);
         nextButtonView.setAlpha(formStyle.alphaOfDisabledElements);
+    }
+
+    void enableButtons() {
+        nextButtonView.setEnabled(true);
+        nextButtonView.setAlpha(1f);
+        cancelButtonView.setEnabled(true);
+        cancelButtonView.setAlpha(1f);
+    }
+
+    void disableButtons() {
+        nextButtonView.setEnabled(false);
+        nextButtonView.setAlpha(formStyle.alphaOfDisabledElements);
+        cancelButtonView.setEnabled(false);
+        cancelButtonView.setAlpha(formStyle.alphaOfDisabledElements);
     }
 
     private boolean updateTitleTextViewValue() {
@@ -292,10 +316,14 @@ class StepHelper implements Step.InternalFormStepListener {
         CharSequence previousValue = subtitleView.getText();
         String previousValueAsString = previousValue == null ? "" : previousValue.toString();
 
-        String subtitle = step.getSubtitle();
-        subtitle = subtitle == null ? "" : subtitle;
+        String subtitle = getActualSubtitleText();
         if (!subtitle.equals(previousValueAsString)) {
-            subtitleView.setText(subtitle);
+            if (!subtitle.isEmpty()) {
+                // We don't update the text view if the subtitle is empty; instead, we leave the last
+                // non-empty subtitle so the text view has text and can be seen while animating to hide
+                subtitleView.setText(subtitle);
+            }
+
             return true;
         }
 
@@ -306,7 +334,7 @@ class StepHelper implements Step.InternalFormStepListener {
         CharSequence previousValue = nextButtonView.getText();
         String previousValueAsString = previousValue == null ? "" : previousValue.toString();
 
-        String buttonText = step.getButtonText();
+        String buttonText = step.getNextButtonText();
         if (!buttonText.equals(previousValueAsString)) {
             nextButtonView.setText(buttonText);
             return true;
@@ -321,7 +349,12 @@ class StepHelper implements Step.InternalFormStepListener {
 
         String errorMessage = step.getErrorMessage();
         if (!errorMessage.equals(previousValueAsString)) {
-            errorMessageView.setText(errorMessage);
+            if (!errorMessage.isEmpty()) {
+                // We don't update the text view if the error message is empty; instead, we leave the last
+                // non-empty error message so the text view has text and can be seen while animating to hide
+                errorMessageView.setText(errorMessage);
+            }
+
             return true;
         }
 
@@ -329,7 +362,7 @@ class StepHelper implements Step.InternalFormStepListener {
     }
 
     private void updateSubtitleVisibility(boolean useAnimations) {
-        boolean showSubtitle = !subtitleView.getText().toString().isEmpty()
+        boolean showSubtitle = !getActualSubtitleText().isEmpty()
                 && (step.isOpen() || step.isCompleted());
         if (showSubtitle) {
             Animations.slideDownIfNecessary(subtitleView, useAnimations);
@@ -339,14 +372,20 @@ class StepHelper implements Step.InternalFormStepListener {
     }
 
     private void updateErrorMessageVisibility(boolean useAnimations) {
-        if (step.isOpen()
-                && !step.isCompleted()
-                && step.getErrorMessage() != null
-                && !errorMessageView.getText().toString().isEmpty()) {
+        if (step.isOpen() && !step.isCompleted() && !step.getErrorMessage().isEmpty()) {
             Animations.slideDownIfNecessary(errorMessageContainerView, useAnimations);
         } else {
             Animations.slideUpIfNecessary(errorMessageContainerView, useAnimations);
         }
+    }
+
+    private String getActualSubtitleText() {
+        String subtitle = formStyle.displayStepDataInSubtitleOfClosedSteps && !step.isOpen()
+                ? step.getStepDataAsHumanReadableString()
+                : step.getSubtitle();
+        subtitle = subtitle == null ? "" : subtitle;
+
+        return subtitle;
     }
 
     private boolean isConfirmationStep() {
@@ -369,7 +408,7 @@ class StepHelper implements Step.InternalFormStepListener {
 
         @Override
         public String getStepDataAsHumanReadableString() {
-            return null;
+            return getSubtitle();
         }
 
         @Override
