@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -127,6 +128,21 @@ class StepHelper implements Step.InternalFormStepListener {
                 formStyle.lastStepCancelButtonTextColor,
                 formStyle.lastStepCancelButtonPressedBackgroundColor,
                 formStyle.lastStepCancelButtonPressedTextColor);
+
+        ViewGroup.LayoutParams layoutParamsCircle = stepNumberCircleView.getLayoutParams();
+        layoutParamsCircle.width = formStyle.leftCircleSizeInPx;
+        layoutParamsCircle.height = formStyle.leftCircleSizeInPx;
+        stepNumberCircleView.setLayoutParams(layoutParamsCircle);
+        ViewGroup.LayoutParams layoutParamsLine1 = lineView1.getLayoutParams();
+        layoutParamsLine1.width = formStyle.leftVerticalLineThicknessSizeInPx;
+        lineView1.setLayoutParams(layoutParamsLine1);
+        ViewGroup.LayoutParams layoutParamsLine2 = lineView2.getLayoutParams();
+        layoutParamsLine2.width = formStyle.leftVerticalLineThicknessSizeInPx;
+        lineView2.setLayoutParams(layoutParamsLine2);
+        stepNumberTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, formStyle.leftCircleTextSizeInPx);
+        titleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, formStyle.stepTitleTextSizeInPx);
+        subtitleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, formStyle.stepSubtitleTextSizeInPx);
+        errorMessageView.setTextSize(TypedValue.COMPLEX_UNIT_PX, formStyle.stepErrorMessageTextSizeInPx);
 
         headerView.setOnClickListener(new View.OnClickListener() {
             @Override

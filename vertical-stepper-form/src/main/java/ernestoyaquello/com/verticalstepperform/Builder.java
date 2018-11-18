@@ -202,6 +202,80 @@ public class Builder {
     }
 
     /**
+     * Sets the size of the left circles in which the step numbers are displayed.
+     *
+     * @param leftCircleSizeInPx The size of the left circles in which the step numbers are displayed.
+     * @return The builder instance.
+     */
+    public Builder leftCircleSizeInPx(int leftCircleSizeInPx) {
+        style.leftCircleSizeInPx = leftCircleSizeInPx;
+
+        return this;
+    }
+
+    /**
+     * Sets the text size of the step numbers that are displayed inside the left circles.
+     *
+     * @param leftCircleTextSizeInPx The text size of the step numbers that are displayed inside the
+     *                               left circles.
+     * @return The builder instance.
+     */
+    public Builder leftCircleTextSizeInPx(int leftCircleTextSizeInPx) {
+        style.leftCircleTextSizeInPx = leftCircleTextSizeInPx;
+
+        return this;
+    }
+
+    /**
+     * Sets the text size of the step titles.
+     *
+     * @param stepTitleTextSizeInPx The text size of the step titles.
+     * @return The builder instance.
+     */
+    public Builder stepTitleTextSizeInPx(int stepTitleTextSizeInPx) {
+        style.stepTitleTextSizeInPx = stepTitleTextSizeInPx;
+
+        return this;
+    }
+
+    /**
+     * Sets the text size of the step subtitles.
+     *
+     * @param stepSubtitleTextSizeInPx The text size of the step subtitles.
+     * @return The builder instance.
+     */
+    public Builder stepSubtitleTextSizeInPx(int stepSubtitleTextSizeInPx) {
+        style.stepSubtitleTextSizeInPx = stepSubtitleTextSizeInPx;
+
+        return this;
+    }
+
+    /**
+     * Sets the text size of the error messages.
+     *
+     * @param stepErrorMessageTextSizeInPx The text size of the error messages.
+     * @return The builder instance.
+     */
+    public Builder stepErrorMessageTextSizeInPx(int stepErrorMessageTextSizeInPx) {
+        style.stepErrorMessageTextSizeInPx = stepErrorMessageTextSizeInPx;
+
+        return this;
+    }
+
+    /**
+     * Sets the width of the vertical lines that are displayed between step numbers.
+     *
+     * @param leftVerticalLineThicknessSizeInPx The width of the vertical lines that are displayed
+     *                                          between step numbers.
+     * @return The builder instance.
+     */
+    public Builder leftVerticalLineThicknessSizeInPx(int leftVerticalLineThicknessSizeInPx) {
+        style.leftVerticalLineThicknessSizeInPx = leftVerticalLineThicknessSizeInPx;
+
+        return this;
+    }
+
+    /**
      * Specifies whether or not the bottom navigation bar will be displayed.
      *
      * @param displayBottomNavigationBar True to display it; false otherwise.

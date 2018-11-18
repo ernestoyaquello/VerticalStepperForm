@@ -455,7 +455,6 @@ public class VerticalStepperFormLayout extends LinearLayout {
 
         // TODO Move all these default style values to resource files
         // TODO Get these values from XML attributes whenever possible
-        // TODO Add sizes
         FormStyle.defaultNextStepButtonText =
                 getResources().getString(R.string.vertical_form_stepper_form_continue_button);
         FormStyle.defaultLastStepNextButtonText =
@@ -466,6 +465,18 @@ public class VerticalStepperFormLayout extends LinearLayout {
                 getResources().getString(R.string.vertical_form_stepper_form_confirmation_step_title);
         FormStyle.defaultConfirmationStepSubtitle =
                 getResources().getString(R.string.vertical_form_stepper_form_confirmation_step_subtitle);
+        FormStyle.defaultLeftCircleSizeInPx =
+                getResources().getDimensionPixelSize(R.dimen.vertical_stepper_circle_size);
+        FormStyle.defaultLeftCircleTextSizeInPx =
+                getResources().getDimensionPixelSize(R.dimen.vertical_stepper_circle_text_size);
+        FormStyle.defaultStepTitleTextSizeInPx =
+                getResources().getDimensionPixelSize(R.dimen.vertical_stepper_title_text_size);
+        FormStyle.defaultStepSubtitleTextSizeInPx =
+                getResources().getDimensionPixelSize(R.dimen.vertical_stepper_subtitle_text_size);
+        FormStyle.defaultStepErrorMessageTextSizeInPx =
+                getResources().getDimensionPixelSize(R.dimen.vertical_stepper_vertical_error_message_text_size);
+        FormStyle.defaultLeftVerticalLineThicknessSizeInPx =
+                getResources().getDimensionPixelSize(R.dimen.vertical_stepper_vertical_line_thickness);
         FormStyle.defaultAlphaOfDisabledElements = 0.25f;
         FormStyle.defaultBackgroundColorOfDisabledElements = Color.rgb(200, 200, 200);
         FormStyle.defaultStepNumberBackgroundColor = Color.rgb(63, 81, 181);
@@ -827,6 +838,12 @@ public class VerticalStepperFormLayout extends LinearLayout {
         private static String defaultLastStepCancelButtonText;
         private static String defaultConfirmationStepTitle;
         private static String defaultConfirmationStepSubtitle;
+        private static int defaultLeftCircleSizeInPx;
+        private static int defaultLeftCircleTextSizeInPx;
+        private static int defaultStepTitleTextSizeInPx;
+        private static int defaultStepSubtitleTextSizeInPx;
+        private static int defaultStepErrorMessageTextSizeInPx;
+        private static int defaultLeftVerticalLineThicknessSizeInPx;
         private static float defaultAlphaOfDisabledElements;
         private static int defaultBackgroundColorOfDisabledElements;
         private static int defaultStepNumberBackgroundColor;
@@ -849,12 +866,17 @@ public class VerticalStepperFormLayout extends LinearLayout {
         private static boolean defaultDisplayStepDataInSubtitleOfClosedSteps;
         private static boolean defaultDisplayDifferentBackgroundColorOnDisabledElements;
         private static boolean defaultAllowNonLinearNavigation;
-
         String stepNextButtonText;
         String lastStepNextButtonText;
         String lastStepCancelButtonText;
         String confirmationStepTitle;
         String confirmationStepSubtitle;
+        int leftCircleSizeInPx;
+        int leftCircleTextSizeInPx;
+        int stepTitleTextSizeInPx;
+        int stepSubtitleTextSizeInPx;
+        int stepErrorMessageTextSizeInPx;
+        int leftVerticalLineThicknessSizeInPx;
         float alphaOfDisabledElements;
         int backgroundColorOfDisabledElements;
         int stepNumberBackgroundColor;
@@ -884,6 +906,12 @@ public class VerticalStepperFormLayout extends LinearLayout {
             this.lastStepCancelButtonText = defaultLastStepCancelButtonText;
             this.confirmationStepTitle = defaultConfirmationStepTitle;
             this.confirmationStepSubtitle = defaultConfirmationStepSubtitle;
+            this.leftCircleSizeInPx = defaultLeftCircleSizeInPx;
+            this.leftCircleTextSizeInPx = defaultLeftCircleTextSizeInPx;
+            this.stepTitleTextSizeInPx = defaultStepTitleTextSizeInPx;
+            this.stepSubtitleTextSizeInPx = defaultStepSubtitleTextSizeInPx;
+            this.stepErrorMessageTextSizeInPx = defaultStepErrorMessageTextSizeInPx;
+            this.leftVerticalLineThicknessSizeInPx = defaultLeftVerticalLineThicknessSizeInPx;
             this.alphaOfDisabledElements = defaultAlphaOfDisabledElements;
             this.backgroundColorOfDisabledElements = defaultBackgroundColorOfDisabledElements;
             this.stepNumberBackgroundColor = defaultStepNumberBackgroundColor;
