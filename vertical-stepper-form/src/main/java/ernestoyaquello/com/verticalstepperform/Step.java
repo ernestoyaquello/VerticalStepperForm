@@ -23,7 +23,7 @@ public abstract class Step<T> {
     private View stepLayout;
     private View contentLayout;
     private int position;
-    private VerticalStepperFormLayout formLayout;
+    private VerticalStepperFormView formView;
 
     private List<InternalFormStepListener> internalListeners;
 
@@ -187,8 +187,8 @@ public abstract class Step<T> {
      *
      * @return The instance of the form.
      */
-    public VerticalStepperFormLayout getFormLayout() {
-        return formLayout;
+    public VerticalStepperFormView getFormView() {
+        return formView;
     }
 
     /**
@@ -197,7 +197,7 @@ public abstract class Step<T> {
      * @return The context.
      */
     public Context getContext() {
-        return formLayout.getContext();
+        return formView.getContext();
     }
 
     /**
@@ -370,9 +370,9 @@ public abstract class Step<T> {
         }
     }
 
-    void initializeStepInternal(View stepLayout, VerticalStepperFormLayout formLayout, int position) {
+    void initializeStepInternal(View stepLayout, VerticalStepperFormView formView, int position) {
         this.stepLayout = stepLayout;
-        this.formLayout = formLayout;
+        this.formView = formView;
         this.position = position;
     }
 

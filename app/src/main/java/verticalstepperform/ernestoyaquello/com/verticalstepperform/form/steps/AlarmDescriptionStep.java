@@ -34,7 +34,7 @@ public class AlarmDescriptionStep extends Step<String> {
         alarmDescriptionEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                getFormLayout().goToNextStep(true);
+                getFormView().goToNextStep(true);
                 return false;
             }
         });

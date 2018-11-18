@@ -7,19 +7,16 @@ import ernestoyaquello.com.verticalstepperform.listener.StepperFormListener;
  */
 public class Builder {
 
-    private VerticalStepperFormLayout formLayout;
+    private VerticalStepperFormView formView;
     private StepperFormListener listener;
     private StepHelper[] steps;
 
-    private VerticalStepperFormLayout.FormStyle style;
-
-    Builder(VerticalStepperFormLayout formLayout, StepperFormListener listener, Step[] steps) {
-        this.formLayout = formLayout;
+    Builder(VerticalStepperFormView formView, StepperFormListener listener, Step[] steps) {
+        this.formView = formView;
         this.listener = listener;
-        this.style = new VerticalStepperFormLayout.FormStyle();
         this.steps = new StepHelper[steps.length];
         for (int i = 0; i < steps.length; i++) {
-            this.steps[i] = new StepHelper(formLayout.internalListener, steps[i]);
+            this.steps[i] = new StepHelper(formView.internalListener, steps[i]);
         }
     }
 
@@ -32,7 +29,7 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder stepNextButtonText(String stepNextButtonText) {
-        style.stepNextButtonText = stepNextButtonText;
+        formView.style.stepNextButtonText = stepNextButtonText;
 
         return this;
     }
@@ -44,7 +41,7 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder lastStepNextButtonText(String lastStepNextButtonText) {
-        style.lastStepNextButtonText = lastStepNextButtonText;
+        formView.style.lastStepNextButtonText = lastStepNextButtonText;
 
         return this;
     }
@@ -57,7 +54,7 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder lastStepCancelButtonText(String lastStepCancelButtonText) {
-        style.lastStepCancelButtonText = lastStepCancelButtonText;
+        formView.style.lastStepCancelButtonText = lastStepCancelButtonText;
 
         return this;
     }
@@ -69,7 +66,7 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder confirmationStepTitle(String confirmationStepTitle) {
-        style.confirmationStepTitle = confirmationStepTitle;
+        formView.style.confirmationStepTitle = confirmationStepTitle;
 
         return this;
     }
@@ -82,7 +79,7 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder confirmationStepSubtitle(String confirmationStepSubtitle) {
-        style.confirmationStepSubtitle = confirmationStepSubtitle;
+        formView.style.confirmationStepSubtitle = confirmationStepSubtitle;
 
         return this;
     }
@@ -104,12 +101,12 @@ public class Builder {
             int primaryColorDark,
             int textColorOfElementsDisplayedOverThePrimaryColor) {
 
-        style.stepNumberBackgroundColor = primaryColor;
-        style.stepNumberTextColor = textColorOfElementsDisplayedOverThePrimaryColor;
-        style.nextButtonBackgroundColor = primaryColor;
-        style.nextButtonTextColor = textColorOfElementsDisplayedOverThePrimaryColor;
-        style.nextButtonPressedBackgroundColor = primaryColorDark;
-        style.nextButtonPressedTextColor = textColorOfElementsDisplayedOverThePrimaryColor;
+        formView.style.stepNumberBackgroundColor = primaryColor;
+        formView.style.stepNumberTextColor = textColorOfElementsDisplayedOverThePrimaryColor;
+        formView.style.nextButtonBackgroundColor = primaryColor;
+        formView.style.nextButtonTextColor = textColorOfElementsDisplayedOverThePrimaryColor;
+        formView.style.nextButtonPressedBackgroundColor = primaryColorDark;
+        formView.style.nextButtonPressedTextColor = textColorOfElementsDisplayedOverThePrimaryColor;
 
         return this;
     }
@@ -122,8 +119,8 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder stepNumberColors(int stepNumberBackgroundColor, int stepNumberTextColor) {
-        style.stepNumberBackgroundColor = stepNumberBackgroundColor;
-        style.stepNumberTextColor = stepNumberTextColor;
+        formView.style.stepNumberBackgroundColor = stepNumberBackgroundColor;
+        formView.style.stepNumberTextColor = stepNumberTextColor;
 
         return this;
     }
@@ -144,10 +141,10 @@ public class Builder {
             int nextButtonTextColor,
             int nextButtonPressedTextColor) {
 
-        style.nextButtonBackgroundColor = nextButtonBackgroundColor;
-        style.nextButtonPressedBackgroundColor = nextButtonPressedBackgroundColor;
-        style.nextButtonTextColor = nextButtonTextColor;
-        style.nextButtonPressedTextColor = nextButtonPressedTextColor;
+        formView.style.nextButtonBackgroundColor = nextButtonBackgroundColor;
+        formView.style.nextButtonPressedBackgroundColor = nextButtonPressedBackgroundColor;
+        formView.style.nextButtonTextColor = nextButtonTextColor;
+        formView.style.nextButtonPressedTextColor = nextButtonPressedTextColor;
 
         return this;
     }
@@ -169,10 +166,10 @@ public class Builder {
             int lastStepCancelButtonTextColor,
             int lastStepCancelButtonPressedTextColor) {
 
-        style.lastStepCancelButtonBackgroundColor = lastStepCancelButtonBackgroundColor;
-        style.lastStepCancelButtonPressedBackgroundColor = lastStepCancelButtonPressedBackgroundColor;
-        style.lastStepCancelButtonTextColor = lastStepCancelButtonTextColor;
-        style.lastStepCancelButtonPressedTextColor = lastStepCancelButtonPressedTextColor;
+        formView.style.lastStepCancelButtonBackgroundColor = lastStepCancelButtonBackgroundColor;
+        formView.style.lastStepCancelButtonPressedBackgroundColor = lastStepCancelButtonPressedBackgroundColor;
+        formView.style.lastStepCancelButtonTextColor = lastStepCancelButtonTextColor;
+        formView.style.lastStepCancelButtonPressedTextColor = lastStepCancelButtonPressedTextColor;
 
         return this;
     }
@@ -184,7 +181,7 @@ public class Builder {
      * @return This builder instance.
      */
     public Builder stepSubtitleTextColor(int stepSubtitleTextColor) {
-        style.stepSubtitleTextColor = stepSubtitleTextColor;
+        formView.style.stepSubtitleTextColor = stepSubtitleTextColor;
 
         return this;
     }
@@ -196,7 +193,7 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder errorMessageTextColor(int errorMessageTextColor) {
-        style.errorMessageTextColor = errorMessageTextColor;
+        formView.style.errorMessageTextColor = errorMessageTextColor;
 
         return this;
     }
@@ -208,7 +205,7 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder leftCircleSizeInPx(int leftCircleSizeInPx) {
-        style.leftCircleSizeInPx = leftCircleSizeInPx;
+        formView.style.leftCircleSizeInPx = leftCircleSizeInPx;
 
         return this;
     }
@@ -221,7 +218,7 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder leftCircleTextSizeInPx(int leftCircleTextSizeInPx) {
-        style.leftCircleTextSizeInPx = leftCircleTextSizeInPx;
+        formView.style.leftCircleTextSizeInPx = leftCircleTextSizeInPx;
 
         return this;
     }
@@ -233,7 +230,7 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder stepTitleTextSizeInPx(int stepTitleTextSizeInPx) {
-        style.stepTitleTextSizeInPx = stepTitleTextSizeInPx;
+        formView.style.stepTitleTextSizeInPx = stepTitleTextSizeInPx;
 
         return this;
     }
@@ -245,7 +242,7 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder stepSubtitleTextSizeInPx(int stepSubtitleTextSizeInPx) {
-        style.stepSubtitleTextSizeInPx = stepSubtitleTextSizeInPx;
+        formView.style.stepSubtitleTextSizeInPx = stepSubtitleTextSizeInPx;
 
         return this;
     }
@@ -257,7 +254,7 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder stepErrorMessageTextSizeInPx(int stepErrorMessageTextSizeInPx) {
-        style.stepErrorMessageTextSizeInPx = stepErrorMessageTextSizeInPx;
+        formView.style.stepErrorMessageTextSizeInPx = stepErrorMessageTextSizeInPx;
 
         return this;
     }
@@ -270,7 +267,7 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder leftVerticalLineThicknessSizeInPx(int leftVerticalLineThicknessSizeInPx) {
-        style.leftVerticalLineThicknessSizeInPx = leftVerticalLineThicknessSizeInPx;
+        formView.style.leftVerticalLineThicknessSizeInPx = leftVerticalLineThicknessSizeInPx;
 
         return this;
     }
@@ -282,7 +279,7 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder displayBottomNavigation(boolean displayBottomNavigationBar) {
-        style.displayBottomNavigation = displayBottomNavigationBar;
+        formView.style.displayBottomNavigation = displayBottomNavigationBar;
 
         return this;
     }
@@ -294,7 +291,7 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder alphaOfDisabledElements(float alpha) {
-        style.alphaOfDisabledElements = alpha;
+        formView.style.alphaOfDisabledElements = alpha;
 
         return this;
     }
@@ -307,7 +304,7 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder backgroundColorOfDisabledElements(int backgroundColorOfDisabledElements) {
-        style.backgroundColorOfDisabledElements = backgroundColorOfDisabledElements;
+        formView.style.backgroundColorOfDisabledElements = backgroundColorOfDisabledElements;
 
         return this;
     }
@@ -323,7 +320,7 @@ public class Builder {
     public Builder displayDifferentBackgroundColorOnDisabledElements(
             boolean displayDifferentBackgroundColorOnDisabledElements) {
 
-        style.displayDifferentBackgroundColorOnDisabledElements
+        formView.style.displayDifferentBackgroundColorOnDisabledElements
                 = displayDifferentBackgroundColorOnDisabledElements;
 
         return this;
@@ -338,7 +335,7 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder displayStepButtons(boolean displayStepButtons) {
-        style.displayStepButtons = displayStepButtons;
+        formView.style.displayStepButtons = displayStepButtons;
 
         return this;
     }
@@ -352,7 +349,7 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder displayCancelButtonInLastStep(boolean displayCancelButtonInLastStep) {
-        style.displayCancelButtonInLastStep = displayCancelButtonInLastStep;
+        formView.style.displayCancelButtonInLastStep = displayCancelButtonInLastStep;
 
         return this;
     }
@@ -366,7 +363,7 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder includeConfirmationStep(boolean includeConfirmationStep) {
-        style.includeConfirmationStep = includeConfirmationStep;
+        formView.style.includeConfirmationStep = includeConfirmationStep;
 
         return this;
     }
@@ -381,7 +378,7 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder displayStepDataInSubtitleOfClosedSteps(boolean displayStepDataInSubtitleOfClosedSteps) {
-        style.displayStepDataInSubtitleOfClosedSteps = displayStepDataInSubtitleOfClosedSteps;
+        formView.style.displayStepDataInSubtitleOfClosedSteps = displayStepDataInSubtitleOfClosedSteps;
 
         return this;
     }
@@ -394,7 +391,7 @@ public class Builder {
      * @return The builder instance.
      */
     public Builder allowNonLinearNavigation(boolean allowNonLinearNavigation) {
-        style.allowNonLinearNavigation = allowNonLinearNavigation;
+        formView.style.allowNonLinearNavigation = allowNonLinearNavigation;
 
         return this;
     }
@@ -404,15 +401,15 @@ public class Builder {
      */
     public void init() {
         addConfirmationStepIfRequested();
-        formLayout.initializeForm(listener, style, steps);
+        formView.initializeForm(listener, steps);
     }
 
     private void addConfirmationStepIfRequested() {
-        if (style.includeConfirmationStep) {
+        if (formView.style.includeConfirmationStep) {
             StepHelper[] currentSteps = steps;
             steps = new StepHelper[steps.length + 1];
             System.arraycopy(currentSteps, 0, steps, 0, currentSteps.length);
-            steps[currentSteps.length] = new StepHelper(formLayout.internalListener, null, true);
+            steps[currentSteps.length] = new StepHelper(formView.internalListener, null, true);
         }
     }
 }

@@ -1,7 +1,7 @@
 package ernestoyaquello.com.verticalstepperform;
 
 import android.content.Context;
-import android.graphics.Color;
+import android.content.res.TypedArray;
 import android.graphics.Rect;
 
 import androidx.appcompat.widget.AppCompatImageButton;
@@ -19,16 +19,17 @@ import android.widget.ScrollView;
 import java.util.Arrays;
 import java.util.List;
 
+import androidx.core.content.ContextCompat;
 import ernestoyaquello.com.verticalstepperform.listener.StepperFormListener;
 
 /**
  * Custom layout that implements a vertical stepper form.
  */
-public class VerticalStepperFormLayout extends LinearLayout {
+public class VerticalStepperFormView extends LinearLayout {
 
     FormStepListener internalListener;
+    FormStyle style;
 
-    private FormStyle style;
     private StepperFormListener listener;
     private List<StepHelper> stepHelpers;
 
@@ -41,19 +42,19 @@ public class VerticalStepperFormLayout extends LinearLayout {
     private boolean formCompleted;
     private boolean keyboardIsOpen;
 
-    public VerticalStepperFormLayout(Context context) {
+    public VerticalStepperFormView(Context context) {
         super(context);
 
         onConstructed(context, null, 0);
     }
 
-    public VerticalStepperFormLayout(Context context, AttributeSet attrs) {
+    public VerticalStepperFormView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         onConstructed(context, attrs, 0);
     }
 
-    public VerticalStepperFormLayout(Context context, AttributeSet attrs, int defStyleAttr) {
+    public VerticalStepperFormView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
 
         onConstructed(context, attrs, defStyleAttr);
@@ -453,63 +454,201 @@ public class VerticalStepperFormLayout extends LinearLayout {
         LayoutInflater inflater = LayoutInflater.from(context);
         inflater.inflate(R.layout.vertical_stepper_form_layout, this, true);
 
-        // TODO Move all these default style values to resource files
-        // TODO Get these values from XML attributes whenever possible
-        FormStyle.defaultNextStepButtonText =
-                getResources().getString(R.string.vertical_form_stepper_form_continue_button);
-        FormStyle.defaultLastStepNextButtonText =
-                getResources().getString(R.string.vertical_form_stepper_form_confirm_button);
-        FormStyle.defaultLastStepCancelButtonText =
-                getResources().getString(R.string.vertical_form_stepper_form_cancel_button);
-        FormStyle.defaultConfirmationStepTitle =
-                getResources().getString(R.string.vertical_form_stepper_form_confirmation_step_title);
-        FormStyle.defaultConfirmationStepSubtitle =
-                getResources().getString(R.string.vertical_form_stepper_form_confirmation_step_subtitle);
-        FormStyle.defaultLeftCircleSizeInPx =
-                getResources().getDimensionPixelSize(R.dimen.vertical_stepper_circle_size);
-        FormStyle.defaultLeftCircleTextSizeInPx =
-                getResources().getDimensionPixelSize(R.dimen.vertical_stepper_circle_text_size);
-        FormStyle.defaultStepTitleTextSizeInPx =
-                getResources().getDimensionPixelSize(R.dimen.vertical_stepper_title_text_size);
-        FormStyle.defaultStepSubtitleTextSizeInPx =
-                getResources().getDimensionPixelSize(R.dimen.vertical_stepper_subtitle_text_size);
-        FormStyle.defaultStepErrorMessageTextSizeInPx =
-                getResources().getDimensionPixelSize(R.dimen.vertical_stepper_vertical_error_message_text_size);
-        FormStyle.defaultLeftVerticalLineThicknessSizeInPx =
-                getResources().getDimensionPixelSize(R.dimen.vertical_stepper_vertical_line_thickness);
-        FormStyle.defaultAlphaOfDisabledElements = 0.25f;
-        FormStyle.defaultBackgroundColorOfDisabledElements = Color.rgb(200, 200, 200);
-        FormStyle.defaultStepNumberBackgroundColor = Color.rgb(63, 81, 181);
-        FormStyle.defaultNextButtonBackgroundColor = Color.rgb(63, 81, 181);
-        FormStyle.defaultNextButtonPressedBackgroundColor = Color.rgb(48, 63, 159);
-        FormStyle.defaultLastStepCancelButtonBackgroundColor = Color.rgb(155, 155, 155);
-        FormStyle.defaultLastStepCancelButtonPressedBackgroundColor = Color.rgb(135, 135, 135);
-        FormStyle.defaultStepNumberTextColor = Color.rgb(255, 255, 255);
-        FormStyle.defaultStepTitleTextColor = Color.rgb(33, 33, 33);
-        FormStyle.defaultStepSubtitleTextColor = Color.rgb(162, 162, 162);
-        FormStyle.defaultNextButtonTextColor = Color.rgb(255, 255, 255);
-        FormStyle.defaultNextButtonPressedTextColor = Color.rgb(255, 255, 255);
-        FormStyle.defaultLastStepCancelButtonTextColor = Color.rgb(255, 255, 255);
-        FormStyle.defaultLastStepCancelButtonPressedTextColor = Color.rgb(255, 255, 255);
-        FormStyle.defaultErrorMessageTextColor = Color.rgb(175, 18, 18);
-        FormStyle.defaultDisplayBottomNavigation = true;
-        FormStyle.defaultDisplayStepButtons = true;
-        FormStyle.defaultDisplayCancelButtonInLastStep = false;
-        FormStyle.defaultIncludeConfirmationStep = true;
-        FormStyle.defaultDisplayStepDataInSubtitleOfClosedSteps = false;
-        FormStyle.defaultDisplayDifferentBackgroundColorOnDisabledElements = false;
-        FormStyle.defaultAllowNonLinearNavigation = false;
+        style = new FormStyle();
+
+        // Set the default values for all the style properties
+        style.stepNextButtonText =
+                getResources().getString(R.string.vertical_stepper_form_continue_button);
+        style.lastStepNextButtonText =
+                getResources().getString(R.string.vertical_stepper_form_confirm_button);
+        style.lastStepCancelButtonText =
+                getResources().getString(R.string.vertical_stepper_form_cancel_button);
+        style.confirmationStepTitle =
+                getResources().getString(R.string.vertical_stepper_form_confirmation_step_title);
+        style.confirmationStepSubtitle = "";
+        style.leftCircleSizeInPx =
+                getResources().getDimensionPixelSize(R.dimen.vertical_stepper_form_width_circle);
+        style.leftCircleTextSizeInPx =
+                getResources().getDimensionPixelSize(R.dimen.vertical_stepper_form_text_size_circle);
+        style.stepTitleTextSizeInPx =
+                getResources().getDimensionPixelSize(R.dimen.vertical_stepper_form_text_size_title);
+        style.stepSubtitleTextSizeInPx =
+                getResources().getDimensionPixelSize(R.dimen.vertical_stepper_form_text_size_subtitle);
+        style.stepErrorMessageTextSizeInPx =
+                getResources().getDimensionPixelSize(R.dimen.vertical_stepper_form_text_size_error_message);
+        style.leftVerticalLineThicknessSizeInPx =
+                getResources().getDimensionPixelSize(R.dimen.vertical_stepper_form_width_vertical_line);
+        style.backgroundColorOfDisabledElements =
+                ContextCompat.getColor(context, R.color.vertical_stepper_form_background_color_disabled_elements);
+        style.stepNumberBackgroundColor =
+                ContextCompat.getColor(context, R.color.vertical_stepper_form_background_color_circle);
+        style.nextButtonBackgroundColor =
+                ContextCompat.getColor(context, R.color.vertical_stepper_form_background_color_next_button);
+        style.nextButtonPressedBackgroundColor =
+                ContextCompat.getColor(context, R.color.vertical_stepper_form_background_color_next_button_pressed);
+        style.lastStepCancelButtonBackgroundColor =
+                ContextCompat.getColor(context, R.color.vertical_stepper_form_background_color_cancel_button);
+        style.lastStepCancelButtonPressedBackgroundColor =
+                ContextCompat.getColor(context, R.color.vertical_stepper_form_background_color_cancel_button_pressed);
+        style.stepNumberTextColor =
+                ContextCompat.getColor(context, R.color.vertical_stepper_form_text_color_circle);
+        style.stepTitleTextColor =
+                ContextCompat.getColor(context, R.color.vertical_stepper_form_text_color_title);
+        style.stepSubtitleTextColor =
+                ContextCompat.getColor(context, R.color.vertical_stepper_form_text_color_subtitle);
+        style.nextButtonTextColor =
+                ContextCompat.getColor(context, R.color.vertical_stepper_form_text_color_next_button);
+        style.nextButtonPressedTextColor =
+                ContextCompat.getColor(context, R.color.vertical_stepper_form_text_color_next_button_pressed);
+        style.lastStepCancelButtonTextColor =
+                ContextCompat.getColor(context, R.color.vertical_stepper_form_text_color_cancel_button);
+        style.lastStepCancelButtonPressedTextColor =
+                ContextCompat.getColor(context, R.color.vertical_stepper_form_text_color_cancel_button_pressed);
+        style.errorMessageTextColor =
+                ContextCompat.getColor(context, R.color.vertical_stepper_form_text_color_error_message);
+        style.bottomNavigationBackgroundColor =
+                ContextCompat.getColor(context, R.color.vertical_stepper_form_background_color_bottom_navigation);
+        style.displayBottomNavigation = true;
+        style.displayStepButtons = true;
+        style.displayCancelButtonInLastStep = false;
+        style.displayStepDataInSubtitleOfClosedSteps = true;
+        style.displayDifferentBackgroundColorOnDisabledElements = false;
+        style.includeConfirmationStep = true;
+        style.allowNonLinearNavigation = false;
+        style.alphaOfDisabledElements = 0.3f;
+
+        // Try to get the user values for the style properties to replace the default ones
+        TypedArray vars;
+        if (attrs != null) {
+            vars = context.getTheme().obtainStyledAttributes(
+                    attrs,
+                    R.styleable.VerticalStepperFormView,
+                    defStyleAttr,
+                    0);
+            if (vars != null) {
+
+                if (vars.hasValue(R.styleable.VerticalStepperFormView_next_button_text)) {
+                    style.stepNextButtonText = vars.getString(
+                            R.styleable.VerticalStepperFormView_next_button_text);
+                }
+                if (vars.hasValue(R.styleable.VerticalStepperFormView_last_button_text)) {
+                    style.lastStepNextButtonText = vars.getString(
+                            R.styleable.VerticalStepperFormView_last_button_text);
+                }
+                if (vars.hasValue(R.styleable.VerticalStepperFormView_cancel_button_text)) {
+                    style.lastStepCancelButtonText = vars.getString(
+                            R.styleable.VerticalStepperFormView_cancel_button_text);
+                }
+                if (vars.hasValue(R.styleable.VerticalStepperFormView_confirmation_step_title_text)) {
+                    style.confirmationStepTitle = vars.getString(
+                            R.styleable.VerticalStepperFormView_confirmation_step_title_text);
+                }
+                if (vars.hasValue(R.styleable.VerticalStepperFormView_confirmation_step_subtitle_text)) {
+                    style.confirmationStepSubtitle = vars.getString(
+                            R.styleable.VerticalStepperFormView_confirmation_step_subtitle_text);
+                }
+                style.leftCircleSizeInPx = vars.getDimensionPixelSize(
+                        R.styleable.VerticalStepperFormView_circle_size,
+                        style.leftCircleSizeInPx);
+                style.leftCircleTextSizeInPx = vars.getDimensionPixelSize(
+                        R.styleable.VerticalStepperFormView_circle_text_size,
+                        style.leftCircleTextSizeInPx);
+                style.stepTitleTextSizeInPx = vars.getDimensionPixelSize(
+                        R.styleable.VerticalStepperFormView_title_text_size,
+                        style.stepTitleTextSizeInPx);
+                style.stepSubtitleTextSizeInPx = vars.getDimensionPixelSize(
+                        R.styleable.VerticalStepperFormView_subtitle_text_size,
+                        style.stepSubtitleTextSizeInPx);
+                style.stepErrorMessageTextSizeInPx = vars.getDimensionPixelSize(
+                        R.styleable.VerticalStepperFormView_error_message_text_size,
+                        style.stepErrorMessageTextSizeInPx);
+                style.leftVerticalLineThicknessSizeInPx = vars.getDimensionPixelSize(
+                        R.styleable.VerticalStepperFormView_vertical_line_width,
+                        style.leftVerticalLineThicknessSizeInPx);
+                style.backgroundColorOfDisabledElements = vars.getDimensionPixelSize(
+                        R.styleable.VerticalStepperFormView_disabled_elements_background_color,
+                        style.backgroundColorOfDisabledElements);
+                style.stepNumberBackgroundColor = vars.getColor(
+                        R.styleable.VerticalStepperFormView_circle_background_color,
+                        style.stepNumberBackgroundColor);
+                style.nextButtonBackgroundColor = vars.getColor(
+                        R.styleable.VerticalStepperFormView_next_button_background_color,
+                        style.nextButtonBackgroundColor);
+                style.nextButtonPressedBackgroundColor = vars.getColor(
+                        R.styleable.VerticalStepperFormView_next_button_pressed_background_color,
+                        style.nextButtonPressedBackgroundColor);
+                style.lastStepCancelButtonBackgroundColor = vars.getColor(
+                        R.styleable.VerticalStepperFormView_cancel_button_background_color,
+                        style.lastStepCancelButtonBackgroundColor);
+                style.lastStepCancelButtonPressedBackgroundColor = vars.getColor(
+                        R.styleable.VerticalStepperFormView_cancel_button_pressed_background_color,
+                        style.lastStepCancelButtonPressedBackgroundColor);
+                style.stepNumberTextColor = vars.getColor(
+                        R.styleable.VerticalStepperFormView_circle_text_color,
+                        style.stepNumberTextColor);
+                style.stepTitleTextColor = vars.getColor(
+                        R.styleable.VerticalStepperFormView_title_text_color,
+                        style.stepTitleTextColor);
+                style.stepSubtitleTextColor = vars.getColor(
+                        R.styleable.VerticalStepperFormView_subtitle_text_color,
+                        style.stepSubtitleTextColor);
+                style.nextButtonTextColor = vars.getColor(
+                        R.styleable.VerticalStepperFormView_next_button_text_color,
+                        style.nextButtonTextColor);
+                style.nextButtonPressedTextColor = vars.getColor(
+                        R.styleable.VerticalStepperFormView_next_button_pressed_text_color,
+                        style.nextButtonPressedTextColor);
+                style.lastStepCancelButtonTextColor = vars.getColor(
+                        R.styleable.VerticalStepperFormView_cancel_button_text_color,
+                        style.lastStepCancelButtonTextColor);
+                style.lastStepCancelButtonPressedTextColor = vars.getColor(
+                        R.styleable.VerticalStepperFormView_cancel_button_pressed_text_color,
+                        style.lastStepCancelButtonPressedTextColor);
+                style.errorMessageTextColor = vars.getColor(
+                        R.styleable.VerticalStepperFormView_error_message_text_color,
+                        style.errorMessageTextColor);
+                style.bottomNavigationBackgroundColor = vars.getColor(
+                        R.styleable.VerticalStepperFormView_bottom_navigation_background_color,
+                        style.bottomNavigationBackgroundColor);
+                style.displayBottomNavigation = vars.getBoolean(
+                        R.styleable.VerticalStepperFormView_display_bottom_navigation,
+                        style.displayBottomNavigation);
+                style.displayStepButtons = vars.getBoolean(
+                        R.styleable.VerticalStepperFormView_display_step_buttons,
+                        style.displayStepButtons);
+                style.displayCancelButtonInLastStep = vars.getBoolean(
+                        R.styleable.VerticalStepperFormView_display_cancel_button_in_last_step,
+                        style.displayCancelButtonInLastStep);
+                style.displayStepDataInSubtitleOfClosedSteps = vars.getBoolean(
+                        R.styleable.VerticalStepperFormView_display_step_data_in_subtitle_of_closed_steps,
+                        style.displayStepDataInSubtitleOfClosedSteps);
+                style.displayDifferentBackgroundColorOnDisabledElements = vars.getBoolean(
+                        R.styleable.VerticalStepperFormView_display_different_background_color_on_disabled_elements,
+                        style.displayDifferentBackgroundColorOnDisabledElements);
+                style.includeConfirmationStep = vars.getBoolean(
+                        R.styleable.VerticalStepperFormView_include_confirmation_step,
+                        style.includeConfirmationStep);
+                style.allowNonLinearNavigation = vars.getBoolean(
+                        R.styleable.VerticalStepperFormView_allow_non_linear_navigation,
+                        style.allowNonLinearNavigation);
+                style.alphaOfDisabledElements = vars.getFloat(
+                        R.styleable.VerticalStepperFormView_alpha_of_disabled_elements,
+                        style.alphaOfDisabledElements);
+
+                vars.recycle();
+            }
+        }
 
         internalListener = new FormStepListener();
     }
 
-    void initializeForm(StepperFormListener listener, FormStyle style, StepHelper[] stepsArray) {
+    void initializeForm(StepperFormListener listener, StepHelper[] stepsArray) {
         this.listener = listener;
-        this.style = style;
         this.stepHelpers = Arrays.asList(stepsArray);
 
         progressBar.setMax(stepHelpers.size());
 
+        bottomNavigationView.setBackgroundColor(style.bottomNavigationBackgroundColor);
         if (!style.displayBottomNavigation) {
             hideBottomNavigation();
         }
@@ -529,7 +668,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
         StepHelper stepHelper = stepHelpers.get(position);
         boolean isLast = (position + 1) == stepHelpers.size();
 
-        return stepHelper.initialize(this, style, formContentView, position, isLast);
+        return stepHelper.initialize(this, formContentView, position, isLast);
     }
 
     private synchronized void openStep(int stepToOpenPosition, boolean useAnimations) {
@@ -831,41 +970,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
         }
     }
 
-    static class FormStyle {
-
-        private static String defaultNextStepButtonText;
-        private static String defaultLastStepNextButtonText;
-        private static String defaultLastStepCancelButtonText;
-        private static String defaultConfirmationStepTitle;
-        private static String defaultConfirmationStepSubtitle;
-        private static int defaultLeftCircleSizeInPx;
-        private static int defaultLeftCircleTextSizeInPx;
-        private static int defaultStepTitleTextSizeInPx;
-        private static int defaultStepSubtitleTextSizeInPx;
-        private static int defaultStepErrorMessageTextSizeInPx;
-        private static int defaultLeftVerticalLineThicknessSizeInPx;
-        private static float defaultAlphaOfDisabledElements;
-        private static int defaultBackgroundColorOfDisabledElements;
-        private static int defaultStepNumberBackgroundColor;
-        private static int defaultNextButtonBackgroundColor;
-        private static int defaultNextButtonPressedBackgroundColor;
-        private static int defaultLastStepCancelButtonBackgroundColor;
-        private static int defaultLastStepCancelButtonPressedBackgroundColor;
-        private static int defaultStepNumberTextColor;
-        private static int defaultStepTitleTextColor;
-        private static int defaultStepSubtitleTextColor;
-        private static int defaultNextButtonTextColor;
-        private static int defaultNextButtonPressedTextColor;
-        private static int defaultLastStepCancelButtonTextColor;
-        private static int defaultLastStepCancelButtonPressedTextColor;
-        private static int defaultErrorMessageTextColor;
-        private static boolean defaultDisplayBottomNavigation;
-        private static boolean defaultDisplayStepButtons;
-        private static boolean defaultDisplayCancelButtonInLastStep;
-        private static boolean defaultIncludeConfirmationStep;
-        private static boolean defaultDisplayStepDataInSubtitleOfClosedSteps;
-        private static boolean defaultDisplayDifferentBackgroundColorOnDisabledElements;
-        private static boolean defaultAllowNonLinearNavigation;
+    class FormStyle {
         String stepNextButtonText;
         String lastStepNextButtonText;
         String lastStepCancelButtonText;
@@ -877,7 +982,6 @@ public class VerticalStepperFormLayout extends LinearLayout {
         int stepSubtitleTextSizeInPx;
         int stepErrorMessageTextSizeInPx;
         int leftVerticalLineThicknessSizeInPx;
-        float alphaOfDisabledElements;
         int backgroundColorOfDisabledElements;
         int stepNumberBackgroundColor;
         int nextButtonBackgroundColor;
@@ -892,48 +996,14 @@ public class VerticalStepperFormLayout extends LinearLayout {
         int lastStepCancelButtonTextColor;
         int lastStepCancelButtonPressedTextColor;
         int errorMessageTextColor;
+        int bottomNavigationBackgroundColor;
         boolean displayBottomNavigation;
         boolean displayStepButtons;
         boolean displayCancelButtonInLastStep;
-        boolean includeConfirmationStep;
         boolean displayStepDataInSubtitleOfClosedSteps;
         boolean displayDifferentBackgroundColorOnDisabledElements;
+        boolean includeConfirmationStep;
         boolean allowNonLinearNavigation;
-
-        FormStyle() {
-            this.stepNextButtonText = defaultNextStepButtonText;
-            this.lastStepNextButtonText = defaultLastStepNextButtonText;
-            this.lastStepCancelButtonText = defaultLastStepCancelButtonText;
-            this.confirmationStepTitle = defaultConfirmationStepTitle;
-            this.confirmationStepSubtitle = defaultConfirmationStepSubtitle;
-            this.leftCircleSizeInPx = defaultLeftCircleSizeInPx;
-            this.leftCircleTextSizeInPx = defaultLeftCircleTextSizeInPx;
-            this.stepTitleTextSizeInPx = defaultStepTitleTextSizeInPx;
-            this.stepSubtitleTextSizeInPx = defaultStepSubtitleTextSizeInPx;
-            this.stepErrorMessageTextSizeInPx = defaultStepErrorMessageTextSizeInPx;
-            this.leftVerticalLineThicknessSizeInPx = defaultLeftVerticalLineThicknessSizeInPx;
-            this.alphaOfDisabledElements = defaultAlphaOfDisabledElements;
-            this.backgroundColorOfDisabledElements = defaultBackgroundColorOfDisabledElements;
-            this.stepNumberBackgroundColor = defaultStepNumberBackgroundColor;
-            this.nextButtonBackgroundColor = defaultNextButtonBackgroundColor;
-            this.nextButtonPressedBackgroundColor = defaultNextButtonPressedBackgroundColor;
-            this.lastStepCancelButtonBackgroundColor = defaultLastStepCancelButtonBackgroundColor;
-            this.lastStepCancelButtonPressedBackgroundColor = defaultLastStepCancelButtonPressedBackgroundColor;
-            this.stepNumberTextColor = defaultStepNumberTextColor;
-            this.stepTitleTextColor = defaultStepTitleTextColor;
-            this.stepSubtitleTextColor = defaultStepSubtitleTextColor;
-            this.nextButtonTextColor = defaultNextButtonTextColor;
-            this.nextButtonPressedTextColor = defaultNextButtonPressedTextColor;
-            this.lastStepCancelButtonTextColor = defaultLastStepCancelButtonTextColor;
-            this.lastStepCancelButtonPressedTextColor = defaultLastStepCancelButtonPressedTextColor;
-            this.errorMessageTextColor = defaultErrorMessageTextColor;
-            this.displayBottomNavigation = defaultDisplayBottomNavigation;
-            this.displayStepButtons = defaultDisplayStepButtons;
-            this.displayCancelButtonInLastStep = defaultDisplayCancelButtonInLastStep;
-            this.includeConfirmationStep = defaultIncludeConfirmationStep;
-            this.displayStepDataInSubtitleOfClosedSteps = defaultDisplayStepDataInSubtitleOfClosedSteps;
-            this.displayDifferentBackgroundColorOnDisabledElements = defaultDisplayDifferentBackgroundColorOnDisabledElements;
-            this.allowNonLinearNavigation = defaultAllowNonLinearNavigation;
-        }
+        float alphaOfDisabledElements;
     }
 }

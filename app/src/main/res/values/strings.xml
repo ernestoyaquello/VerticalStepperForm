@@ -3,7 +3,7 @@
     <string name="add_alarm">Add Alarm</string>
     <string name="add_alarm_confirm_subtitle">Confirm data and add alarm</string>
     <string name="new_alarm_added">New alarm added successfully</string>
-    <string name="error_alarm_name_min_characters">At least %1$d characters</string>
+    <string name="error_alarm_name_min_characters">At least %1$d character(s)</string>
     <string name="main_activity_alarm_added_info">Alarm %s set up at %s</string>
     <string name="main_activity_explanation">Click the button to set up a new alarm</string>
     <string name="main_activity_explanation_disclaimer">Don\'t worry, this app does not actually set up alarms.</string>

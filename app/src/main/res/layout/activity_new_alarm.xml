@@ -1,0 +1,20 @@
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ernestoyaquello.com.verticalstepperform.VerticalStepperFormView
+        android:id="@+id/vertical_stepper_form"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:last_button_text="@string/add_alarm"
+        app:circle_background_color="@color/colorPrimary"
+        app:next_button_background_color="@color/colorPrimary"
+        app:next_button_pressed_background_color="@color/colorPrimaryDark"
+        app:display_cancel_button_in_last_step="true"
+        app:cancel_button_background_color="@android:color/transparent"
+        app:cancel_button_pressed_background_color="@android:color/transparent"
+        app:cancel_button_text_color="@color/colorPrimary"
+        app:cancel_button_pressed_text_color="@color/colorPrimaryDark"/>
+
+</FrameLayout>

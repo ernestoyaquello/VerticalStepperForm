@@ -24,23 +24,23 @@
 
             <FrameLayout
                 android:id="@+id/step_number_circle"
-                android:layout_width="@dimen/vertical_stepper_circle_size"
-                android:layout_height="@dimen/vertical_stepper_circle_size"
+                android:layout_width="@dimen/vertical_stepper_form_width_circle"
+                android:layout_height="@dimen/vertical_stepper_form_width_circle"
                 android:background="@drawable/circle_step_done">
 
                 <TextView
                     android:id="@+id/step_number"
                     android:layout_width="match_parent"
-                    android:layout_height="@dimen/vertical_stepper_circle_size"
+                    android:layout_height="@dimen/vertical_stepper_form_width_circle"
                     android:textColor="#ffffff"
                     android:gravity="center"
-                    android:textSize="@dimen/vertical_stepper_circle_text_size"
+                    android:textSize="@dimen/vertical_stepper_form_text_size_circle"
                     tools:text="1" />
 
                 <ImageView
                     android:id="@+id/step_done_icon"
-                    android:layout_width="@dimen/vertical_stepper_circle_size"
-                    android:layout_height="@dimen/vertical_stepper_circle_size"
+                    android:layout_width="@dimen/vertical_stepper_form_width_circle"
+                    android:layout_height="@dimen/vertical_stepper_form_width_circle"
                     android:padding="2dp"
                     android:src="@drawable/ic_done"
                     android:scaleType="centerInside"
@@ -52,7 +52,7 @@
             <View
                 android:id="@+id/line1"
                 android:layout_marginTop="8dp"
-                android:layout_width="@dimen/vertical_stepper_vertical_line_thickness"
+                android:layout_width="@dimen/vertical_stepper_form_width_vertical_line"
                 android:layout_height="0dp"
                 android:layout_weight="1"
                 android:background="#e0e0e0"
@@ -71,10 +71,10 @@
             <TextView
                 android:id="@+id/step_title"
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/vertical_stepper_circle_size"
+                android:layout_height="@dimen/vertical_stepper_form_width_circle"
                 android:gravity="center_vertical"
                 android:textColor="#212121"
-                android:textSize="@dimen/vertical_stepper_title_text_size"
+                android:textSize="@dimen/vertical_stepper_form_text_size_title"
                 android:maxLines="1"
                 android:ellipsize="end"
                 tools:text="Step 1" />
@@ -91,7 +91,7 @@
                     android:id="@+id/step_subtitle"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/vertical_stepper_subtitle_text_size"
+                    android:textSize="@dimen/vertical_stepper_form_text_size_subtitle"
                     android:textColor="#A2A2A2"
                     android:visibility="gone"
                     tools:visibility="visible"
@@ -109,12 +109,12 @@
         android:orientation="horizontal">
 
         <FrameLayout
-            android:layout_width="@dimen/vertical_stepper_circle_size"
+            android:layout_width="@dimen/vertical_stepper_form_width_circle"
             android:layout_height="match_parent">
 
             <View
                 android:id="@+id/line2"
-                android:layout_width="@dimen/vertical_stepper_vertical_line_thickness"
+                android:layout_width="@dimen/vertical_stepper_form_width_vertical_line"
                 android:layout_height="match_parent"
                 android:background="#e0e0e0"
                 android:layout_gravity="center" />
@@ -148,7 +148,7 @@
                     android:id="@+id/step_error_message"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:textSize="@dimen/vertical_stepper_vertical_error_message_text_size"
+                    android:textSize="@dimen/vertical_stepper_form_text_size_error_message"
                     android:textColor="#af1212"
                     tools:text="Some data is missing"/>
 
@@ -177,7 +177,7 @@
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/vertical_form_stepper_form_continue_button"
+                        android:text="@string/vertical_stepper_form_continue_button"
                         android:textColor="#FFFFFF"
                         android:layout_marginTop="16dp"
                         android:layout_marginBottom="4dp"/>
@@ -188,7 +188,7 @@
                         android:textAppearance="@style/TextAppearance.AppCompat.Medium"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="@string/vertical_form_stepper_form_cancel_button"
+                        android:text="@string/vertical_stepper_form_cancel_button"
                         android:textColor="#FFFFFF"
                         android:layout_marginTop="16dp"
                         android:layout_marginBottom="4dp"

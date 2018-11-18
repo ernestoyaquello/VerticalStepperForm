@@ -15,7 +15,7 @@ import com.google.android.material.button.MaterialButton;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout.FormStyle;
+import ernestoyaquello.com.verticalstepperform.VerticalStepperFormView.FormStyle;
 
 /**
  * This class holds a step instance and deals with updating its views so they reflect its state.
@@ -54,15 +54,9 @@ class StepHelper implements Step.InternalFormStepListener {
         this.step.addListenerInternal(formListener);
     }
 
-    View initialize(
-            VerticalStepperFormLayout form,
-            FormStyle style,
-            ViewGroup parent,
-            int position,
-            boolean isLast) {
-
+    View initialize(VerticalStepperFormView form, ViewGroup parent, int position, boolean isLast) {
         if (step.getEntireStepLayout() == null) {
-            formStyle = style;
+            formStyle = form.style;
 
             Context context = form.getContext();
             LayoutInflater inflater = LayoutInflater.from(context);
@@ -71,7 +65,7 @@ class StepHelper implements Step.InternalFormStepListener {
             step.initializeStepInternal(stepLayout, form, position);
             step.setContentLayoutInternal(step.createStepContentLayout());
 
-            setupStepViews(form, context, stepLayout, position, isLast);
+            setupStepViews(form, stepLayout, position, isLast);
         } else {
             throw new IllegalStateException("This step has already been initialized");
         }
@@ -80,8 +74,7 @@ class StepHelper implements Step.InternalFormStepListener {
     }
 
     private void setupStepViews(
-            final VerticalStepperFormLayout form,
-            Context context,
+            final VerticalStepperFormView form,
             View stepLayout,
             final int position,
             boolean isLast) {
@@ -112,7 +105,7 @@ class StepHelper implements Step.InternalFormStepListener {
         doneIconView.setColorFilter(formStyle.stepNumberTextColor);
         errorMessageView.setTextColor(formStyle.errorMessageTextColor);
         errorIconView.setColorFilter(formStyle.errorMessageTextColor);
-        Drawable circleDrawable = ContextCompat.getDrawable(context, R.drawable.circle_step_done);
+        Drawable circleDrawable = ContextCompat.getDrawable(form.getContext(), R.drawable.circle_step_done);
         circleDrawable.setColorFilter(
                 new PorterDuffColorFilter(formStyle.stepNumberBackgroundColor, PorterDuff.Mode.SRC_IN));
         stepNumberCircleView.setBackground(circleDrawable);

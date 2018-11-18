@@ -1,9 +1,8 @@
 <resources>
 
-    <string name="vertical_form_stepper_form_continue_button">Continue</string>
-    <string name="vertical_form_stepper_form_cancel_button">Cancel</string>
-    <string name="vertical_form_stepper_form_confirm_button">Confirm data</string>
-    <string name="vertical_form_stepper_form_confirmation_step_title">Confirmation</string>
-    <string name="vertical_form_stepper_form_confirmation_step_subtitle">Confirm that the data is correct and finish</string>
+    <string name="vertical_stepper_form_continue_button">Continue</string>
+    <string name="vertical_stepper_form_cancel_button">Cancel</string>
+    <string name="vertical_stepper_form_confirm_button">Confirm data</string>
+    <string name="vertical_stepper_form_confirmation_step_title">Confirmation</string>
 
 </resources>

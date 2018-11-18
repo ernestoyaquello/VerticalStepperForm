@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="VerticalStepperFormView">
+        <attr name="next_button_text" format="string" />
+        <attr name="last_button_text" format="string" />
+        <attr name="cancel_button_text" format="string" />
+        <attr name="confirmation_step_title_text" format="string" />
+        <attr name="confirmation_step_subtitle_text" format="string" />
+        <attr name="circle_size" format="dimension" />
+        <attr name="circle_text_size" format="dimension" />
+        <attr name="title_text_size" format="dimension" />
+        <attr name="subtitle_text_size" format="dimension" />
+        <attr name="error_message_text_size" format="dimension" />
+        <attr name="vertical_line_width" format="dimension" />
+        <attr name="disabled_elements_background_color" format="color" />
+        <attr name="circle_background_color" format="color" />
+        <attr name="next_button_background_color" format="color" />
+        <attr name="next_button_pressed_background_color" format="color" />
+        <attr name="cancel_button_background_color" format="color" />
+        <attr name="cancel_button_pressed_background_color" format="color" />
+        <attr name="bottom_navigation_background_color" format="color" />
+        <attr name="circle_text_color" format="color" />
+        <attr name="title_text_color" format="color" />
+        <attr name="subtitle_text_color" format="color" />
+        <attr name="next_button_text_color" format="color" />
+        <attr name="next_button_pressed_text_color" format="color" />
+        <attr name="cancel_button_text_color" format="color" />
+        <attr name="cancel_button_pressed_text_color" format="color" />
+        <attr name="error_message_text_color" format="color" />
+        <attr name="display_bottom_navigation" format="boolean" />
+        <attr name="display_step_buttons" format="boolean" />
+        <attr name="display_cancel_button_in_last_step" format="boolean" />
+        <attr name="display_step_data_in_subtitle_of_closed_steps" format="boolean" />
+        <attr name="display_different_background_color_on_disabled_elements" format="boolean" />
+        <attr name="include_confirmation_step" format="boolean" />
+        <attr name="allow_non_linear_navigation" format="boolean" />
+        <attr name="alpha_of_disabled_elements" format="float" />
+    </declare-styleable>
+
+</resources>

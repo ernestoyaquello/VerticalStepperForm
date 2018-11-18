@@ -50,7 +50,7 @@ public class AlarmNameStep extends Step<String> {
         alarmNameEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                getFormLayout().goToNextStep(true);
+                getFormView().goToNextStep(true);
                 return false;
             }
         });

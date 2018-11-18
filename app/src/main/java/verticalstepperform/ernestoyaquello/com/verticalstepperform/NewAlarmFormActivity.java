@@ -5,7 +5,6 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -15,7 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.view.MenuItem;
 
 import androidx.fragment.app.DialogFragment;
-import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout;
+import ernestoyaquello.com.verticalstepperform.VerticalStepperFormView;
 import ernestoyaquello.com.verticalstepperform.listener.StepperFormListener;
 import verticalstepperform.ernestoyaquello.com.verticalstepperform.form.steps.AlarmDaysStep;
 import verticalstepperform.ernestoyaquello.com.verticalstepperform.form.steps.AlarmDescriptionStep;
@@ -32,7 +31,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
     public static final String STATE_WEEK_DAYS = "week_days";
 
     private ProgressDialog progressDialog;
-    private VerticalStepperFormLayout verticalStepperForm;
+    private VerticalStepperFormView verticalStepperForm;
 
     private AlarmNameStep nameStep;
     private AlarmDescriptionStep descriptionStep;
@@ -42,7 +41,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_vertical_stepper_form);
+        setContentView(R.layout.activity_new_alarm);
 
         int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
         int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
@@ -55,14 +54,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
         daysStep = new AlarmDaysStep(stepTitles[3]);//, stepSubtitles[3]);
 
         verticalStepperForm = findViewById(R.id.vertical_stepper_form);
-        verticalStepperForm.setup(this, nameStep, descriptionStep, timeStep, daysStep)
-                .basicColorScheme(colorPrimary, colorPrimaryDark, Color.WHITE)
-                .displayCancelButtonInLastStep(true)
-                .lastStepCancelButtonColors(Color.TRANSPARENT, Color.TRANSPARENT, colorPrimary, colorPrimaryDark)
-                .lastStepNextButtonText(getString(R.string.add_alarm))
-                .confirmationStepSubtitle(null)//getString(R.string.add_alarm_confirm_subtitle))
-                .displayStepDataInSubtitleOfClosedSteps(true)
-                .init();
+        verticalStepperForm.setup(this, nameStep, descriptionStep, timeStep, daysStep).init();
     }
 
     @Override
