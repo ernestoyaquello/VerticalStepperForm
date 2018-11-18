@@ -10,12 +10,12 @@ ext {
     libraryName = 'VerticalStepperForm'
     artifact = 'vertical-stepper-form'
 
-    libraryDescription = 'A vertical stepper form for Android that follows Material Desing guidelines'
+    libraryDescription = 'A highly customizable vertical stepper form for Android.'
 
     siteUrl = 'https://github.com/ernestoyaquello/vertical-stepper-form'
     gitUrl = 'https://github.com/ernestoyaquello/vertical-stepper-form.git'
 
-    libraryVersion = '1.0.0'
+    libraryVersion = '2.0.0'
 
     developerId = 'ernestoyaquello'
     developerName = 'Julio Ernesto Rodríguez Cabañas'
@@ -32,7 +32,7 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 2
+        versionCode 10
         versionName libraryVersion
     }
 
