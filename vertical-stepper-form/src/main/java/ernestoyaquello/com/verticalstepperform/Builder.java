@@ -38,9 +38,9 @@ public class Builder {
     }
 
     /**
-     * Sets the text to be displayed in the last step's "Confirm" button.
+     * Sets the text to be displayed in the "Confirm" button of the last step.
      *
-     * @param lastStepNextButtonText The text to display in the last step's "Confirm" button.
+     * @param lastStepNextButtonText The text to display in the "Confirm" button of the last step.
      * @return The builder instance.
      */
     public Builder lastStepNextButtonText(String lastStepNextButtonText) {
@@ -50,10 +50,10 @@ public class Builder {
     }
 
     /**
-     * Sets the text to be displayed in the last step's "Cancel" button.
-     * To display this button in the last step, set displayCancelButtonInLastStep to true.
+     * Sets the text to be displayed in the "Cancel" button of the last step.
+     * To display this button in the last step, use displayCancelButtonInLastStep().
      *
-     * @param lastStepCancelButtonText The text to display in the last step's "Cancel" button.
+     * @param lastStepCancelButtonText The text to display in the "Cancel" button of the last step.
      * @return The builder instance.
      */
     public Builder lastStepCancelButtonText(String lastStepCancelButtonText) {
@@ -76,6 +76,7 @@ public class Builder {
 
     /**
      * Sets the subtitle to be displayed on the confirmation step.
+     * Null to not show a subtitle in the confirmation step.
      *
      * @param confirmationStepSubtitle The subtitle of the confirmation step.
      * @return The builder instance.
@@ -87,35 +88,35 @@ public class Builder {
     }
 
     /**
-     * Sets the primary color of the form. Will be used for the left circles and the buttons.
+     * Sets the primary color of the form. It will be used for the left circles and the buttons.
      * To set a different background color for buttons and left circles, please use
-     * stepNumberBackgroundColor() and buttonBackgroundColor().
+     * stepNumberBackgroundColor() and nextButtonBackgroundColor().
      *
      * @param colorPrimary The primary color.
      * @return The builder instance.
      */
     public Builder primaryColor(int colorPrimary) {
-        style.stepNumberBackgroundColor = colorPrimary;
-        style.buttonBackgroundColor = colorPrimary;
+        stepNumberBackgroundColor(colorPrimary);
+        nextButtonBackgroundColor(colorPrimary);
 
         return this;
     }
 
     /**
-     * Sets the dark primary color. Will be displayed as the background color of the buttons
-     * while clicked.
+     * Sets the dark primary color. It will be displayed as the background color of the "Continue"
+     * buttons when clicked. Equivalent to nextButtonPressedBackgroundColor().
      *
-     * @param colorPrimaryDark Primary color (dark)
+     * @param colorPrimaryDark The primary color (dark).
      * @return The builder instance.
      */
     public Builder primaryDarkColor(int colorPrimaryDark) {
-        style.buttonPressedBackgroundColor = colorPrimaryDark;
+        nextButtonPressedBackgroundColor(colorPrimaryDark);
 
         return this;
     }
 
     /**
-     * Sets the background color of the left circles.
+     * Sets the background color of the left circles in which the step numbers are displayed.
      *
      * @param stepNumberBackgroundColor Background color of the left circles.
      * @return The builder instance.
@@ -127,33 +128,61 @@ public class Builder {
     }
 
     /**
-     * Sets the background color of the buttons.
+     * Sets the background color of the "Continue" buttons.
      *
-     * @param buttonBackgroundColor Background color of the buttons.
+     * @param nextButtonBackgroundColor Background color of the "Continue" button.
      * @return The builder instance.
      */
-    public Builder buttonBackgroundColor(int buttonBackgroundColor) {
-        style.buttonBackgroundColor = buttonBackgroundColor;
+    public Builder nextButtonBackgroundColor(int nextButtonBackgroundColor) {
+        style.nextButtonBackgroundColor = nextButtonBackgroundColor;
 
         return this;
     }
 
     /**
-     * Sets the background color of the buttons when pressed.
+     * Sets the background color of the "Continue" buttons when pressed.
      *
-     * @param buttonPressedBackgroundColor Background color of the buttons when pressed.
+     * @param nextButtonPressedBackgroundColor Background color of the "Continue" buttons when pressed.
      * @return The builder instance.
      */
-    public Builder buttonPressedBackgroundColor(int buttonPressedBackgroundColor) {
-        style.buttonPressedBackgroundColor = buttonPressedBackgroundColor;
+    public Builder nextButtonPressedBackgroundColor(int nextButtonPressedBackgroundColor) {
+        style.nextButtonPressedBackgroundColor = nextButtonPressedBackgroundColor;
 
         return this;
     }
 
     /**
-     * Sets the text color of the left circles.
+     * Sets the background color of the "Cancel" button of the last step.
+     * To display the cancel button of the last step, use displayCancelButtonInLastStep().
      *
-     * @param stepNumberTextColor Text color of the left circles.
+     * @param lastStepCancelButtonBackgroundColor Background color of the "Cancel" button of the
+     *                                            last step.
+     * @return The builder instance.
+     */
+    public Builder lastStepCancelButtonBackgroundColor(int lastStepCancelButtonBackgroundColor) {
+        style.lastStepCancelButtonBackgroundColor = lastStepCancelButtonBackgroundColor;
+
+        return this;
+    }
+
+    /**
+     * Sets the background color of the "Cancel" button of the last step when pressed.
+     * To display the cancel button of the last step, use displayCancelButtonInLastStep().
+     *
+     * @param lastStepCancelButtonPressedBackgroundColor Background color of the "Cancel" button of
+     *                                                   the last step when pressed.
+     * @return The builder instance.
+     */
+    public Builder lastStepCancelButtonPressedBackgroundColor(int lastStepCancelButtonPressedBackgroundColor) {
+        style.lastStepCancelButtonPressedBackgroundColor = lastStepCancelButtonPressedBackgroundColor;
+
+        return this;
+    }
+
+    /**
+     * Sets the text color of the step numbers displayed inside the left circles.
+     *
+     * @param stepNumberTextColor Text color for the step numbers displayed in the left circles.
      * @return The builder instance.
      */
     public Builder stepNumberTextColor(int stepNumberTextColor) {
@@ -211,9 +240,9 @@ public class Builder {
     }
 
     /**
-     * Sets the error message color.
+     * Sets the color of the error message.
      *
-     * @param errorMessageTextColor Error message color.
+     * @param errorMessageTextColor The color of the error message.
      * @return The builder instance.
      */
     public Builder errorMessageTextColor(int errorMessageTextColor) {
@@ -247,6 +276,19 @@ public class Builder {
     }
 
     /**
+     * Sets the background color of the disabled elements (buttons and left circles).
+     * It will only work if used along with displayDifferentBackgroundColorOnDisabledElements().
+     *
+     * @param backgroundColorOfDisabledElements The background color of the disabled elements.
+     * @return The builder instance.
+     */
+    public Builder backgroundColorOfDisabledElements(int backgroundColorOfDisabledElements) {
+        style.backgroundColorOfDisabledElements = backgroundColorOfDisabledElements;
+
+        return this;
+    }
+
+    /**
      * Specifies whether or not a "Next" button should be automatically displayed within each step.
      * If set to false, the step buttons will be missing and manual calls to
      * goToStep(stepPosition + 1, true) will be required in order to move to the next step.
@@ -262,7 +304,7 @@ public class Builder {
 
     /**
      * Specifies whether or not a cancellation button should be displayed in the last step.
-     * If displayed, this button will invoke the callback onCancelledForm().
+     * If displayed, this button will invoke the callback onCancelledForm() when clicked.
      *
      * @param displayCancelButtonInLastStep True to display a cancellation button in the last step;
      *                                      false to not.
@@ -298,6 +340,20 @@ public class Builder {
      */
     public Builder displayStepDataInSubtitleOfClosedSteps(boolean displayStepDataInSubtitleOfClosedSteps) {
         style.displayStepDataInSubtitleOfClosedSteps = displayStepDataInSubtitleOfClosedSteps;
+
+        return this;
+    }
+
+    /**
+     * Specifies whether or not a different background color should be displayed on disabled elements.
+     * Use backgroundColorOfDisabledElements() to specify what background color should be used.
+     *
+     * @param displayDifferentBackgroundColorOnDisabledElements True to show a different background
+     *                                                          color on disabled elements.
+     * @return The builder instance.
+     */
+    public Builder displayDifferentBackgroundColorOnDisabledElements(boolean displayDifferentBackgroundColorOnDisabledElements) {
+        style.displayDifferentBackgroundColorOnDisabledElements = displayDifferentBackgroundColorOnDisabledElements;
 
         return this;
     }

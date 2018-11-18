@@ -46,18 +46,19 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
         int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
         int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
         String[] stepTitles = getResources().getStringArray(R.array.steps_titles);
-        String[] stepSubtitles = getResources().getStringArray(R.array.steps_subtitles);
+        //String[] stepSubtitles = getResources().getStringArray(R.array.steps_subtitles);
 
-        nameStep = new AlarmNameStep(stepTitles[0], stepSubtitles[0]);
-        descriptionStep = new AlarmDescriptionStep(stepTitles[1], stepSubtitles[1]);
-        timeStep = new AlarmTimeStep(stepTitles[2], stepSubtitles[2]);
-        daysStep = new AlarmDaysStep(stepTitles[3], stepSubtitles[3]);
+        nameStep = new AlarmNameStep(stepTitles[0]);//, stepSubtitles[0]);
+        descriptionStep = new AlarmDescriptionStep(stepTitles[1]);//, stepSubtitles[1]);
+        timeStep = new AlarmTimeStep(stepTitles[2]);//, stepSubtitles[2]);
+        daysStep = new AlarmDaysStep(stepTitles[3]);//, stepSubtitles[3]);
 
         verticalStepperForm = findViewById(R.id.vertical_stepper_form);
         verticalStepperForm.setup(this, nameStep, descriptionStep, timeStep, daysStep)
                 .primaryColor(colorPrimary)
                 .primaryDarkColor(colorPrimaryDark)
                 .lastStepNextButtonText(getString(R.string.add_alarm))
+                .confirmationStepSubtitle(null)//getString(R.string.add_alarm_confirm_subtitle))
                 .displayCancelButtonInLastStep(true)
                 .displayStepDataInSubtitleOfClosedSteps(true)
                 .init();
