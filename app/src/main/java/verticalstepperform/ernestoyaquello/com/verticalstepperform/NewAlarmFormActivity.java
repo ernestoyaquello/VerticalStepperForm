@@ -2,8 +2,10 @@ package verticalstepperform.ernestoyaquello.com.verticalstepperform;
 
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -20,7 +22,7 @@ import verticalstepperform.ernestoyaquello.com.verticalstepperform.form.steps.Al
 import verticalstepperform.ernestoyaquello.com.verticalstepperform.form.steps.AlarmNameStep;
 import verticalstepperform.ernestoyaquello.com.verticalstepperform.form.steps.AlarmTimeStep;
 
-public class NewAlarmFormActivity extends AppCompatActivity implements StepperFormListener {
+public class NewAlarmFormActivity extends AppCompatActivity implements StepperFormListener, DialogInterface.OnClickListener {
     
     public static final String STATE_NEW_ALARM_ADDED = "new_alarm_added";
     public static final String STATE_TITLE = "title";
@@ -61,6 +63,10 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
                 .confirmationStepSubtitle(null)//getString(R.string.add_alarm_confirm_subtitle))
                 .displayCancelButtonInLastStep(true)
                 .displayStepDataInSubtitleOfClosedSteps(true)
+                .lastStepCancelButtonTextColor(colorPrimary)
+                .lastStepCancelButtonPressedTextColor(colorPrimaryDark)
+                .lastStepCancelButtonBackgroundColor(Color.TRANSPARENT)
+                .lastStepCancelButtonPressedBackgroundColor(Color.TRANSPARENT)
                 .init();
     }
 
@@ -88,12 +94,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
 
     @Override
     public void onCancelledForm() {
-        showCloseConfirmationDialog(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-                verticalStepperForm.cancelFormCompletionAttempt();
-            }
-        });
+        showCloseConfirmationDialog();
     }
 
     private Thread saveData() {
@@ -126,22 +127,14 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
 
     private void finishIfPossible() {
         if(verticalStepperForm.isAnyStepCompleted()) {
-            showCloseConfirmationDialog(null);
+            showCloseConfirmationDialog();
         } else {
             finish();
         }
     }
 
-    private void showCloseConfirmationDialog(DialogInterface.OnClickListener dialogCancellationAction) {
-        DiscardAlarmConfirmationFragment closeConfirmation = new DiscardAlarmConfirmationFragment();
-        closeConfirmation.setOnConfirmDiscardAlarm(new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                finish();
-            }
-        });
-        closeConfirmation.setOnCancelDialog(dialogCancellationAction);
-        closeConfirmation.show(getSupportFragmentManager(), null);
+    private void showCloseConfirmationDialog() {
+        new DiscardAlarmConfirmationFragment().show(getSupportFragmentManager(), null);
     }
 
     private void dismissDialogIfNecessary() {
@@ -159,6 +152,18 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
         }
 
         return false;
+    }
+
+    @Override
+    public void onClick(DialogInterface dialogInterface, int which) {
+        switch (which) {
+            case -1:
+                finish();
+                break;
+            case -2:
+                verticalStepperForm.cancelFormCompletionAttempt();
+                break;
+        }
     }
 
     @Override
@@ -198,13 +203,11 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
 
         if(savedInstanceState.containsKey(STATE_TITLE)) {
             String title = savedInstanceState.getString(STATE_TITLE);
-
             nameStep.restoreStepData(title);
         }
 
         if(savedInstanceState.containsKey(STATE_DESCRIPTION)) {
             String description = savedInstanceState.getString(STATE_DESCRIPTION);
-
             descriptionStep.restoreStepData(description);
         }
 
@@ -213,13 +216,11 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
             int hour = savedInstanceState.getInt(STATE_TIME_HOUR);
             int minutes = savedInstanceState.getInt(STATE_TIME_MINUTES);
             AlarmTimeStep.TimeHolder time = new AlarmTimeStep.TimeHolder(hour, minutes);
-
             timeStep.restoreStepData(time);
         }
 
         if(savedInstanceState.containsKey(STATE_WEEK_DAYS)) {
             boolean[] alarmDays = savedInstanceState.getBooleanArray(STATE_WEEK_DAYS);
-
             daysStep.restoreStepData(alarmDays);
         }
 
@@ -229,15 +230,13 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
 
     public static class DiscardAlarmConfirmationFragment extends DialogFragment {
 
-        private DialogInterface.OnClickListener onConfirmDiscardAlarm;
-        private DialogInterface.OnClickListener onCancelDialog;
+        private DialogInterface.OnClickListener listener;
 
-        void setOnConfirmDiscardAlarm(DialogInterface.OnClickListener onConfirmDiscardAlarm) {
-            this.onConfirmDiscardAlarm = onConfirmDiscardAlarm;
-        }
+        @Override
+        public void onAttach(Context context) {
+            super.onAttach(context);
 
-        void setOnCancelDialog(DialogInterface.OnClickListener onCancelDialog) {
-            this.onCancelDialog = onCancelDialog;
+            listener = (DialogInterface.OnClickListener) context;
         }
 
         @Override
@@ -249,16 +248,16 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
                     .setPositiveButton(R.string.form_discard, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            if (onConfirmDiscardAlarm != null) {
-                                onConfirmDiscardAlarm.onClick(dialogInterface, i);
+                            if (listener != null) {
+                                listener.onClick(dialogInterface, i);
                             }
                         }
                     })
                     .setNegativeButton(R.string.form_discard_cancel, new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialogInterface, int i) {
-                            if (onCancelDialog != null) {
-                                onCancelDialog.onClick(dialogInterface, i);
+                            if (listener != null) {
+                                listener.onClick(dialogInterface, i);
                             }
                         }
                     })

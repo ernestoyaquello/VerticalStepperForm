@@ -14,8 +14,6 @@ import java.util.List;
  */
 public abstract class Step<T> {
 
-    private List<InternalFormStepListener> internalListeners;
-
     private String title;
     private String subtitle;
     private String nextButtonText;
@@ -26,6 +24,8 @@ public abstract class Step<T> {
     private View contentLayout;
     private int position;
     private VerticalStepperFormLayout formLayout;
+
+    private List<InternalFormStepListener> internalListeners;
 
     protected Step(String title) {
         this(title, "");

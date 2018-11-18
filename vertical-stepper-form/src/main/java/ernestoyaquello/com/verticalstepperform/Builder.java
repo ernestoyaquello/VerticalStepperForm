@@ -216,25 +216,50 @@ public class Builder {
     }
 
     /**
-     * Sets the text color of the buttons.
+     * Sets the text color of the "Continue" buttons.
      *
-     * @param buttonTextColor Text color of the buttons.
+     * @param nextButtonTextColor Text color of the "Continue" buttons.
      * @return The builder instance.
      */
-    public Builder buttonTextColor(int buttonTextColor) {
-        style.buttonTextColor = buttonTextColor;
+    public Builder nextButtonTextColor(int nextButtonTextColor) {
+        style.nextButtonTextColor = nextButtonTextColor;
 
         return this;
     }
 
     /**
-     * Sets the text color of the buttons when clicked.
+     * Sets the text color of the "Continue" buttons when pressed.
      *
-     * @param buttonPressedTextColor Text color of the buttons when clicked.
+     * @param nextButtonPressedTextColor Text color of the "Continue" buttons when pressed.
      * @return The builder instance.
      */
-    public Builder buttonPressedTextColor(int buttonPressedTextColor) {
-        style.buttonPressedTextColor = buttonPressedTextColor;
+    public Builder nextButtonPressedTextColor(int nextButtonPressedTextColor) {
+        style.nextButtonPressedTextColor = nextButtonPressedTextColor;
+
+        return this;
+    }
+
+    /**
+     * Sets the text color of the "Cancel" button of the last step.
+     *
+     * @param lastStepCancelButtonTextColor Text color of the "Cancel" button of the last step.
+     * @return The builder instance.
+     */
+    public Builder lastStepCancelButtonTextColor(int lastStepCancelButtonTextColor) {
+        style.lastStepCancelButtonTextColor = lastStepCancelButtonTextColor;
+
+        return this;
+    }
+
+    /**
+     * Sets the text color of the "Cancel" button of the last step when pressed.
+     *
+     * @param lastStepCancelButtonPressedTextColor Text color of the "Cancel" button of the last
+     *                                             step when pressed.
+     * @return The builder instance.
+     */
+    public Builder lastStepCancelButtonPressedTextColor(int lastStepCancelButtonPressedTextColor) {
+        style.lastStepCancelButtonPressedTextColor = lastStepCancelButtonPressedTextColor;
 
         return this;
     }
@@ -352,8 +377,11 @@ public class Builder {
      *                                                          color on disabled elements.
      * @return The builder instance.
      */
-    public Builder displayDifferentBackgroundColorOnDisabledElements(boolean displayDifferentBackgroundColorOnDisabledElements) {
-        style.displayDifferentBackgroundColorOnDisabledElements = displayDifferentBackgroundColorOnDisabledElements;
+    public Builder displayDifferentBackgroundColorOnDisabledElements(
+            boolean displayDifferentBackgroundColorOnDisabledElements) {
+
+        style.displayDifferentBackgroundColorOnDisabledElements
+                = displayDifferentBackgroundColorOnDisabledElements;
 
         return this;
     }

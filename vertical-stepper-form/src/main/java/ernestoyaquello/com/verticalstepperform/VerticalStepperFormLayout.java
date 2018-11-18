@@ -332,8 +332,9 @@ public class VerticalStepperFormLayout extends LinearLayout {
         if (stepPosition >= 0 && stepPosition < stepHelpers.size()) {
             stepsScrollView.post(new Runnable() {
                 public void run() {
-                    View stepEntireLayout = stepHelpers.get(stepPosition).getStepInstance().getEntireStepLayout();
-                    View stepContentLayout = stepHelpers.get(stepPosition).getStepInstance().getContentLayout();
+                    Step stepInstance = stepHelpers.get(stepPosition).getStepInstance();
+                    View stepEntireLayout = stepInstance.getEntireStepLayout();
+                    View stepContentLayout = stepInstance.getContentLayout();
                     Rect scrollBounds = new Rect();
                     stepsScrollView.getDrawingRect(scrollBounds);
                     if (stepContentLayout == null || scrollBounds.top > stepContentLayout.getY()) {
@@ -387,6 +388,10 @@ public class VerticalStepperFormLayout extends LinearLayout {
      * in order to re-send the data.
      */
     public synchronized void cancelFormCompletionAttempt() {
+        if (!formCompleted) {
+            return;
+        }
+
         int openedStepPosition = getOpenStepPosition();
         if (openedStepPosition >= 0 && openedStepPosition < stepHelpers.size()) {
             StepHelper stepHelper = stepHelpers.get(openedStepPosition);
@@ -445,13 +450,15 @@ public class VerticalStepperFormLayout extends LinearLayout {
         FormStyle.defaultStepNumberBackgroundColor = Color.rgb(63, 81, 181);
         FormStyle.defaultNextButtonBackgroundColor = Color.rgb(63, 81, 181);
         FormStyle.defaultNextButtonPressedBackgroundColor = Color.rgb(48, 63, 159);
-        FormStyle.defaultLastStepCancelButtonBackgroundColor = Color.rgb(150, 150, 150);
-        FormStyle.defaultLastStepCancelButtonPressedBackgroundColor = Color.rgb(130, 130, 130);
+        FormStyle.defaultLastStepCancelButtonBackgroundColor = Color.rgb(155, 155, 155);
+        FormStyle.defaultLastStepCancelButtonPressedBackgroundColor = Color.rgb(135, 135, 135);
         FormStyle.defaultStepNumberTextColor = Color.rgb(255, 255, 255);
         FormStyle.defaultStepTitleTextColor = Color.rgb(33, 33, 33);
         FormStyle.defaultStepSubtitleTextColor = Color.rgb(162, 162, 162);
-        FormStyle.defaultButtonTextColor = Color.rgb(255, 255, 255);
-        FormStyle.defaultButtonPressedTextColor = Color.rgb(255, 255, 255);
+        FormStyle.defaultNextButtonTextColor = Color.rgb(255, 255, 255);
+        FormStyle.defaultNextButtonPressedTextColor = Color.rgb(255, 255, 255);
+        FormStyle.defaultLastStepCancelButtonTextColor = Color.rgb(255, 255, 255);
+        FormStyle.defaultLastStepCancelButtonPressedTextColor = Color.rgb(255, 255, 255);
         FormStyle.defaultErrorMessageTextColor = Color.rgb(175, 18, 18);
         FormStyle.defaultDisplayBottomNavigation = true;
         FormStyle.defaultDisplayStepButtons = true;
@@ -718,7 +725,14 @@ public class VerticalStepperFormLayout extends LinearLayout {
             int positionToOpen = bundle.getInt("openStep");
             state = bundle.getParcelable("superState");
 
-            restoreFromState(positionToOpen, completedSteps, titles, subtitles, buttonTexts, errorMessages, formCompleted);
+            restoreFromState(
+                    positionToOpen,
+                    completedSteps,
+                    titles,
+                    subtitles,
+                    buttonTexts,
+                    errorMessages,
+                    formCompleted);
         }
         super.onRestoreInstanceState(state);
     }
@@ -775,8 +789,10 @@ public class VerticalStepperFormLayout extends LinearLayout {
         private static int defaultStepNumberTextColor;
         private static int defaultStepTitleTextColor;
         private static int defaultStepSubtitleTextColor;
-        private static int defaultButtonTextColor;
-        private static int defaultButtonPressedTextColor;
+        private static int defaultNextButtonTextColor;
+        private static int defaultNextButtonPressedTextColor;
+        private static int defaultLastStepCancelButtonTextColor;
+        private static int defaultLastStepCancelButtonPressedTextColor;
         private static int defaultErrorMessageTextColor;
         private static boolean defaultDisplayBottomNavigation;
         private static boolean defaultDisplayStepButtons;
@@ -800,8 +816,10 @@ public class VerticalStepperFormLayout extends LinearLayout {
         int stepNumberTextColor;
         int stepTitleTextColor;
         int stepSubtitleTextColor;
-        int buttonTextColor;
-        int buttonPressedTextColor;
+        int nextButtonTextColor;
+        int nextButtonPressedTextColor;
+        int lastStepCancelButtonTextColor;
+        int lastStepCancelButtonPressedTextColor;
         int errorMessageTextColor;
         boolean displayBottomNavigation;
         boolean displayStepButtons;
@@ -826,8 +844,10 @@ public class VerticalStepperFormLayout extends LinearLayout {
             this.stepNumberTextColor = defaultStepNumberTextColor;
             this.stepTitleTextColor = defaultStepTitleTextColor;
             this.stepSubtitleTextColor = defaultStepSubtitleTextColor;
-            this.buttonTextColor = defaultButtonTextColor;
-            this.buttonPressedTextColor = defaultButtonPressedTextColor;
+            this.nextButtonTextColor = defaultNextButtonTextColor;
+            this.nextButtonPressedTextColor = defaultNextButtonPressedTextColor;
+            this.lastStepCancelButtonTextColor = defaultLastStepCancelButtonTextColor;
+            this.lastStepCancelButtonPressedTextColor = defaultLastStepCancelButtonPressedTextColor;
             this.errorMessageTextColor = defaultErrorMessageTextColor;
             this.displayBottomNavigation = defaultDisplayBottomNavigation;
             this.displayStepButtons = defaultDisplayStepButtons;

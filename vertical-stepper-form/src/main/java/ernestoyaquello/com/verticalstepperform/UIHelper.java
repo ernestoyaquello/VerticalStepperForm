@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.content.res.ColorStateList;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -11,11 +12,44 @@ import android.view.WindowManager;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-class Animations {
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.core.view.ViewCompat;
+
+class UIHelper {
 
     private static final long MIN_DURATION_MILLIS = 150;
 
     private static final Map<View, ObjectAnimator> _runningObjectAnimators = new ConcurrentHashMap<>();
+
+    static void setButtonColor(
+            AppCompatButton button,
+            int buttonColor,
+            int buttonTextColor,
+            int buttonPressedColor,
+            int buttonPressedTextColor) {
+
+        int[][] states = new int[][]{
+                new int[]{android.R.attr.state_pressed},
+                new int[]{android.R.attr.state_focused},
+                new int[]{}
+        };
+        ColorStateList buttonColours = new ColorStateList(
+                states,
+                new int[]{
+                        buttonPressedColor,
+                        buttonPressedColor,
+                        buttonColor
+                });
+        ColorStateList buttonTextColours = new ColorStateList(
+                states,
+                new int[]{
+                        buttonPressedTextColor,
+                        buttonPressedTextColor,
+                        buttonTextColor
+                });
+        ViewCompat.setBackgroundTintList(button, buttonColours);
+        button.setTextColor(buttonTextColours);
+    }
 
     static void slideDownIfNecessary(View view, boolean animate) {
 
@@ -70,7 +104,8 @@ class Animations {
             return;
         }
 
-        long durationMillis = ((int) (expandedHeight * (Math.abs(finalValue - initialValue)) / view.getContext().getResources().getDisplayMetrics().density)) * 2;
+        float density = view.getContext().getResources().getDisplayMetrics().density;
+        long durationMillis = ((int) (expandedHeight * (Math.abs(finalValue - initialValue)) / density)) * 2;
         durationMillis = durationMillis < MIN_DURATION_MILLIS ? MIN_DURATION_MILLIS : durationMillis;
 
         final ObjectAnimator animator = ObjectAnimator.ofFloat(view, View.ALPHA, initialValue, finalValue);

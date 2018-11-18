@@ -21,7 +21,7 @@ import ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout.FormSty
  * It can also handle the logic of the optional confirmation step.
  *
  * All this logic could certainly be in the base class of the step, but by keeping it here we make
- * that class cleaner, helping anyone taking a look at it to understand it better.
+ * that class cleaner, making it easier to understand for anyone taking a look at it.
  */
 class StepHelper implements Step.InternalFormStepListener {
 
@@ -112,20 +112,21 @@ class StepHelper implements Step.InternalFormStepListener {
         errorMessageView.setTextColor(formStyle.errorMessageTextColor);
         errorIconView.setColorFilter(formStyle.errorMessageTextColor);
         Drawable circleDrawable = ContextCompat.getDrawable(context, R.drawable.circle_step_done);
-        circleDrawable.setColorFilter(new PorterDuffColorFilter(formStyle.stepNumberBackgroundColor, PorterDuff.Mode.SRC_IN));
+        circleDrawable.setColorFilter(
+                new PorterDuffColorFilter(formStyle.stepNumberBackgroundColor, PorterDuff.Mode.SRC_IN));
         stepNumberCircleView.setBackground(circleDrawable);
-        UIHelpers.setButtonColor(
+        UIHelper.setButtonColor(
                 nextButtonView,
                 formStyle.nextButtonBackgroundColor,
-                formStyle.buttonTextColor,
+                formStyle.nextButtonTextColor,
                 formStyle.nextButtonPressedBackgroundColor,
-                formStyle.buttonPressedTextColor);
-        UIHelpers.setButtonColor(
+                formStyle.nextButtonPressedTextColor);
+        UIHelper.setButtonColor(
                 cancelButtonView,
                 formStyle.lastStepCancelButtonBackgroundColor,
-                formStyle.buttonTextColor,
+                formStyle.lastStepCancelButtonTextColor,
                 formStyle.lastStepCancelButtonPressedBackgroundColor,
-                formStyle.buttonPressedTextColor);
+                formStyle.lastStepCancelButtonPressedTextColor);
 
         headerView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -162,8 +163,10 @@ class StepHelper implements Step.InternalFormStepListener {
         step.updateNextButtonText(stepNextButtonText, false);
 
         if (formStyle.displayCancelButtonInLastStep && isLast) {
+            String cancelButtonText = formStyle.lastStepCancelButtonText == null
+                    ? "" : formStyle.lastStepCancelButtonText;
+            cancelButtonView.setText(cancelButtonText);
             cancelButtonView.setVisibility(View.VISIBLE);
-            cancelButtonView.setText(formStyle.lastStepCancelButtonText == null ? "" : formStyle.lastStepCancelButtonText);
         }
 
         if (!formStyle.displayStepButtons && !isConfirmationStep()) {
@@ -219,9 +222,9 @@ class StepHelper implements Step.InternalFormStepListener {
     public void onUpdatedStepVisibility(int stepPosition, boolean useAnimations) {
         if (step.getEntireStepLayout() != null) {
             if (step.isOpen()) {
-                Animations.slideDownIfNecessary(stepAndButtonView, useAnimations);
+                UIHelper.slideDownIfNecessary(stepAndButtonView, useAnimations);
             } else {
-                Animations.slideUpIfNecessary(stepAndButtonView, useAnimations);
+                UIHelper.slideUpIfNecessary(stepAndButtonView, useAnimations);
             }
 
             if (step.isOpen()) {
@@ -296,12 +299,12 @@ class StepHelper implements Step.InternalFormStepListener {
         nextButtonView.setAlpha(1f);
 
         if (formStyle.displayDifferentBackgroundColorOnDisabledElements) {
-            UIHelpers.setButtonColor(
+            UIHelper.setButtonColor(
                     nextButtonView,
                     formStyle.nextButtonBackgroundColor,
-                    formStyle.buttonTextColor,
+                    formStyle.nextButtonTextColor,
                     formStyle.nextButtonPressedBackgroundColor,
-                    formStyle.buttonPressedTextColor);
+                    formStyle.nextButtonPressedTextColor);
         }
     }
 
@@ -310,12 +313,12 @@ class StepHelper implements Step.InternalFormStepListener {
         nextButtonView.setAlpha(formStyle.alphaOfDisabledElements);
 
         if (formStyle.displayDifferentBackgroundColorOnDisabledElements) {
-            UIHelpers.setButtonColor(
+            UIHelper.setButtonColor(
                     nextButtonView,
                     formStyle.backgroundColorOfDisabledElements,
-                    formStyle.buttonTextColor,
+                    formStyle.nextButtonTextColor,
                     formStyle.backgroundColorOfDisabledElements,
-                    formStyle.buttonPressedTextColor);
+                    formStyle.nextButtonPressedTextColor);
         }
     }
 
@@ -324,12 +327,12 @@ class StepHelper implements Step.InternalFormStepListener {
         cancelButtonView.setAlpha(1f);
 
         if (formStyle.displayDifferentBackgroundColorOnDisabledElements) {
-            UIHelpers.setButtonColor(
+            UIHelper.setButtonColor(
                     cancelButtonView,
                     formStyle.lastStepCancelButtonBackgroundColor,
-                    formStyle.buttonTextColor,
+                    formStyle.lastStepCancelButtonTextColor,
                     formStyle.lastStepCancelButtonPressedBackgroundColor,
-                    formStyle.buttonPressedTextColor);
+                    formStyle.lastStepCancelButtonPressedTextColor);
         }
     }
 
@@ -338,12 +341,12 @@ class StepHelper implements Step.InternalFormStepListener {
         cancelButtonView.setAlpha(formStyle.alphaOfDisabledElements);
 
         if (formStyle.displayDifferentBackgroundColorOnDisabledElements) {
-            UIHelpers.setButtonColor(
+            UIHelper.setButtonColor(
                     cancelButtonView,
                     formStyle.backgroundColorOfDisabledElements,
-                    formStyle.buttonTextColor,
+                    formStyle.lastStepCancelButtonTextColor,
                     formStyle.backgroundColorOfDisabledElements,
-                    formStyle.buttonPressedTextColor);
+                    formStyle.lastStepCancelButtonPressedTextColor);
         }
     }
 
@@ -423,17 +426,17 @@ class StepHelper implements Step.InternalFormStepListener {
         boolean showSubtitle = !getActualSubtitleText().isEmpty()
                 && (step.isOpen() || step.isCompleted());
         if (showSubtitle) {
-            Animations.slideDownIfNecessary(subtitleView, useAnimations);
+            UIHelper.slideDownIfNecessary(subtitleView, useAnimations);
         } else {
-            Animations.slideUpIfNecessary(subtitleView, useAnimations);
+            UIHelper.slideUpIfNecessary(subtitleView, useAnimations);
         }
     }
 
     private void updateErrorMessageVisibility(boolean useAnimations) {
         if (step.isOpen() && !step.isCompleted() && !step.getErrorMessage().isEmpty()) {
-            Animations.slideDownIfNecessary(errorMessageContainerView, useAnimations);
+            UIHelper.slideDownIfNecessary(errorMessageContainerView, useAnimations);
         } else {
-            Animations.slideUpIfNecessary(errorMessageContainerView, useAnimations);
+            UIHelper.slideUpIfNecessary(errorMessageContainerView, useAnimations);
         }
     }
 
