@@ -219,49 +219,63 @@ public class VerticalStepperFormLayout extends LinearLayout {
     }
 
     /**
-     * Goes to the step that is positioned after the currently open one, closing the current one and
-     * opening the next one.
+     * If possible, goes to the step that is positioned after the currently open one, closing the
+     * current one and opening the next one.
+     * Please note that, unless allowNonLinearNavigation is set to true, it will only be possible to
+     * navigate to a certain step if all the previous ones are marked as completed.
      *
      * @param useAnimations Indicates whether or not the affected steps will be opened/closed using
      *                      animations.
+     * @return True if the navigation to the step was performed; false otherwise.
      */
-    public synchronized void goToNextStep(boolean useAnimations) {
-        goToStep(getOpenStepPosition() + 1, useAnimations);
+    public synchronized boolean goToNextStep(boolean useAnimations) {
+        return goToStep(getOpenStepPosition() + 1, useAnimations);
     }
 
     /**
-     * Goes to the step that is positioned before the currently open one, closing the current one
-     * and opening the previous one.
+     * If possible, goes to the step that is positioned before the currently open one, closing the
+     * current one and opening the previous one.
+     * Please note that, unless allowNonLinearNavigation is set to true, it will only be possible to
+     * navigate to a certain step if all the previous ones are marked as completed.
      *
      * @param useAnimations Indicates whether or not the affected steps will be opened/closed using
      *                      animations.
+     * @return True if the navigation to the step was performed; false otherwise.
      */
-    public synchronized void goToPreviousStep(boolean useAnimations) {
-        goToStep(getOpenStepPosition() - 1, useAnimations);
+    public synchronized boolean goToPreviousStep(boolean useAnimations) {
+        return goToStep(getOpenStepPosition() - 1, useAnimations);
     }
 
     /**
-     * Goes to a certain step, closing the currently open one and opening the target one.
-     * If the specified position to go to is the next one to the actual last one, the form will
-     * attempt to complete.
+     * If possible, goes to the specified step, closing the currently open one and opening the
+     * target one.
+     * Please note that, unless allowNonLinearNavigation is set to true, it will only be possible to
+     * navigate to a certain step if all the previous ones are marked as completed.
+     * In case the navigation is possible and the specified position to go to is the last one + 1,
+     * the form will attempt to complete.
      *
      * @param stepPosition The step position to go to. If it is the next one to the actual last one,
      *                     the form will attempt to complete.
      * @param useAnimations Indicates whether or not the affected steps will be opened/closed using
      *                      animations.
+     * @return True if the navigation to the step was performed; false otherwise.
      */
-    public synchronized void goToStep(int stepPosition, boolean useAnimations) {
+    public synchronized boolean goToStep(int stepPosition, boolean useAnimations) {
         if (formCompleted) {
-            return;
+            return false;
         }
 
         int openStepPosition = getOpenStepPosition();
         if (openStepPosition != stepPosition && stepPosition >= 0 && stepPosition <= stepHelpers.size()) {
             boolean previousStepsAreCompleted = areAllPreviousStepsCompleted(stepPosition);
-            if (stepPosition < stepHelpers.size() || previousStepsAreCompleted) {
+            if ((style.allowNonLinearNavigation && stepPosition < stepHelpers.size()) || previousStepsAreCompleted) {
                 openStep(stepPosition, useAnimations);
+
+                return true;
             }
         }
+
+        return false;
     }
 
     /**
@@ -473,6 +487,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
         FormStyle.defaultIncludeConfirmationStep = true;
         FormStyle.defaultDisplayStepDataInSubtitleOfClosedSteps = false;
         FormStyle.defaultDisplayDifferentBackgroundColorOnDisabledElements = false;
+        FormStyle.defaultAllowNonLinearNavigation = false;
 
         internalListener = new FormStepListener();
     }
@@ -525,6 +540,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
     protected synchronized void updateBottomNavigationButtons() {
         int stepPosition = getOpenStepPosition();
         if (stepPosition >= 0 && stepPosition < stepHelpers.size()) {
+            StepHelper stepHelper = stepHelpers.get(stepPosition);
 
             if (!formCompleted && stepPosition > 0) {
                 enablePreviousButtonInBottomNavigation();
@@ -532,7 +548,9 @@ public class VerticalStepperFormLayout extends LinearLayout {
                 disablePreviousButtonInBottomNavigation();
             }
 
-            if (!formCompleted && (stepPosition + 1) < stepHelpers.size()) {
+            if (!formCompleted
+                    && (stepPosition + 1) < stepHelpers.size()
+                    && (style.allowNonLinearNavigation || stepHelper.getStepInstance().isCompleted())) {
                 enableNextButtonInBottomNavigation();
             } else {
                 disableNextButtonInBottomNavigation();
@@ -830,6 +848,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
         private static boolean defaultIncludeConfirmationStep;
         private static boolean defaultDisplayStepDataInSubtitleOfClosedSteps;
         private static boolean defaultDisplayDifferentBackgroundColorOnDisabledElements;
+        private static boolean defaultAllowNonLinearNavigation;
 
         String stepNextButtonText;
         String lastStepNextButtonText;
@@ -857,6 +876,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
         boolean includeConfirmationStep;
         boolean displayStepDataInSubtitleOfClosedSteps;
         boolean displayDifferentBackgroundColorOnDisabledElements;
+        boolean allowNonLinearNavigation;
 
         FormStyle() {
             this.stepNextButtonText = defaultNextStepButtonText;
@@ -885,6 +905,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
             this.includeConfirmationStep = defaultIncludeConfirmationStep;
             this.displayStepDataInSubtitleOfClosedSteps = defaultDisplayStepDataInSubtitleOfClosedSteps;
             this.displayDifferentBackgroundColorOnDisabledElements = defaultDisplayDifferentBackgroundColorOnDisabledElements;
+            this.allowNonLinearNavigation = defaultAllowNonLinearNavigation;
         }
     }
 }

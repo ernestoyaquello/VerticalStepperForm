@@ -387,6 +387,19 @@ public class Builder {
     }
 
     /**
+     * Specifies whether or not the user will be able to jump to any step without having completed
+     * the previous ones.
+     *
+     * @param allowNonLinearNavigation True to allow non-linear navigation between steps; false to not.
+     * @return The builder instance.
+     */
+    public Builder allowNonLinearNavigation(boolean allowNonLinearNavigation) {
+        style.allowNonLinearNavigation = allowNonLinearNavigation;
+
+        return this;
+    }
+
+    /**
      * Sets up the form and initializes it.
      */
     public void init() {
