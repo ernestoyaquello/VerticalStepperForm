@@ -365,7 +365,8 @@ public class VerticalStepperFormLayout extends LinearLayout {
      * If all the steps are currently marked as completed, completes the form, disabling the step
      * navigation and the button(s) of the last step, and invoking onCompletedForm() on the listener.
      * To revert these changes (for example, because saving or sending the data has failed and you
-     * want the form to go back to normal so the user can use it), call cancelFormCompletionAttempt().
+     * want the form to go back to normal so the user can use it), call
+     * cancelFormCompletionOrCancellationAttempt().
      */
     public void completeForm() {
         attemptToCompleteForm(false);
@@ -375,19 +376,20 @@ public class VerticalStepperFormLayout extends LinearLayout {
      * Cancels the form, disabling the step navigation and the button(s) of the currently open step,
      * and invoking onCancelledForm() on the listener.
      * To revert these changes (for example, because the user has dismissed the cancellation and you
-     * want the form to go back to normal), call cancelFormCompletionAttempt().
+     * want the form to go back to normal), call cancelFormCompletionOrCancellationAttempt().
      */
     public void cancelForm() {
         attemptToCompleteForm(true);
     }
 
     /**
-     * To be used after a failed form completion attempt, this method re-activates the navigation to
-     * other steps and re-enables the button of the currently open step.
+     * To be used after a failed form completion attempt or after a dismissed cancellation attempt,
+     * this method re-activates the navigation to other steps and re-enables the button(s) of the
+     * currently open step.
      * Useful when saving the form data fails and you want to allow the user to use the form again
      * in order to re-send the data.
      */
-    public synchronized void cancelFormCompletionAttempt() {
+    public synchronized void cancelFormCompletionOrCancellationAttempt() {
         if (!formCompleted) {
             return;
         }
@@ -395,7 +397,11 @@ public class VerticalStepperFormLayout extends LinearLayout {
         int openedStepPosition = getOpenStepPosition();
         if (openedStepPosition >= 0 && openedStepPosition < stepHelpers.size()) {
             StepHelper stepHelper = stepHelpers.get(openedStepPosition);
-            stepHelper.enableAllButtons();
+            if ((openedStepPosition + 1) < stepHelpers.size() || areAllStepsCompleted()) {
+                stepHelper.enableAllButtons();
+            } else {
+                stepHelper.enableCancelButton();
+            }
 
             formCompleted = false;
             updateBottomNavigationButtons();
@@ -511,8 +517,6 @@ public class VerticalStepperFormLayout extends LinearLayout {
 
             StepHelper stepToOpen = stepHelpers.get(stepToOpenPosition);
             stepToOpen.getStepInstance().openInternal(useAnimations);
-
-            enableOrDisableLastStepButtons();
         } else if (stepToOpenPosition == stepHelpers.size()) {
             attemptToCompleteForm(false);
         }
@@ -568,11 +572,11 @@ public class VerticalStepperFormLayout extends LinearLayout {
         }
     }
 
-    private void enableOrDisableLastStepButtons() {
+    private void enableOrDisableLastStepNextButton() {
         if (!areAllStepsCompleted()) {
-            stepHelpers.get(stepHelpers.size() - 1).disableAllButtons();
+            stepHelpers.get(stepHelpers.size() - 1).disableNextButton();
         } else {
-            stepHelpers.get(stepHelpers.size() - 1).enableAllButtons();
+            stepHelpers.get(stepHelpers.size() - 1).enableNextButton();
         }
     }
 
@@ -787,14 +791,14 @@ public class VerticalStepperFormLayout extends LinearLayout {
         public void onUpdatedStepCompletionState(int stepPosition, boolean useAnimations) {
             updateBottomNavigationButtons();
             refreshFormProgress();
-            enableOrDisableLastStepButtons();
+            enableOrDisableLastStepNextButton();
         }
 
         @Override
         public void onUpdatedStepVisibility(int stepPosition, boolean useAnimations) {
             updateBottomNavigationButtons();
             scrollToOpenStepIfNecessary(useAnimations);
-            enableOrDisableLastStepButtons();
+            enableOrDisableLastStepNextButton();
         }
     }
 

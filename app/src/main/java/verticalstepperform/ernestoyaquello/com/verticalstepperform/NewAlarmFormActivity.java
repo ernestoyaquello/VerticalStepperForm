@@ -86,7 +86,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
                 } catch (RuntimeException e) {
                     // No need to do anything here
                 } finally {
-                    verticalStepperForm.cancelFormCompletionAttempt();
+                    verticalStepperForm.cancelFormCompletionOrCancellationAttempt();
                 }
             }
         });
@@ -161,7 +161,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
                 finish();
                 break;
             case -2:
-                verticalStepperForm.cancelFormCompletionAttempt();
+                verticalStepperForm.cancelFormCompletionOrCancellationAttempt();
                 break;
         }
     }

@@ -294,7 +294,7 @@ class StepHelper implements Step.InternalFormStepListener {
         stepNumberTextView.setVisibility(View.VISIBLE);
     }
 
-    private void enableNextButton() {
+    void enableNextButton() {
         nextButtonView.setEnabled(true);
         nextButtonView.setAlpha(1f);
 
@@ -308,7 +308,7 @@ class StepHelper implements Step.InternalFormStepListener {
         }
     }
 
-    private void disableNextButton() {
+    void disableNextButton() {
         nextButtonView.setEnabled(false);
         nextButtonView.setAlpha(formStyle.alphaOfDisabledElements);
 
@@ -322,7 +322,7 @@ class StepHelper implements Step.InternalFormStepListener {
         }
     }
 
-    private void enableCancelButton() {
+    void enableCancelButton() {
         cancelButtonView.setEnabled(true);
         cancelButtonView.setAlpha(1f);
 
@@ -336,7 +336,7 @@ class StepHelper implements Step.InternalFormStepListener {
         }
     }
 
-    private void disableCancelButton() {
+    void disableCancelButton() {
         cancelButtonView.setEnabled(false);
         cancelButtonView.setAlpha(formStyle.alphaOfDisabledElements);
 
@@ -351,7 +351,9 @@ class StepHelper implements Step.InternalFormStepListener {
     }
 
     void enableAllButtons() {
-        enableNextButton();
+        if (step.isCompleted()) {
+            enableNextButton();
+        }
         enableCancelButton();
     }
 

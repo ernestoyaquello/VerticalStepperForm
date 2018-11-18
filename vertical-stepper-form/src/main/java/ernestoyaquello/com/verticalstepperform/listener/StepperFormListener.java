@@ -7,7 +7,7 @@ public interface StepperFormListener {
      * been marked as completed. It can be used to trigger showing loaders, sending the data, etc.
      *
      * Before this method gets called, the form disables the navigation between steps, as well as
-     * all the buttons. To revert the form to normal, call cancelFormCompletionAttempt().
+     * all the buttons. To revert the form to normal, call cancelFormCompletionOrCancellationAttempt().
      */
     void onCompletedForm();
 
@@ -17,7 +17,7 @@ public interface StepperFormListener {
      * button of the confirmation step).
      *
      * Before this method gets called, the form disables the navigation between steps, as well as
-     * all the buttons. To revert the form to normal, call cancelFormCompletionAttempt().
+     * all the buttons. To revert the form to normal, call cancelFormCompletionOrCancellationAttempt().
      */
     void onCancelledForm();
 
