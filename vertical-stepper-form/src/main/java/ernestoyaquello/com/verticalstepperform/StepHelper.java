@@ -1,6 +1,7 @@
 package ernestoyaquello.com.verticalstepperform;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
@@ -232,11 +233,7 @@ class StepHelper implements Step.InternalFormStepListener {
         if (step.getEntireStepLayout() != null) {
             if (step.isOpen()) {
                 UIHelper.slideDownIfNecessary(stepAndButtonView, useAnimations);
-            } else {
-                UIHelper.slideUpIfNecessary(stepAndButtonView, useAnimations);
-            }
 
-            if (step.isOpen()) {
                 // As soon as the step opens, we update its completion state
                 boolean wasCompleted = step.isCompleted();
                 boolean isCompleted = step.markAsCompletedOrUncompleted(useAnimations);
@@ -244,6 +241,7 @@ class StepHelper implements Step.InternalFormStepListener {
                     updateHeader(useAnimations);
                 }
             } else {
+                UIHelper.slideUpIfNecessary(stepAndButtonView, useAnimations);
                 updateHeader(useAnimations);
             }
         }

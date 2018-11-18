@@ -84,7 +84,8 @@
                 android:layout_height="wrap_content">
 
                 <View
-                    android:layout_width="1dp"
+                    android:id="@+id/spacing"
+                    android:layout_width="match_parent"
                     android:layout_height="10dp" />
 
                 <TextView

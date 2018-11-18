@@ -7,7 +7,6 @@ import android.animation.ValueAnimator;
 import android.content.res.ColorStateList;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -55,8 +54,11 @@ class UIHelper {
 
         if (!animate) {
             endPreviousAnimationIfNecessary(view);
-            view.measure(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
-            setViewHeight(view, view.getMeasuredHeight());
+            view.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            int measuredHeight = view.getMeasuredHeight();
+            if (measuredHeight > 0) {
+                setViewHeight(view, measuredHeight);
+            }
             setFinalAlphaAndVisibility(view, false);
 
             return;
@@ -81,7 +83,7 @@ class UIHelper {
     private static void performSlideAnimation(final View view, final boolean slideUp) {
 
         int currentHeight = view.getHeight();
-        view.measure(WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT);
+        view.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         final int expandedHeight = view.getMeasuredHeight();
 
         if (currentHeight < 0) {
@@ -91,10 +93,10 @@ class UIHelper {
             setViewHeight(view, currentHeight);
         }
 
-        final float initialValue = currentHeight / (float) expandedHeight;
-        final float finalValue = slideUp ? 0 : 1;
-
-        if (initialValue == finalValue) {
+        float initialValue = currentHeight / (float) expandedHeight;
+        float finalValue = slideUp ? 0 : 1;
+        final float correctedInitialValue = initialValue > 1 ? 1 : initialValue;
+        if (correctedInitialValue == finalValue) {
 
             // No need to animate anything because initial value and final value match
             endPreviousAnimationIfNecessary(view);
@@ -105,10 +107,10 @@ class UIHelper {
         }
 
         float density = view.getContext().getResources().getDisplayMetrics().density;
-        long durationMillis = ((int) (expandedHeight * (Math.abs(finalValue - initialValue)) / density)) * 2;
+        long durationMillis = ((int) (expandedHeight * (Math.abs(finalValue - correctedInitialValue)) / density)) * 2;
         durationMillis = durationMillis < MIN_DURATION_MILLIS ? MIN_DURATION_MILLIS : durationMillis;
 
-        final ObjectAnimator animator = ObjectAnimator.ofFloat(view, View.ALPHA, initialValue, finalValue);
+        final ObjectAnimator animator = ObjectAnimator.ofFloat(view, View.ALPHA, correctedInitialValue, finalValue);
         animator.setDuration(durationMillis);
 
         animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
@@ -126,7 +128,7 @@ class UIHelper {
             public void onAnimationStart(Animator animation) {
                 super.onAnimationEnd(animation);
 
-                view.setAlpha(initialValue);
+                view.setAlpha(correctedInitialValue);
                 view.setVisibility(View.VISIBLE);
             }
 
@@ -159,9 +161,9 @@ class UIHelper {
         }
     }
 
-    private static void setViewHeight(View view, int currentHeight) {
+    private static void setViewHeight(View view, int newHeight) {
         ViewGroup.LayoutParams layoutParams = view.getLayoutParams();
-        layoutParams.height = currentHeight;
+        layoutParams.height = newHeight;
         view.setLayoutParams(layoutParams);
     }
 }

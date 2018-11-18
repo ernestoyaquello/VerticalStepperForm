@@ -85,8 +85,9 @@ public class AlarmDaysStep extends Step<boolean[]> {
             }
         }
 
-        // TODO Set an error message as well for when thereIsAtLeastOneDaySelected is false
-        return new IsDataValid(thereIsAtLeastOneDaySelected);
+        return thereIsAtLeastOneDaySelected
+                ? new IsDataValid(true)
+                : new IsDataValid(false, getContext().getString(R.string.error_alarm_days_min_days));
     }
 
     private void setupAlarmDays() {
