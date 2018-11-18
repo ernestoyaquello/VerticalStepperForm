@@ -49,8 +49,8 @@ class StepHelper implements Step.InternalFormStepListener {
 
     StepHelper(Step.InternalFormStepListener formListener, Step step, boolean isConfirmationStep) {
         this.step = !isConfirmationStep ? step : new ConfirmationStep();
-        this.step.addListenerInternal(formListener);
         this.step.addListenerInternal(this);
+        this.step.addListenerInternal(formListener);
     }
 
     View initialize(
@@ -249,7 +249,6 @@ class StepHelper implements Step.InternalFormStepListener {
                 disableNextButton();
             }
             updateHeader(useAnimations);
-            updateErrorMessageVisibility(useAnimations);
         }
     }
 
@@ -282,6 +281,7 @@ class StepHelper implements Step.InternalFormStepListener {
 
         updateSubtitleTextViewValue();
         updateSubtitleVisibility(useAnimations);
+        updateErrorMessageVisibility(useAnimations);
     }
 
     private void showDoneIconAndHideStepNumber() {
@@ -449,7 +449,7 @@ class StepHelper implements Step.InternalFormStepListener {
         return subtitle;
     }
 
-    private boolean isConfirmationStep() {
+    boolean isConfirmationStep() {
         return step instanceof ConfirmationStep;
     }
 

@@ -210,55 +210,58 @@ public class VerticalStepperFormLayout extends LinearLayout {
     }
 
     /**
-     * If possible, goes to the step that is positioned after the currently open one, closing the
-     * current one and opening the next one.
-     * It is only possible to navigate to a certain step if all the previous ones are marked as completed.
+     * Determines whether all the steps are currently marked as completed.
      *
-     * @param useAnimations Indicates whether or not the affected steps will be opened/closed using
-     *                      animations.
-     * @return True if the navigation to the step was performed; false otherwise.
+     * @return True if all the steps are marked as completed; false otherwise.
      */
-    public synchronized boolean goToNextStep(boolean useAnimations) {
-        return goToStep(getOpenStepPosition() + 1, useAnimations);
+    public boolean areAllStepsCompleted() {
+        return areAllPreviousStepsCompleted(stepHelpers.size());
     }
 
     /**
-     * If possible, goes to the step that is positioned before the currently open one, closing the
-     * current one and opening the previous one.
-     * It is only possible to navigate to a certain step if all the previous ones are marked as completed.
+     * Goes to the step that is positioned after the currently open one, closing the current one and
+     * opening the next one.
      *
      * @param useAnimations Indicates whether or not the affected steps will be opened/closed using
      *                      animations.
-     * @return True if the navigation to the step was performed; false otherwise.
      */
-    public synchronized boolean goToPreviousStep(boolean useAnimations) {
-        return goToStep(getOpenStepPosition() - 1, useAnimations);
+    public synchronized void goToNextStep(boolean useAnimations) {
+        goToStep(getOpenStepPosition() + 1, useAnimations);
     }
 
     /**
-     * If possible, goes to a certain step, closing the currently open one and opening the target one.
-     * It is only possible to navigate to a certain step if all the previous ones are marked as completed.
+     * Goes to the step that is positioned before the currently open one, closing the current one
+     * and opening the previous one.
      *
-     * @param stepPosition The step position.
      * @param useAnimations Indicates whether or not the affected steps will be opened/closed using
      *                      animations.
-     * @return True if the navigation to the step was performed; false otherwise.
      */
-    public synchronized boolean goToStep(int stepPosition, boolean useAnimations) {
+    public synchronized void goToPreviousStep(boolean useAnimations) {
+        goToStep(getOpenStepPosition() - 1, useAnimations);
+    }
+
+    /**
+     * Goes to a certain step, closing the currently open one and opening the target one.
+     * If the specified position to go to is the next one to the actual last one, the form will
+     * attempt to complete.
+     *
+     * @param stepPosition The step position to go to. If it is the next one to the actual last one,
+     *                     the form will attempt to complete.
+     * @param useAnimations Indicates whether or not the affected steps will be opened/closed using
+     *                      animations.
+     */
+    public synchronized void goToStep(int stepPosition, boolean useAnimations) {
         if (formCompleted) {
-            return false;
+            return;
         }
 
         int openStepPosition = getOpenStepPosition();
         if (openStepPosition != stepPosition && stepPosition >= 0 && stepPosition <= stepHelpers.size()) {
             boolean previousStepsAreCompleted = areAllPreviousStepsCompleted(stepPosition);
-            if (previousStepsAreCompleted) {
+            if (stepPosition < stepHelpers.size() || previousStepsAreCompleted) {
                 openStep(stepPosition, useAnimations);
-                return true;
             }
         }
-
-        return false;
     }
 
     /**
@@ -359,21 +362,18 @@ public class VerticalStepperFormLayout extends LinearLayout {
     }
 
     /**
-     * If all the steps are currently marked as completed, it completes the form, disabling the
-     * step navigation and the button of the currently open step and invoking onCompletedForm() on
-     * the listener.
+     * If all the steps are currently marked as completed, completes the form, disabling the step
+     * navigation and the button(s) of the last step, and invoking onCompletedForm() on the listener.
      * To revert these changes (for example, because saving or sending the data has failed and you
      * want the form to go back to normal so the user can use it), call cancelFormCompletionAttempt().
-     *
-     * @return True if the form was completed; false otherwise.
      */
-    public boolean completeForm() {
-        return goToStep(stepHelpers.size(), true);
+    public void completeForm() {
+        attemptToCompleteForm(false);
     }
 
     /**
-     * Cancels the form, disabling the step navigation and the button of the currently open step
-     * and invoking onCompletedForm() on the listener.
+     * Cancels the form, disabling the step navigation and the button(s) of the currently open step,
+     * and invoking onCancelledForm() on the listener.
      * To revert these changes (for example, because the user has dismissed the cancellation and you
      * want the form to go back to normal), call cancelFormCompletionAttempt().
      */
@@ -435,6 +435,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
 
         // TODO Move all these default style values to resource files
         // TODO Get these values from XML attributes whenever possible
+        // TODO Add sizes
         FormStyle.defaultNextStepButtonText =
                 getResources().getString(R.string.vertical_form_stepper_form_continue_button);
         FormStyle.defaultLastStepNextButtonText =
@@ -511,6 +512,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
             StepHelper stepToOpen = stepHelpers.get(stepToOpenPosition);
             stepToOpen.getStepInstance().openInternal(useAnimations);
 
+            enableOrDisableLastStepButtons();
         } else if (stepToOpenPosition == stepHelpers.size()) {
             attemptToCompleteForm(false);
         }
@@ -519,7 +521,6 @@ public class VerticalStepperFormLayout extends LinearLayout {
     protected synchronized void updateBottomNavigationButtons() {
         int stepPosition = getOpenStepPosition();
         if (stepPosition >= 0 && stepPosition < stepHelpers.size()) {
-            StepHelper stepHelper = stepHelpers.get(stepPosition);
 
             if (!formCompleted && stepPosition > 0) {
                 enablePreviousButtonInBottomNavigation();
@@ -527,9 +528,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
                 disablePreviousButtonInBottomNavigation();
             }
 
-            if (!formCompleted
-                    && stepHelper.getStepInstance().isCompleted()
-                    && (stepPosition + 1) < stepHelpers.size()) {
+            if (!formCompleted && (stepPosition + 1) < stepHelpers.size()) {
                 enableNextButtonInBottomNavigation();
             } else {
                 disableNextButtonInBottomNavigation();
@@ -569,6 +568,14 @@ public class VerticalStepperFormLayout extends LinearLayout {
         }
     }
 
+    private void enableOrDisableLastStepButtons() {
+        if (!areAllStepsCompleted()) {
+            stepHelpers.get(stepHelpers.size() - 1).disableAllButtons();
+        } else {
+            stepHelpers.get(stepHelpers.size() - 1).enableAllButtons();
+        }
+    }
+
     private void setObserverForKeyboard() {
         getRootView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
@@ -586,9 +593,9 @@ public class VerticalStepperFormLayout extends LinearLayout {
         Rect r = new Rect();
         formContentView.getWindowVisibleDisplayFrame(r);
         int screenHeight = formContentView.getRootView().getHeight();
-        int keyboardHeigh = screenHeight - r.bottom;
+        int keyboardHeight = screenHeight - r.bottom;
 
-        return keyboardHeigh > screenHeight * 0.2;
+        return keyboardHeight > screenHeight * 0.2;
     }
 
     private synchronized void attemptToCompleteForm(boolean isCancellation) {
@@ -596,8 +603,24 @@ public class VerticalStepperFormLayout extends LinearLayout {
             return;
         }
 
+        // If the last step is a confirmation step that happens to be marked as uncompleted,
+        // here we attempt to mark it as completed so the form can be completed
+        boolean markedConfirmationStepAsCompleted = false;
+        String confirmationStepErrorMessage = "";
+        StepHelper lastStepHelper = stepHelpers.get(stepHelpers.size() - 1);
+        Step lastStep = lastStepHelper.getStepInstance();
+        if (!isCancellation) {
+            if (!lastStep.isCompleted() && lastStepHelper.isConfirmationStep()) {
+                confirmationStepErrorMessage = lastStep.getErrorMessage();
+                lastStep.markAsCompletedOrUncompleted(true);
+                if (lastStep.isCompleted()) {
+                    markedConfirmationStepAsCompleted = true;
+                }
+            }
+        }
+
         int openStepPosition = getOpenStepPosition();
-        if (openStepPosition >= 0 && openStepPosition < stepHelpers.size()) {
+        if (openStepPosition >= 0 && openStepPosition < stepHelpers.size() && (isCancellation || areAllStepsCompleted())) {
             formCompleted = true;
             stepHelpers.get(openStepPosition).disableAllButtons();
             updateBottomNavigationButtons();
@@ -609,6 +632,9 @@ public class VerticalStepperFormLayout extends LinearLayout {
                     listener.onCancelledForm();
                 }
             }
+        } else if (markedConfirmationStepAsCompleted) {
+            // If the completion attempt fails, we restore the confirmation step to its previous state
+            lastStep.markAsUncompleted(confirmationStepErrorMessage, true);
         }
     }
 
@@ -666,9 +692,7 @@ public class VerticalStepperFormLayout extends LinearLayout {
             }
         }
 
-        for (int i = 0; i <= positionToOpen; i++) {
-            goToStep(i, false);
-        }
+        goToStep(positionToOpen, false);
 
         if (formCompleted) {
             this.formCompleted = true;
@@ -763,12 +787,14 @@ public class VerticalStepperFormLayout extends LinearLayout {
         public void onUpdatedStepCompletionState(int stepPosition, boolean useAnimations) {
             updateBottomNavigationButtons();
             refreshFormProgress();
+            enableOrDisableLastStepButtons();
         }
 
         @Override
         public void onUpdatedStepVisibility(int stepPosition, boolean useAnimations) {
             updateBottomNavigationButtons();
             scrollToOpenStepIfNecessary(useAnimations);
+            enableOrDisableLastStepButtons();
         }
     }
 
