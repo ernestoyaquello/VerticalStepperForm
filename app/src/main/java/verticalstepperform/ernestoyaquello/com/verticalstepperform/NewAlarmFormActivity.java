@@ -44,7 +44,6 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vertical_stepper_form);
 
-        // TODO Replace string array with normal strings
         int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
         int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
         String[] stepTitles = getResources().getStringArray(R.array.steps_titles);
@@ -57,16 +56,12 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
 
         verticalStepperForm = findViewById(R.id.vertical_stepper_form);
         verticalStepperForm.setup(this, nameStep, descriptionStep, timeStep, daysStep)
-                .primaryColor(colorPrimary)
-                .primaryDarkColor(colorPrimaryDark)
+                .basicColorScheme(colorPrimary, colorPrimaryDark, Color.WHITE)
+                .displayCancelButtonInLastStep(true)
+                .lastStepCancelButtonColors(Color.TRANSPARENT, Color.TRANSPARENT, colorPrimary, colorPrimaryDark)
                 .lastStepNextButtonText(getString(R.string.add_alarm))
                 .confirmationStepSubtitle(null)//getString(R.string.add_alarm_confirm_subtitle))
-                .displayCancelButtonInLastStep(true)
                 .displayStepDataInSubtitleOfClosedSteps(true)
-                .lastStepCancelButtonTextColor(colorPrimary)
-                .lastStepCancelButtonPressedTextColor(colorPrimaryDark)
-                .lastStepCancelButtonBackgroundColor(Color.TRANSPARENT)
-                .lastStepCancelButtonPressedBackgroundColor(Color.TRANSPARENT)
                 .init();
     }
 
@@ -157,9 +152,13 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
     @Override
     public void onClick(DialogInterface dialogInterface, int which) {
         switch (which) {
+
+            // "Discard" button of the Discard Alarm dialog
             case -1:
                 finish();
                 break;
+
+            // "Cancel" button of the Discard Alarm dialog
             case -2:
                 verticalStepperForm.cancelFormCompletionOrCancellationAttempt();
                 break;
@@ -245,22 +244,8 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
             AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
             builder.setTitle(R.string.form_discard_question)
                     .setMessage(R.string.form_info_will_be_lost)
-                    .setPositiveButton(R.string.form_discard, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            if (listener != null) {
-                                listener.onClick(dialogInterface, i);
-                            }
-                        }
-                    })
-                    .setNegativeButton(R.string.form_discard_cancel, new DialogInterface.OnClickListener() {
-                        @Override
-                        public void onClick(DialogInterface dialogInterface, int i) {
-                            if (listener != null) {
-                                listener.onClick(dialogInterface, i);
-                            }
-                        }
-                    })
+                    .setPositiveButton(R.string.form_discard, listener)
+                    .setNegativeButton(R.string.form_discard_cancel, listener)
             .setCancelable(false);
             Dialog dialog = builder.create();
             dialog.setCanceledOnTouchOutside(false);

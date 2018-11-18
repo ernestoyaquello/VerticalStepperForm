@@ -7,7 +7,7 @@
     <string name="main_activity_alarm_added_info">Alarm %s set up at %s</string>
     <string name="main_activity_explanation">Click the button to set up a new alarm</string>
     <string name="main_activity_explanation_disclaimer">Don\'t worry, this app does not actually set up alarms.</string>
-    <string name="form_hint_title">Alarm title (required)</string>
+    <string name="form_hint_title">Alarm name (required)</string>
     <string name="form_hint_description">Alarm description (optional)</string>
     <string name="form_discard_question">Discard alarm?</string>
     <string name="form_info_will_be_lost">All the information about this new alarm will be lost</string>
@@ -17,13 +17,13 @@
     <string name="form_discard">Discard</string>
     <string name="form_empty_field">(Empty)</string>
     <string-array name="steps_titles">
-        <item>Title</item>
+        <item>Name</item>
         <item>Description</item>
         <item>Time</item>
         <item>Week schedule</item>
     </string-array>
     <string-array name="steps_subtitles">
-        <item>Title of the alarm</item>
+        <item>Name of the alarm</item>
         <item>Description of the alarm</item>
         <item>Time when the alarm will go off</item>
         <item>Week schedule of the alarm</item>
