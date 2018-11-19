@@ -9,7 +9,6 @@ import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AppCompatActivity;
 import android.view.MenuItem;
 
@@ -43,8 +42,6 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_alarm);
 
-        int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
-        int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
         String[] stepTitles = getResources().getStringArray(R.array.steps_titles);
         //String[] stepSubtitles = getResources().getStringArray(R.array.steps_subtitles);
 
@@ -53,7 +50,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
         timeStep = new AlarmTimeStep(stepTitles[2]);//, stepSubtitles[2]);
         daysStep = new AlarmDaysStep(stepTitles[3]);//, stepSubtitles[3]);
 
-        verticalStepperForm = findViewById(android.R.id.content);
+        verticalStepperForm = findViewById(R.id.stepper_form);
         verticalStepperForm.setup(this, nameStep, descriptionStep, timeStep, daysStep).init();
     }
 

@@ -26,6 +26,7 @@ Add the view ```VerticalStepperFormView``` to your layout using XML. For design 
 <ernestoyaquello.com.verticalstepperform.VerticalStepperFormView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/stepper_form"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:circle_background_color="@color/colorPrimary"
