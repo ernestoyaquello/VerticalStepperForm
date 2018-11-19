@@ -4,9 +4,6 @@ This Android library implements a highly customizable **vertical stepper form**.
 ## Demo
 ![Demo picture](https://raw.githubusercontent.com/ernestoyaquello/VerticalStepperForm/master/stepper-example.gif)
 
-## Examples
-![Design examples](https://raw.githubusercontent.com/ernestoyaquello/VerticalStepperForm/master/design-examples.png)
-
 ## How To Use It
 ### 1. Reference The Library
 Add the library to your project via Gradle:
@@ -29,11 +26,11 @@ Add the view ```VerticalStepperFormView``` to your layout using XML. For design 
     android:id="@+id/stepper_form"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    app:circle_background_color="@color/colorPrimary"
-    app:next_button_background_color="@color/colorPrimary"
-    app:next_button_pressed_background_color="@color/colorPrimaryDark"/>
+    app:form_circle_background_color="@color/colorPrimary"
+    app:form_next_button_background_color="@color/colorPrimary"
+    app:form_next_button_pressed_background_color="@color/colorPrimaryDark"/>
 ```
-As you can see in this example, the properties `circle_background_color`, `next_button_background_color` and `next_button_pressed_background_color` are being used to configure the form. There are plenty of other ones that you can use to customize it as you please.
+As you can see in this example, the properties `form_circle_background_color`, `form_next_button_background_color` and `form_next_button_pressed_background_color` are being used to configure the form. There are plenty of other ones that you can use to customize it as you please.
 
 ### 3. Define Your Steps
 [TBC]
@@ -43,7 +40,7 @@ In ```onCreate()```, you will need to find the view of the form to set it up and
 
 [TBC]
 
-### 5. Handle Configuration Changes (Optional)
+### 5. Handle Configuration Changes
 [TBC]
 
 
