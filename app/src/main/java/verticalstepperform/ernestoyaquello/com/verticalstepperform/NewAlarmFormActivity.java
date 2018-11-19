@@ -53,7 +53,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
         timeStep = new AlarmTimeStep(stepTitles[2]);//, stepSubtitles[2]);
         daysStep = new AlarmDaysStep(stepTitles[3]);//, stepSubtitles[3]);
 
-        verticalStepperForm = findViewById(R.id.vertical_stepper_form);
+        verticalStepperForm = findViewById(android.R.id.content);
         verticalStepperForm.setup(this, nameStep, descriptionStep, timeStep, daysStep).init();
     }
 
