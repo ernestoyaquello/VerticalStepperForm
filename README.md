@@ -177,7 +177,7 @@ verticalStepperForm
 
 There are many methods available to customize the form, but **all the configuration options that you can specify via code are also available in XML**, so it is up to you to set up the form in one way or another.
 
-#### About the listener
+#### About The Listener
 The listener `StepperFormListener` has only two methods:
 
 ##### `onCompletedForm()`
