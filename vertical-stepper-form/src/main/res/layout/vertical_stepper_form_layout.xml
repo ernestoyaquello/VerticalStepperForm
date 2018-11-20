@@ -1,88 +1,81 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="match_parent"
-    android:gravity="center_horizontal">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
 
-    <RelativeLayout
+    <ScrollView
+        android:id="@+id/steps_scroll"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:id="@+id/content"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginLeft="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginEnd="16dp"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp" />
+
+    </ScrollView>
+
+    <LinearLayout
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="48dp"
-        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
         android:background="#eeeeee"
-        android:paddingLeft="@dimen/activity_horizontal_margin"
-        android:paddingStart="@dimen/activity_horizontal_margin"
-        android:paddingRight="@dimen/activity_horizontal_margin"
-        android:paddingEnd="@dimen/activity_horizontal_margin">
+        android:gravity="center">
 
-        <android.support.v7.widget.AppCompatImageButton
+        <androidx.appcompat.widget.AppCompatImageButton
             style="?android:attr/borderlessButtonStyle"
             android:id="@+id/down_previous"
-            android:tag="@string/vertical_form_stepper_form_down_previous"
-            android:layout_width="48dp"
+            android:background="?android:attr/selectableItemBackground"
+            android:layout_width="56dp"
             android:layout_height="48dp"
             android:src="@drawable/previous_step"
             android:scaleType="centerInside"
-            android:layout_marginLeft="0dp"
-            android:layout_marginStart="0dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginRight="16dp"
-            android:layout_marginEnd="16dp"
-            android:textColor="#6c6c6c"
-            android:alpha="0.25" />
-
-        <android.support.v7.widget.AppCompatImageButton
-            style="?android:attr/borderlessButtonStyle"
-            android:id="@+id/down_next"
-            android:tag="@string/vertical_form_stepper_form_down_next"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:src="@drawable/next_step"
-            android:scaleType="centerInside"
-            android:layout_marginRight="0dp"
-            android:layout_marginEnd="0dp"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true"
-            android:layout_marginLeft="16dp"
-            android:layout_marginStart="16dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="8dp"
             android:textColor="#6c6c6c"
             android:alpha="0.25" />
 
         <ProgressBar
             style="@style/Base.Widget.AppCompat.ProgressBar.Horizontal"
             android:id="@+id/progress_bar"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="8dp"
-            android:layout_marginTop="24dp"
+            android:layout_weight="1"
             android:indeterminate="false"
             android:visibility="visible"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@id/down_previous"
-            android:layout_toEndOf="@id/down_previous"
-            android:layout_toLeftOf="@id/down_next"
-            android:layout_toStartOf="@id/down_next"/>
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginRight="8dp"
+            android:layout_gravity="center"/>
 
-    </RelativeLayout>
+        <androidx.appcompat.widget.AppCompatImageButton
+            style="?android:attr/borderlessButtonStyle"
+            android:id="@+id/down_next"
+            android:background="?android:attr/selectableItemBackground"
+            android:layout_width="56dp"
+            android:layout_height="48dp"
+            android:src="@drawable/next_step"
+            android:scaleType="centerInside"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:paddingEnd="16dp"
+            android:paddingStart="8dp"
+            android:textColor="#6c6c6c"
+            android:alpha="0.25" />
 
-    <ScrollView android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/steps_scroll"
-        android:layout_alignParentTop="true"
-        android:layout_above="@id/bottom_navigation">
+    </LinearLayout>
 
-        <LinearLayout android:id="@+id/content"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginLeft="@dimen/activity_horizontal_margin"
-            android:layout_marginStart="@dimen/activity_horizontal_margin"
-            android:layout_marginRight="@dimen/activity_horizontal_margin"
-            android:layout_marginEnd="@dimen/activity_horizontal_margin"
-            android:paddingTop="@dimen/activity_vertical_margin"
-            android:paddingBottom="@dimen/activity_vertical_margin">
-        </LinearLayout>
-
-    </ScrollView>
-
-</RelativeLayout>
+</LinearLayout>

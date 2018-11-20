@@ -1,202 +1,236 @@
 # Vertical Stepper Form Library
-This Android library implements a [**vertical stepper form**](https://material.google.com/components/steppers.html) following Google Material Design guidelines.
-
-##### Disclaimer
-> There may be slight differences between the official Material Design specifications and the implementation of this library.
+This Android library implements a highly customizable **vertical stepper form**.
 
 ## Demo
-![Demo picture](https://raw.githubusercontent.com/ernestoyaquello/vertical-stepper-form/master/stepper-example.gif)
+![Demo picture](https://raw.githubusercontent.com/ernestoyaquello/VerticalStepperForm/master/stepper-example.gif)
 
-## Examples
-![Design examples](https://github.com/ernestoyaquello/vertical-stepper-form/blob/master/design-examples.png)
+## How To Use It
+### 1. Reference The Library
+Add the library to your project via Gradle:
 
-## What's new
-#### Version 0.9.9
-* Dimensions are specified in an XML file so they can be overriden
-* Subtitles can be added in each step by calling ```stepsSubtitles()``` in the builder
-* Titles and subtitles can be modified after the form has been initialized thanks to ```setStepTitle()``` and ```setStepSubtitle()```
-* Official Material Design appearance can be applied to disabled/not visited steps by calling ```materialDesignInDisabledSteps(true)``` in the builder
-* The hiding of the software keyboard that is carried out by default every time a step is open can be avoided by calling ```hideKeyboard(false)``` in the builder
-* Now it is possible to force the vertical line to be displayed between collapsed steps by calling ```showVerticalLineWhenStepsAreCollapsed(true)``` in the builder
-
-#### Version 0.9.8
-* Easier to set up (Builder Pattern has been implemented)
-* Navigation bar on the bottom can be hidden in order to make the form follow Material Design guidelines more precisely
-* Optional error messages for each step
-* Smoother transitions
-* Tick icon displayed on completed steps
-* Javadoc documentation of the most important methods
-
-## Installation and usage
-1. To include the library in your project, first add it via Gradle:
-
-	```
-	dependencies {
-		compile 'com.ernestoyaquello.stepperform:vertical-stepper-form:0.9.9'
-	}
-	```
-2. Now, you have to add a ```VerticalStepperFormLayout``` view to your activity layout, which will contain the vertical stepper form. For design purposes, it is recommended that you don't put anything else than this view in your activity layout (see the code below).
-
-  ```xml
-  <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-      xmlns:tools="http://schemas.android.com/tools"
-      android:layout_width="match_parent" android:layout_height="match_parent"
-      tools:context=".StepperExampleActivity">
-  
-      <ernestoyaquello.com.verticalstepperform.VerticalStepperFormLayout
-          android:id="@+id/vertical_stepper_form"
-          android:layout_width="match_parent"
-          android:layout_height="match_parent"
-          android:layout_alignParentTop="true"/>
-  
-  </RelativeLayout>
-  ```
-3. In ```onCreate()```, you will need to find the view and initialize the form:
-
-  ```java
-  private VerticalStepperFormLayout verticalStepperForm;
-  ...
-  
-  @Override
-  protected void onCreate(Bundle savedInstanceState) {
-      super.onCreate(savedInstanceState);
-      setContentView(R.layout.your_activity_layout);
-      
-      String[] mySteps = {"Name", "Email", "Phone Number"};
-      int colorPrimary = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimary);
-      int colorPrimaryDark = ContextCompat.getColor(getApplicationContext(), R.color.colorPrimaryDark);
-      
-      // Finding the view
-      verticalStepperForm = (VerticalStepperFormLayout) findViewById(R.id.vertical_stepper_form);
-          
-      // Setting up and initializing the form
-      VerticalStepperFormLayout.Builder.newInstance(verticalStepperForm, mySteps, this, this)
-          .primaryColor(colorPrimary)
-          .primaryDarkColor(colorPrimaryDark)
-          .displayBottomNavigation(true) // It is true by default, so in this case this line is not necessary
-          .init();
-      
-      ...
-      
-  }
-  ```
-  NOTE: In this step you may need need to import ```ernestoyaquello.com.verticalstepperform.*```.
-
-4. Finally, edit your activity class to make it implement ```VerticalStepperForm```. Then, implement the methods ```createStepContentView()```, ```onStepOpening()``` and ```sendData()```.
-
-
-### Implementing the methods
-#### createStepContentView()
-This method will be called automatically by the system to generate the view of the content of each step. You have to implement the generation of the corresponding step view and return it:
-```java
-@Override
-public View createStepContentView(int stepNumber) {
-	View view = null;
-	switch (stepNumber) {
-		case 0:
-			view = createNameStep();
-			break;
-		case 1:
-			view = createEmailStep();
-			break;
-		case 2:
-			view = createPhoneNumberStep();
-			break;
-	}
-	return view;
-}
-
-private View createNameStep() {
-	// Here we generate programmatically the view that will be added by the system to the step content layout
-	name = new EditText(this);
-	name.setSingleLine(true);
-	name.setHint("Your name");
-	...
-	return name;
-}
-
-private View createEmailStep() {
-	// In this case we generate the view by inflating a XML file
-	LayoutInflater inflater = LayoutInflater.from(getBaseContext());
-	LinearLayout emailLayoutContent = (LinearLayout) inflater.inflate(R.layout.email_step_layout, null, false);
-	email = (EditText) emailLayoutContent.findViewById(R.id.email);
-	...
-	return emailLayoutContent;
-}
-
-private View createPhoneNumberStep() {
-	LayoutInflater inflater = LayoutInflater.from(getBaseContext());
-	LinearLayout phoneLayoutContent = (LinearLayout) inflater.inflate(R.layout.phone_step_layout, null, false);
-	...
-	return phoneLayoutContent;
+```
+dependencies {
+    implementation 'com.ernestoyaquello.stepperform:vertical-stepper-form:2.0.0'
 }
 ```
 
+> Make sure you are using AndroidX instead of the old support libraries; otherwise this library might not work.
 
-#### onStepOpening()
-This method will be called every time a step is open, so it can be used for checking conditions. It is noteworthy that the button "Continue" is disabled by default in every step, so it will only show up after certain user actions (for example, after the introduction of a correct name or email):
+### 2. Add The Form To Your Layout
+Add the view ```VerticalStepperFormView``` to your layout using XML. For design purposes, it is recommended that you don't put anything else than this view in the layout of the screen that will contain the form:
+
+```xml
+<!-- new_user_form_activity.xml -->
+<ernestoyaquello.com.verticalstepperform.VerticalStepperFormView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/stepper_form"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:form_circle_background_color="@color/colorPrimary"
+    app:form_next_button_background_color="@color/colorPrimary"
+    app:form_next_button_pressed_background_color="@color/colorPrimaryDark"/>
+```
+
+As you can see in this example, only the properties `form_circle_background_color`, `form_next_button_background_color` and `form_next_button_pressed_background_color` are being used to configure the form, but **there are plenty of other ones that you can use to customize it as you please**.
+
+### 3. Define Your Steps
+Each one of the fields of your form **must be defined as a step**.
+
+To define a step, create a class that extends `Step<T>`, where `T` will be the type of the step's data (e.g., `String` if the data of the step is the user's name, `Integer` if it is the user's age, etc). For instance:
+
 ```java
-@Override
-public void onStepOpening(int stepNumber) {
-	switch (stepNumber) {
-		case 0: 
-			checkName();
-			break;
-		case 1:
-			checkEmail();
-			break;
-		case 2: 
-			// As soon as the phone number step is open, we mark it as completed in order to show the "Continue"
-			// button (We do it because this field is optional, so the user can skip it without giving any info)
-			verticalStepperForm.setStepAsCompleted(2);
-			// In this case, the instruction above is equivalent to: 
-			// verticalStepperForm.setActiveStepAsCompleted();
-			break;
-	}
-}
+public class UserNameStep extends Step<String> {
 
-private void checkName() {
-	if(name.length() >= 3 && name.length() <= 40) {
-		verticalStepperForm.setActiveStepAsCompleted();
-	} else {
-		// This error message is optional (use null if you don't want to display an error message)
-		String errorMessage = "The name must have between 3 and 40 characters";
-		verticalStepperForm.setActiveStepAsUncompleted(errorMessage);
-	}
-}
+    private EditText userNameView;
 
-private void checkEmail() {
-	...
+    public UserNameStep(String stepTitle) {
+        super(stepTitle);
+    }
+
+    @Override
+    protected View createStepContentLayout() {        
+        // Here we generate the view that will be used by the library as the content of the step.
+        // In this case we do it programmatically, but we could also do it by inflating an XML layout.
+        userNameView = new EditText(getContext());
+        userNameView.setSingleLine(true);
+        userNameView.setHint("Your Name");
+        ...
+        userNameView.addTextChangedListener(new TextWatcher() {
+            ...
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {                
+                // Whenever the user updates the user name text, we update the state of the step.
+                // The step will be marked as completed only if its data is valid, which will be
+                // checked with a call to isDataValid().
+                markAsCompletedOrUncompleted(true);
+            }
+        });
+
+        return userNameView;
+    }
+    
+    @Override
+    protected IsDataValid isStepDataValid(String stepData) {        
+        // The step's data (i.e., the user name) will be considered valid only if it is longer than 
+        // three characters. In case it is not, we will display an error message for feedback.
+        boolean isNameValid = stepData.length() >= 3;
+        String errorMessage = !isNameValid ? "The name must be at least 3 characters long" : "";
+
+        return new IsDataValid(isNameValid, errorMessage);
+    }
+
+    @Override
+    public String getStepData() {        
+        // We get the step's data from the value that the user has typed in the EditText view.
+        Editable userName = userNameView.getText();        
+        return userName != null ? userName.toString() : "";
+    }
+
+    @Override
+    public String getStepDataAsHumanReadableString() {        
+        // Because the step's data is already a human-readable string, we don't need to convert it.
+        // However, we return "(Empty)" if the text is empty to avoid not having any text to display.
+        // This string will be displayed in the subtitle of the step whenever the step gets closed.
+        String userName = getStepData();        
+        return !userName.isEmpty() ? userName : "(Empty)";
+    }
+
+    @Override
+    protected void onStepOpened(boolean animated) {        
+        // This will be called automatically whenever the step gets opened.
+    }
+
+    @Override
+    protected void onStepClosed(boolean animated) {        
+        // This will be closed automatically whenever the step gets closed.
+    }
+
+    @Override
+    public void restoreStepData(String stepData) {        
+        // To restore the step after a configuration change, we restore the text of its EditText view.
+        userNameView.setText(stepData);
+    }
 }
 ```
-NOTE: You can also use this method to trigger some actions whenever a certain step is open.
 
-#### sendData()
-In this method you have to implement the sending of the data.
+Most of these methods will be called automatically by the library, so all you have to do is implement them in your steps.
 
-### Screen rotation
-This library handles screen rotation by saving and restoring the state of the form. Therefore, if you want to use ```onSaveInstanceState()``` and ```onRestoreInstanceState()```, don't forget to call ```super()``` **at the end**:
+### 4. Set Up The Form And Initialize It
+Once you have defined all your steps, you will need to find the view of the form to set it up and initialize it:
+
+```java
+public class CreateUserAccountActivity extends Activity implements StepperFormListener {
+
+    private UserNameStep userNameStep;
+    private UserEmailStep userEmailStep;
+    private UserAgeStep userAgeStep;
+    
+    private VerticalStepperFormView verticalStepperForm;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.new_user_form_activity);
+
+        // Create the steps.
+        userNameStep = new UserNameStep("User Name");
+        userEmailStep = new UserEmailStep("User Email");
+        userAgeStep = new UserAgeStep("User Age");
+
+        // Find the form view, set it up and initialize it.
+        verticalStepperForm = findViewById(R.id.stepper_form);
+        verticalStepperForm
+            .setup(this, userNameStep, userEmailStep, userAgeStep)
+            .init();
+    }
+
+    @Override
+    public void onCompletedForm() {
+        // This method will be called when the user clicks on the last confirmation button of the 
+        // form in an attempt to save or send the data.
+    }
+
+    @Override
+    public void onCancelledForm() {
+        // This method will be called when the user clicks on the cancel button of the form.
+    }
+}
+```
+
+As you can see in the code above, we set up the form by passing several parameters through the method `setup()`:
+
+1. An implementation of the interface `StepperFormListener ` (in this case, this listener is implemented by the activity, so we just send `this` as a parameter).
+2. The steps that will be displayed in the form: `userNameStep`, `userEmailStep` and `userAgeStep` in our example.
+
+However, **we can also customize the form just before initializing it**:
+
+```java
+verticalStepperForm
+    .setup(this, userNameStep, userEmailStep, userAgeStep)
+    .allowNonLinearNavigation(true)
+    .displayBottomNavigation(false)
+    .lastStepNextButtonText("Create User")
+    ...
+    .init();
+```
+
+There are many methods available to customize the form, but **all the configuration options that you can specify via code are also available in XML**, so it is up to you to set up the form in one way or another.
+
+#### About the listener
+The listener `StepperFormListener` has only two methods:
+
+##### `onCompletedForm()`
+This method will get called when the user clicks on the last confirmation button of the form in an attempt to save/send the information, so **we can use it to save or send the data of the form**. It is worth noting that it will only get invoked if all the steps are marked as completed.
+
+Just before calling this method, the form disables the navigation between steps, as well as all the buttons. To revert the form to normal (for example, because the data couldn't be saved and we want to re-activate the buttons of the form), it is necessary to call `verticalStepperForm.cancelFormCompletionOrCancellationAttempt()`.
+
+##### `onCancelledForm()`
+This method will get called when the user clicks on the optional cancellation button of the last step in order to avoid saving/sending the data. **We can use it to ask the user to confirm the cancellation**, after which we could just close the form screen and navigate away from it.
+
+Right before calling this method, the form disables the navigation between steps, as well as all the buttons. To revert the form to normal (for example, because the user decides not to cancel it), it is necessary to call `verticalStepperForm.cancelFormCompletionOrCancellationAttempt()`.
+
+### 5. Handle Configuration Changes
+To restore your form after configuration changes, such as screen rotation, you must save and restore the data of all your steps like this:
+
 ```java
 @Override
 public void onSaveInstanceState(Bundle savedInstanceState) {
-	...
-	super.onSaveInstanceState(savedInstanceState);
+    savedInstanceState.putString("user_name", userNameStep.getStepData());
+    savedInstanceState.putString("user_email", userEmailStep.getStepData());
+    savedInstanceState.putInt("user_age", userAgeStep.getStepData());
+
+    // IMPORTANT: The call to the super method must be here at the end.
+    super.onSaveInstanceState(savedInstanceState);
 }
 
 @Override
 public void onRestoreInstanceState(Bundle savedInstanceState) {
-	...
-	super.onRestoreInstanceState(savedInstanceState);
+    if(savedInstanceState.containsKey("user_name")) {
+        String userName = savedInstanceState.getString("user_name");
+        userNameStep.restoreStepData(userName);
+    }
+
+    if(savedInstanceState.containsKey("user_email")) {
+        String userEmail = savedInstanceState.getString("user_email");
+        userEmailStep.restoreStepData(userEmail);
+    }
+    
+    if(savedInstanceState.containsKey("user_age")) {
+        int userAge = savedInstanceState.getInt("user_age");
+        userAgeStep.restoreStepData(userAge);
+    }
+
+    // IMPORTANT: The call to the super method must be here at the end.
+    super.onRestoreInstanceState(savedInstanceState);
 }
 ```
 
-### Further details
-Check out the [example application code](https://github.com/ernestoyaquello/vertical-stepper-form/tree/master/app/src/main/java/verticalstepperform/ernestoyaquello/com/verticalstepperform).
+## Further Details
+Check out the [sample application code](https://github.com/ernestoyaquello/VerticalStepperForm/tree/master/app/src/main/java/verticalstepperform/ernestoyaquello/com/verticalstepperform) to see a more complete example of how this library can be used to create vertical stepper forms.
 
 ## Contribution
-Feel free to contribute to this library and help to improve it!
-
-Special thanks to  [**Csaba Kozák**](https://github.com/WonderCsabo) for his collaboration :) 
+Feel free to contribute to this library, any help will be welcomed!
 
 ## License
 ```

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <declare-styleable name="VerticalStepperFormView">
+        <attr name="form_next_button_text" format="string" />
+        <attr name="form_last_button_text" format="string" />
+        <attr name="form_cancel_button_text" format="string" />
+        <attr name="form_confirmation_step_title_text" format="string" />
+        <attr name="form_confirmation_step_subtitle_text" format="string" />
+        <attr name="form_circle_size" format="dimension" />
+        <attr name="form_circle_text_size" format="dimension" />
+        <attr name="form_title_text_size" format="dimension" />
+        <attr name="form_subtitle_text_size" format="dimension" />
+        <attr name="form_error_message_text_size" format="dimension" />
+        <attr name="form_vertical_line_width" format="dimension" />
+        <attr name="form_disabled_elements_background_color" format="color" />
+        <attr name="form_circle_background_color" format="color" />
+        <attr name="form_next_button_background_color" format="color" />
+        <attr name="form_next_button_pressed_background_color" format="color" />
+        <attr name="form_cancel_button_background_color" format="color" />
+        <attr name="form_cancel_button_pressed_background_color" format="color" />
+        <attr name="form_bottom_navigation_background_color" format="color" />
+        <attr name="form_circle_text_color" format="color" />
+        <attr name="form_title_text_color" format="color" />
+        <attr name="form_subtitle_text_color" format="color" />
+        <attr name="form_next_button_text_color" format="color" />
+        <attr name="form_next_button_pressed_text_color" format="color" />
+        <attr name="form_cancel_button_text_color" format="color" />
+        <attr name="form_cancel_button_pressed_text_color" format="color" />
+        <attr name="form_error_message_text_color" format="color" />
+        <attr name="form_display_bottom_navigation" format="boolean" />
+        <attr name="form_display_step_buttons" format="boolean" />
+        <attr name="form_display_cancel_button_in_last_step" format="boolean" />
+        <attr name="form_display_step_data_in_subtitle_of_closed_steps" format="boolean" />
+        <attr name="form_display_different_background_color_on_disabled_elements" format="boolean" />
+        <attr name="form_include_confirmation_step" format="boolean" />
+        <attr name="form_allow_non_linear_navigation" format="boolean" />
+        <attr name="form_alpha_of_disabled_elements" format="float" />
+    </declare-styleable>
+
+</resources>
