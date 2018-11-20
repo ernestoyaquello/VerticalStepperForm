@@ -114,7 +114,7 @@ public class UserNameStep extends Step<String> {
 }
 ```
 
-Most of these methods will be called automatically by the library. For example, every time the user opens a step, the open will be marked as completed or uncompleted depending on the value returned by `isStepDataValid()`.
+Most of the methods showed above will be called automatically by the library. For example, every time the user opens a step, the open step will be marked as completed or uncompleted depending on the value returned by `isStepDataValid()`.
 
 ### 4. Set Up The Form And Initialize It
 Once you have defined all your steps, you will need to find the view of the form to set it up and initialize it:
