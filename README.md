@@ -10,7 +10,7 @@ Add the library to your project via Gradle:
 
 ```
 dependencies {
-    implementation 'com.ernestoyaquello.stepperform:vertical-stepper-form:2.0.0'
+    implementation 'com.ernestoyaquello.stepperform:vertical-stepper-form:2.0.1'
 }
 ```
 
@@ -75,7 +75,7 @@ public class UserNameStep extends Step<String> {
         // The step's data (i.e., the user name) will be considered valid only if it is longer than 
         // three characters. In case it is not, we will display an error message for feedback.
         boolean isNameValid = stepData.length() >= 3;
-        String errorMessage = !isNameValid ? "The name must be at least 3 characters long" : "";
+        String errorMessage = !isNameValid ? "3 characters minimum" : "";
 
         return new IsDataValid(isNameValid, errorMessage);
     }
@@ -114,7 +114,7 @@ public class UserNameStep extends Step<String> {
 }
 ```
 
-Most of the methods showed above will be called automatically by the library. For example, every time the user opens a step, the open step will be marked as completed or uncompleted depending on the value returned by `isStepDataValid()`.
+Most of the methods showed above will be called automatically by the library. For example, every time the user opens a step, the open step will be marked as completed or uncompleted depending on the value returned by `isStepDataValid()` (you can implement it to always return a valid value in case the step is optional).
 
 ### 4. Set Up The Form And Initialize It
 Once you have defined all your steps, you will need to find the view of the form to set it up and initialize it:
