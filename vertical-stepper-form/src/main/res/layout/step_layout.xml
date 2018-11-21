@@ -68,23 +68,34 @@
             android:layout_marginStart="16dp"
             android:paddingBottom="8dp">
 
-            <TextView
-                android:id="@+id/step_title"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="@dimen/vertical_stepper_form_width_circle"
-                android:gravity="center_vertical"
-                android:textColor="#212121"
-                android:textSize="@dimen/vertical_stepper_form_text_size_title"
-                android:maxLines="1"
-                android:ellipsize="end"
-                tools:text="Step 1" />
+                android:layout_height="wrap_content">
+
+                <View
+                    android:id="@+id/spacing1"
+                    android:layout_width="match_parent"
+                    android:layout_height="@dimen/vertical_stepper_form_width_circle"
+                    android:layout_gravity="top"/>
+
+                <TextView
+                    android:id="@+id/step_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:textColor="#212121"
+                    android:textSize="@dimen/vertical_stepper_form_text_size_title"
+                    android:layout_gravity="center_vertical"
+                    tools:text="Step 1" />
+
+            </FrameLayout>
 
             <FrameLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
                 <View
-                    android:id="@+id/spacing"
+                    android:id="@+id/spacing2"
                     android:layout_width="match_parent"
                     android:layout_height="10dp" />
 
@@ -134,7 +145,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:visibility="gone"
                 android:layout_gravity="center_vertical"
                 tools:visibility="visible">
 
