@@ -515,6 +515,7 @@ public class VerticalStepperFormView extends LinearLayout {
         style.displayDifferentBackgroundColorOnDisabledElements = false;
         style.includeConfirmationStep = true;
         style.allowNonLinearNavigation = false;
+        style.allowStepOpeningOnHeaderClick = true;
         style.alphaOfDisabledElements = 0.3f;
 
         // Try to get the user values for the style properties to replace the default ones
@@ -631,6 +632,9 @@ public class VerticalStepperFormView extends LinearLayout {
                 style.allowNonLinearNavigation = vars.getBoolean(
                         R.styleable.VerticalStepperFormView_form_allow_non_linear_navigation,
                         style.allowNonLinearNavigation);
+                style.allowStepOpeningOnHeaderClick = vars.getBoolean(
+                        R.styleable.VerticalStepperFormView_form_allow_step_opening_on_header_click,
+                        style.allowStepOpeningOnHeaderClick);
                 style.alphaOfDisabledElements = vars.getFloat(
                         R.styleable.VerticalStepperFormView_form_alpha_of_disabled_elements,
                         style.alphaOfDisabledElements);
@@ -1004,6 +1008,7 @@ public class VerticalStepperFormView extends LinearLayout {
         boolean displayDifferentBackgroundColorOnDisabledElements;
         boolean includeConfirmationStep;
         boolean allowNonLinearNavigation;
+        boolean allowStepOpeningOnHeaderClick;
         float alphaOfDisabledElements;
     }
 }

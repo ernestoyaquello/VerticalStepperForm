@@ -397,6 +397,19 @@ public class Builder {
     }
 
     /**
+     * Specifies whether or not the user will be able to open a step by clicking on its header.
+     *
+     * @param allowStepOpeningOnHeaderClick True to allow opening steps by clicking on their header;
+     *                                      false to not.
+     * @return The builder instance.
+     */
+    public Builder allowStepOpeningOnHeaderClick(boolean allowStepOpeningOnHeaderClick) {
+        formView.style.allowStepOpeningOnHeaderClick = allowStepOpeningOnHeaderClick;
+
+        return this;
+    }
+
+    /**
      * Sets up the form and initializes it.
      */
     public void init() {

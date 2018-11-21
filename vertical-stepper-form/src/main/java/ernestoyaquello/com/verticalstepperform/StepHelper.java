@@ -141,7 +141,9 @@ class StepHelper implements Step.InternalFormStepListener {
         headerView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                form.goToStep(position, true);
+                if (formStyle.allowStepOpeningOnHeaderClick) {
+                    form.goToStep(position, true);
+                }
             }
         });
         nextButtonView.setOnClickListener(new View.OnClickListener() {
