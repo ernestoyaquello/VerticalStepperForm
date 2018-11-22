@@ -71,6 +71,16 @@ public class AlarmNameStep extends Step<String> {
     }
 
     @Override
+    protected void onStepMarkedAsCompleted(boolean animated) {
+        // No need to do anything here
+    }
+
+    @Override
+    protected void onStepMarkedAsUncompleted(boolean animated) {
+        // No need to do anything here
+    }
+
+    @Override
     public String getStepData() {
         Editable text = alarmNameEditText.getText();
         if (text != null) {

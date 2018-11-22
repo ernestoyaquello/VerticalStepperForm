@@ -86,7 +86,8 @@ public abstract class Step<T> {
      * This method will be called every time the step is opened.
      *
      * @param animated True if the step was opened using animations; false otherwise.
-     *                 It will only be false if the step was opened on loading or on restoration.
+     *                 Generally, it will only be false if the step was opened on loading or on
+     *                 restoration.
      */
     protected abstract void onStepOpened(boolean animated);
 
@@ -94,9 +95,28 @@ public abstract class Step<T> {
      * This method will be called every time the step is closed.
      *
      * @param animated True if the step was closed using animations; false otherwise.
-     *                 It will only be false if the step was closed on loading or on restoration.
+     *                 Generally, it will only be false if the step was closed on loading or on
+     *                 restoration.
      */
     protected abstract void onStepClosed(boolean animated);
+
+    /**
+     * This method will be called every time the step is marked as completed.
+     *
+     * @param animated True if the step was marked as completed using animations; false otherwise.
+     *                 Generally, it will only be false if the step was marked as completed on
+     *                 loading or on restoration.
+     */
+    protected abstract void onStepMarkedAsCompleted(boolean animated);
+
+    /**
+     * This method will be called every time the step is marked as uncompleted.
+     *
+     * @param animated True if the step was marked as uncompleted using animations; false otherwise.
+     *                 Generally, it will only be false if the step was marked as uncompleted on
+     *                 loading or on restoration.
+     */
+    protected abstract void onStepMarkedAsUncompleted(boolean animated);
 
     /**
      * Gets the title of this step.
@@ -303,6 +323,11 @@ public abstract class Step<T> {
 
         updateErrorMessage(errorMessage, useAnimations);
         onUpdatedStepCompletionState(useAnimations);
+        if (completed) {
+            onStepMarkedAsCompleted(useAnimations);
+        } else {
+            onStepMarkedAsUncompleted(useAnimations);
+        }
     }
 
     private void updateStepVisibility(boolean visibility, boolean useAnimations) {

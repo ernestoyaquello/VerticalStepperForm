@@ -82,6 +82,16 @@ public class AlarmTimeStep extends Step<AlarmTimeStep.TimeHolder> {
     }
 
     @Override
+    protected void onStepMarkedAsCompleted(boolean animated) {
+        // No need to do anything here
+    }
+
+    @Override
+    protected void onStepMarkedAsUncompleted(boolean animated) {
+        // No need to do anything here
+    }
+
+    @Override
     public TimeHolder getStepData() {
         return new TimeHolder(alarmTimeHour, alarmTimeMinutes);
     }

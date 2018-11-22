@@ -507,5 +507,15 @@ class StepHelper implements Step.InternalFormStepListener {
         protected void onStepClosed(boolean animated) {
             markAsUncompleted("", animated);
         }
+
+        @Override
+        protected void onStepMarkedAsCompleted(boolean animated) {
+            // No need to do anything here
+        }
+
+        @Override
+        protected void onStepMarkedAsUncompleted(boolean animated) {
+            // No need to do anything here
+        }
     }
 }

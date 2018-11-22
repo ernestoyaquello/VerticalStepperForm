@@ -53,6 +53,16 @@ public class AlarmDaysStep extends Step<boolean[]> {
     }
 
     @Override
+    protected void onStepMarkedAsCompleted(boolean animated) {
+        // No need to do anything here
+    }
+
+    @Override
+    protected void onStepMarkedAsUncompleted(boolean animated) {
+        // No need to do anything here
+    }
+
+    @Override
     public boolean[] getStepData() {
         return alarmDays;
     }

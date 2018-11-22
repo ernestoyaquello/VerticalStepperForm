@@ -10,7 +10,7 @@ Add the library to your project via Gradle:
 
 ```
 dependencies {
-    implementation 'com.ernestoyaquello.stepperform:vertical-stepper-form:2.0.1'
+    implementation 'com.ernestoyaquello.stepperform:vertical-stepper-form:2.1.0'
 }
 ```
 
@@ -74,6 +74,7 @@ public class UserNameStep extends Step<String> {
     protected IsDataValid isStepDataValid(String stepData) {        
         // The step's data (i.e., the user name) will be considered valid only if it is longer than 
         // three characters. In case it is not, we will display an error message for feedback.
+        // In an optional step, you should implement this method to always return a valid value.
         boolean isNameValid = stepData.length() >= 3;
         String errorMessage = !isNameValid ? "3 characters minimum" : "";
 
@@ -103,7 +104,17 @@ public class UserNameStep extends Step<String> {
 
     @Override
     protected void onStepClosed(boolean animated) {        
-        // This will be closed automatically whenever the step gets closed.
+        // This will be called automatically whenever the step gets closed.
+    }
+    
+    @Override
+    protected void onStepMarkedAsCompleted(boolean animated) {
+        // This will be called automatically whenever the step is marked as completed.
+    }
+
+    @Override
+    protected void onStepMarkedAsUncompleted(boolean animated) {
+        // This will be called automatically whenever the step is marked as uncompleted.
     }
 
     @Override
@@ -114,7 +125,9 @@ public class UserNameStep extends Step<String> {
 }
 ```
 
-Most of the methods showed above will be called automatically by the library. For example, every time the user opens a step, the open step will be marked as completed or uncompleted depending on the value returned by `isStepDataValid()` (you can implement it to always return a valid value in case the step is optional).
+Most of the methods showed above will be called automatically by the library. For example, every time the user opens a step, the callback `onStepOpened()` will be invoked and the open step will be marked as completed or uncompleted automatically depending on the value returned by `isStepDataValid()`. Then, the callback `onStepMarkedAsCompleted()`, if applicable, will also be invoked.
+
+It is worth noting that each step has a reference to the context accessible through `getContext()` and a reference to the form accessible through `getFormView()`, as well as several other useful methods.
 
 ### 4. Set Up The Form And Initialize It
 Once you have defined all your steps, you will need to find the view of the form to set it up and initialize it:
