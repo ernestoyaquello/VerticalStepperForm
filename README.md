@@ -10,7 +10,7 @@ Add the library to your project via Gradle:
 
 ```
 dependencies {
-    implementation 'com.ernestoyaquello.stepperform:vertical-stepper-form:2.1.0'
+    implementation 'com.ernestoyaquello.stepperform:vertical-stepper-form:2.1.1'
 }
 ```
 

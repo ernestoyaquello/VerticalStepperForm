@@ -15,7 +15,7 @@ ext {
     siteUrl = 'https://github.com/ernestoyaquello/VerticalStepperForm'
     gitUrl = 'https://github.com/ernestoyaquello/VerticalStepperForm.git'
 
-    libraryVersion = '2.1.0'
+    libraryVersion = '2.1.1'
 
     developerId = 'ernestoyaquello'
     developerName = 'Julio Ernesto Rodríguez Cabañas'
@@ -32,7 +32,7 @@ android {
     defaultConfig {
         minSdkVersion 19
         targetSdkVersion 28
-        versionCode 12
+        versionCode 13
         versionName libraryVersion
     }
 
