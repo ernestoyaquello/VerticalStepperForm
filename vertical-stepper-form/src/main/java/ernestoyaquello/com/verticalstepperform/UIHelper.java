@@ -54,12 +54,7 @@ class UIHelper {
 
         if (!animate) {
             endPreviousAnimationIfNecessary(view);
-            view.measure(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
-            int measuredHeight = view.getMeasuredHeight();
-            if (measuredHeight > 0) {
-                setViewHeight(view, measuredHeight);
-            }
-            setFinalAlphaAndVisibility(view, false);
+            onSlidingFinished(view, false);
 
             return;
         }
@@ -71,8 +66,7 @@ class UIHelper {
 
         if (!animate) {
             endPreviousAnimationIfNecessary(view);
-            setViewHeight(view, 0);
-            setFinalAlphaAndVisibility(view, true);
+            onSlidingFinished(view, true);
 
             return;
         }
@@ -100,9 +94,7 @@ class UIHelper {
 
             // No need to animate anything because initial value and final value match
             endPreviousAnimationIfNecessary(view);
-            setViewHeight(view, (int) (finalValue * expandedHeight));
-            setFinalAlphaAndVisibility(view, slideUp);
-
+            onSlidingFinished(view, slideUp);
             return;
         }
 
@@ -137,7 +129,7 @@ class UIHelper {
                 super.onAnimationEnd(animation);
 
                 _runningObjectAnimators.remove(view);
-                setFinalAlphaAndVisibility(view, slideUp);
+                onSlidingFinished(view, slideUp);
             }
         });
 
@@ -147,7 +139,8 @@ class UIHelper {
         animator.start();
     }
 
-    private static void setFinalAlphaAndVisibility(View view, boolean slideUp) {
+    private static void onSlidingFinished(View view, boolean slideUp) {
+        setViewHeight(view, slideUp ? 0 : ViewGroup.LayoutParams.WRAP_CONTENT);
         view.setAlpha(slideUp ? 0f : 1f);
         view.setVisibility(slideUp ? View.GONE : View.VISIBLE);
     }
