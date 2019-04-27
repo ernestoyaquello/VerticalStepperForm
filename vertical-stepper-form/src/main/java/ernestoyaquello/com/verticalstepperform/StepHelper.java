@@ -1,7 +1,6 @@
 package ernestoyaquello.com.verticalstepperform;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
@@ -15,6 +14,7 @@ import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
 
+import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormView.FormStyle;
@@ -58,13 +58,13 @@ class StepHelper implements Step.InternalFormStepListener {
         this.step.addListenerInternal(formListener);
     }
 
-    View initialize(VerticalStepperFormView form, ViewGroup parent, int position, boolean isLast) {
+    View initialize(VerticalStepperFormView form, ViewGroup parent, @LayoutRes int stepLayoutResourceId, int position, boolean isLast) {
         if (step.getEntireStepLayout() == null) {
             formStyle = form.style;
 
             Context context = form.getContext();
             LayoutInflater inflater = LayoutInflater.from(context);
-            View stepLayout = inflater.inflate(R.layout.step_layout, parent, false);
+            View stepLayout = inflater.inflate(stepLayoutResourceId, parent, false);
 
             step.initializeStepInternal(stepLayout, form, position);
             step.setContentLayoutInternal(step.createStepContentLayout());

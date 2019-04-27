@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 
+import androidx.annotation.LayoutRes;
 import androidx.appcompat.widget.AppCompatImageButton;
 
 import android.os.Bundle;
@@ -676,8 +677,15 @@ public class VerticalStepperFormView extends LinearLayout {
     private View initializeStepHelper(int position) {
         StepHelper stepHelper = stepHelpers.get(position);
         boolean isLast = (position + 1) == stepHelpers.size();
+        int stepLayoutResourceId = getStepLayoutResourceId(position, isLast);
 
-        return stepHelper.initialize(this, formContentView, position, isLast);
+        return stepHelper.initialize(this, formContentView, stepLayoutResourceId, position, isLast);
+    }
+
+    @LayoutRes
+    protected int getStepLayoutResourceId(int position, boolean isLast) {
+        // This could be overridden to use a custom step layout
+        return R.layout.step_layout;
     }
 
     private synchronized void openStep(int stepToOpenPosition, boolean useAnimations) {
