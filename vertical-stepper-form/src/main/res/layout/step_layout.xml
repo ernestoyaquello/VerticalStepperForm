@@ -61,11 +61,12 @@
         </LinearLayout>
 
         <LinearLayout
+            android:id="@+id/title_subtitle_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:layout_marginStart="16dp"
+            android:layout_marginStart="@dimen/vertical_stepper_form_space_between_numbers_and_content"
             android:paddingBottom="8dp">
 
             <FrameLayout
@@ -134,11 +135,12 @@
         </FrameLayout>
 
         <LinearLayout
+            android:id="@+id/error_content_button_container"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:orientation="vertical"
-            android:layout_marginStart="16dp">
+            android:layout_marginStart="@dimen/vertical_stepper_form_space_between_numbers_and_content">
 
             <LinearLayout
                 android:id="@+id/step_error_container"

@@ -1,7 +1,6 @@
 package ernestoyaquello.com.verticalstepperform;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
 import android.graphics.drawable.Drawable;
@@ -10,10 +9,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.google.android.material.button.MaterialButton;
 
+import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormView.FormStyle;
@@ -44,6 +45,8 @@ class StepHelper implements Step.InternalFormStepListener {
     private View lineView2;
     private View stepAndButtonView;
     private View errorMessageContainerView;
+    private View titleAndSubtitleContainerView;
+    private View errorContentAndButtonContainerView;
 
     StepHelper(Step.InternalFormStepListener formListener, @NonNull Step step) {
         this(formListener, step, false);
@@ -55,13 +58,13 @@ class StepHelper implements Step.InternalFormStepListener {
         this.step.addListenerInternal(formListener);
     }
 
-    View initialize(VerticalStepperFormView form, ViewGroup parent, int position, boolean isLast) {
+    View initialize(VerticalStepperFormView form, ViewGroup parent, @LayoutRes int stepLayoutResourceId, int position, boolean isLast) {
         if (step.getEntireStepLayout() == null) {
             formStyle = form.style;
 
             Context context = form.getContext();
             LayoutInflater inflater = LayoutInflater.from(context);
-            View stepLayout = inflater.inflate(R.layout.step_layout, parent, false);
+            View stepLayout = inflater.inflate(stepLayoutResourceId, parent, false);
 
             step.initializeStepInternal(stepLayout, form, position);
             step.setContentLayoutInternal(step.createStepContentLayout());
@@ -99,6 +102,8 @@ class StepHelper implements Step.InternalFormStepListener {
         lineView2 = stepLayout.findViewById(R.id.line2);
         stepAndButtonView = step.getEntireStepLayout().findViewById(R.id.step_content_and_button);
         errorMessageContainerView = step.getEntireStepLayout().findViewById(R.id.step_error_container);
+        titleAndSubtitleContainerView = step.getEntireStepLayout().findViewById(R.id.title_subtitle_container);
+        errorContentAndButtonContainerView = step.getEntireStepLayout().findViewById(R.id.error_content_button_container);
 
         titleView.setTextColor(formStyle.stepTitleTextColor);
         subtitleView.setTextColor(formStyle.stepSubtitleTextColor);
@@ -106,10 +111,12 @@ class StepHelper implements Step.InternalFormStepListener {
         doneIconView.setColorFilter(formStyle.stepNumberTextColor);
         errorMessageView.setTextColor(formStyle.errorMessageTextColor);
         errorIconView.setColorFilter(formStyle.errorMessageTextColor);
+
         Drawable circleDrawable = ContextCompat.getDrawable(form.getContext(), R.drawable.circle_step_done);
         circleDrawable.setColorFilter(
                 new PorterDuffColorFilter(formStyle.stepNumberBackgroundColor, PorterDuff.Mode.SRC_IN));
         stepNumberCircleView.setBackground(circleDrawable);
+
         UIHelper.setButtonColor(
                 nextButtonView,
                 formStyle.nextButtonBackgroundColor,
@@ -127,12 +134,25 @@ class StepHelper implements Step.InternalFormStepListener {
         layoutParamsCircle.width = formStyle.leftCircleSizeInPx;
         layoutParamsCircle.height = formStyle.leftCircleSizeInPx;
         stepNumberCircleView.setLayoutParams(layoutParamsCircle);
+
         ViewGroup.LayoutParams layoutParamsLine1 = lineView1.getLayoutParams();
         layoutParamsLine1.width = formStyle.leftVerticalLineThicknessSizeInPx;
         lineView1.setLayoutParams(layoutParamsLine1);
+
         ViewGroup.LayoutParams layoutParamsLine2 = lineView2.getLayoutParams();
         layoutParamsLine2.width = formStyle.leftVerticalLineThicknessSizeInPx;
         lineView2.setLayoutParams(layoutParamsLine2);
+
+        LinearLayout.LayoutParams titleAndSubtitleContainerLayoutParams =
+                (LinearLayout.LayoutParams) titleAndSubtitleContainerView.getLayoutParams();
+        titleAndSubtitleContainerLayoutParams.setMarginStart(formStyle.marginFromStepNumbersToContentInPx);
+        titleAndSubtitleContainerView.setLayoutParams(titleAndSubtitleContainerLayoutParams);
+
+        LinearLayout.LayoutParams errorContentAndButtonContainerLayoutParams =
+                (LinearLayout.LayoutParams) errorContentAndButtonContainerView.getLayoutParams();
+        errorContentAndButtonContainerLayoutParams.setMarginStart(formStyle.marginFromStepNumbersToContentInPx);
+        errorContentAndButtonContainerView.setLayoutParams(errorContentAndButtonContainerLayoutParams);
+
         stepNumberTextView.setTextSize(TypedValue.COMPLEX_UNIT_PX, formStyle.leftCircleTextSizeInPx);
         titleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, formStyle.stepTitleTextSizeInPx);
         subtitleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, formStyle.stepSubtitleTextSizeInPx);

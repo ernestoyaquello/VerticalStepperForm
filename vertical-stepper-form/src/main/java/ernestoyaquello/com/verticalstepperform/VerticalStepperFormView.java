@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
 
+import androidx.annotation.LayoutRes;
 import androidx.appcompat.widget.AppCompatImageButton;
 
 import android.os.Bundle;
@@ -478,6 +479,8 @@ public class VerticalStepperFormView extends LinearLayout {
                 getResources().getDimensionPixelSize(R.dimen.vertical_stepper_form_text_size_error_message);
         style.leftVerticalLineThicknessSizeInPx =
                 getResources().getDimensionPixelSize(R.dimen.vertical_stepper_form_width_vertical_line);
+        style.marginFromStepNumbersToContentInPx =
+                getResources().getDimensionPixelSize(R.dimen.vertical_stepper_form_space_between_numbers_and_content);
         style.backgroundColorOfDisabledElements =
                 ContextCompat.getColor(context, R.color.vertical_stepper_form_background_color_disabled_elements);
         style.stepNumberBackgroundColor =
@@ -566,6 +569,9 @@ public class VerticalStepperFormView extends LinearLayout {
                 style.leftVerticalLineThicknessSizeInPx = vars.getDimensionPixelSize(
                         R.styleable.VerticalStepperFormView_form_vertical_line_width,
                         style.leftVerticalLineThicknessSizeInPx);
+                style.marginFromStepNumbersToContentInPx = vars.getDimensionPixelSize(
+                        R.styleable.VerticalStepperFormView_form_horizontal_margin_from_step_numbers_to_content,
+                        style.marginFromStepNumbersToContentInPx);
                 style.backgroundColorOfDisabledElements = vars.getColor(
                         R.styleable.VerticalStepperFormView_form_disabled_elements_background_color,
                         style.backgroundColorOfDisabledElements);
@@ -671,8 +677,15 @@ public class VerticalStepperFormView extends LinearLayout {
     private View initializeStepHelper(int position) {
         StepHelper stepHelper = stepHelpers.get(position);
         boolean isLast = (position + 1) == stepHelpers.size();
+        int stepLayoutResourceId = getStepLayoutResourceId(position, isLast);
 
-        return stepHelper.initialize(this, formContentView, position, isLast);
+        return stepHelper.initialize(this, formContentView, stepLayoutResourceId, position, isLast);
+    }
+
+    @LayoutRes
+    protected int getStepLayoutResourceId(int position, boolean isLast) {
+        // This could be overridden to use a custom step layout
+        return R.layout.step_layout;
     }
 
     private synchronized void openStep(int stepToOpenPosition, boolean useAnimations) {
@@ -986,6 +999,7 @@ public class VerticalStepperFormView extends LinearLayout {
         int stepSubtitleTextSizeInPx;
         int stepErrorMessageTextSizeInPx;
         int leftVerticalLineThicknessSizeInPx;
+        int marginFromStepNumbersToContentInPx;
         int backgroundColorOfDisabledElements;
         int stepNumberBackgroundColor;
         int nextButtonBackgroundColor;

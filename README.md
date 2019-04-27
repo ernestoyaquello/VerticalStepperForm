@@ -10,7 +10,7 @@ Add the library to your project via Gradle:
 
 ```
 dependencies {
-    implementation 'com.ernestoyaquello.stepperform:vertical-stepper-form:2.1.1'
+    implementation 'com.ernestoyaquello.stepperform:vertical-stepper-form:2.2.0'
 }
 ```
 
@@ -241,6 +241,11 @@ public void onRestoreInstanceState(Bundle savedInstanceState) {
 
 ## Further Details
 Check out the [sample application code](https://github.com/ernestoyaquello/VerticalStepperForm/tree/master/app/src/main/java/verticalstepperform/ernestoyaquello/com/verticalstepperform) to see a more complete example of how this library can be used to create vertical stepper forms.
+
+## Support this library
+The creation (and maintenance) of this library requires time and effort. If you find it useful and want to support it, please use the link below:
+
+[![Buy me a coffee!](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/ernestoyaquello)
 
 ## Contribution
 Feel free to contribute to this library, any help will be welcomed!
