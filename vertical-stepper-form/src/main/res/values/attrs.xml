@@ -13,6 +13,7 @@
         <attr name="form_subtitle_text_size" format="dimension" />
         <attr name="form_error_message_text_size" format="dimension" />
         <attr name="form_vertical_line_width" format="dimension" />
+        <attr name="form_horizontal_margin_from_step_numbers_to_content" format="dimension" />
         <attr name="form_disabled_elements_background_color" format="color" />
         <attr name="form_circle_background_color" format="color" />
         <attr name="form_next_button_background_color" format="color" />

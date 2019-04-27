@@ -273,6 +273,19 @@ public class Builder {
     }
 
     /**
+     * Sets the horizontal margin between the step numbers and the step content.
+     *
+     * @param marginFromStepNumbersToContentInPx The horizontal margin between the step numbers and
+     *                                           the step content.
+     * @return The builder instance.
+     */
+    public Builder marginFromStepNumbersToContentInPx(int marginFromStepNumbersToContentInPx) {
+        formView.style.marginFromStepNumbersToContentInPx = marginFromStepNumbersToContentInPx;
+
+        return this;
+    }
+
+    /**
      * Specifies whether or not the bottom navigation bar will be displayed.
      *
      * @param displayBottomNavigationBar True to display it; false otherwise.
