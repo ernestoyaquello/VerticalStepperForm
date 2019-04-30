@@ -67,7 +67,7 @@ public class UserNameStep extends Step<String> {
             public void onTextChanged(CharSequence s, int start, int before, int count) {                
                 // Whenever the user updates the user name text, we update the state of the step.
                 // The step will be marked as completed only if its data is valid, which will be
-                // checked with a call to isStepDataValid().
+                // checked automatically by the form with a call to isStepDataValid().
                 markAsCompletedOrUncompleted(true);
             }
         });
