@@ -22,7 +22,7 @@ dependencies {
 > Make sure you are using AndroidX instead of the old support libraries; otherwise this library might not work.
 
 ### 2. Add The Form To Your Layout
-Add the view ```VerticalStepperFormView``` to your layout using XML. For design purposes, it is recommended that you don't put anything else than this view in the layout of the screen that will contain the form:
+Add the view `VerticalStepperFormView` to your layout using XML. For design purposes, it is recommended that you don't put anything else than this view in the layout of the screen that will contain the form:
 
 ```xml
 <!-- new_user_form_activity.xml -->
@@ -178,7 +178,7 @@ public class CreateUserAccountActivity extends Activity implements StepperFormLi
 
 As you can see in the code above, we set up the form by passing several parameters through the method `setup()`:
 
-1. An implementation of the interface `StepperFormListener ` (in this case, this listener is implemented by the activity, so we just send `this` as a parameter).
+1. An implementation of the interface `StepperFormListener` (in this case, this listener is implemented by the activity, so we just send `this` as a parameter).
 2. The steps that will be displayed in the form: `userNameStep`, `userEmailStep` and `userAgeStep` in our example.
 
 However, **we can also customize the form just before initializing it**:
