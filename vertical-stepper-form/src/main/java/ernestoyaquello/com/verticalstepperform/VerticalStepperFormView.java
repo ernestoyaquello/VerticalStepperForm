@@ -32,7 +32,7 @@ public class VerticalStepperFormView extends LinearLayout {
     FormStyle style;
 
     private StepperFormListener listener;
-    private FormGlobalLayoutListener formGlobalLayoutListener;
+    private KeyboardTogglingObserver keyboardTogglingObserver;
     private List<StepHelper> stepHelpers;
     private boolean initialized;
 
@@ -457,7 +457,7 @@ public class VerticalStepperFormView extends LinearLayout {
         LayoutInflater inflater = LayoutInflater.from(context);
         inflater.inflate(R.layout.vertical_stepper_form_layout, this, true);
 
-        formGlobalLayoutListener = new FormGlobalLayoutListener();
+        keyboardTogglingObserver = new KeyboardTogglingObserver();
 
         style = new FormStyle();
 
@@ -839,15 +839,23 @@ public class VerticalStepperFormView extends LinearLayout {
             }
         });
 
-        keyboardIsOpen = isKeyboardOpen();
-        getRootView().getViewTreeObserver().addOnGlobalLayoutListener(formGlobalLayoutListener);
+        addObserverForKeyboard();
     }
 
     @Override
     protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
+        removeObserverForKeyboard();
 
-        getRootView().getViewTreeObserver().removeOnGlobalLayoutListener(formGlobalLayoutListener);
+        super.onDetachedFromWindow();
+    }
+
+    private void addObserverForKeyboard() {
+        keyboardIsOpen = isKeyboardOpen();
+        getRootView().getViewTreeObserver().addOnGlobalLayoutListener(keyboardTogglingObserver);
+    }
+
+    private void removeObserverForKeyboard() {
+        getRootView().getViewTreeObserver().removeOnGlobalLayoutListener(keyboardTogglingObserver);
     }
 
     private boolean isKeyboardOpen() {
@@ -1026,7 +1034,7 @@ public class VerticalStepperFormView extends LinearLayout {
         float alphaOfDisabledElements;
     }
 
-    private class FormGlobalLayoutListener implements ViewTreeObserver.OnGlobalLayoutListener {
+    private class KeyboardTogglingObserver implements ViewTreeObserver.OnGlobalLayoutListener {
 
         @Override
         public void onGlobalLayout() {
