@@ -32,7 +32,9 @@ public class VerticalStepperFormView extends LinearLayout {
     FormStyle style;
 
     private StepperFormListener listener;
+    private FormGlobalLayoutListener formGlobalLayoutListener;
     private List<StepHelper> stepHelpers;
+    private boolean initialized;
 
     private LinearLayout formContentView;
     private ScrollView stepsScrollView;
@@ -455,6 +457,8 @@ public class VerticalStepperFormView extends LinearLayout {
         LayoutInflater inflater = LayoutInflater.from(context);
         inflater.inflate(R.layout.vertical_stepper_form_layout, this, true);
 
+        formGlobalLayoutListener = new FormGlobalLayoutListener();
+
         style = new FormStyle();
 
         // Set the default values for all the style properties
@@ -663,15 +667,14 @@ public class VerticalStepperFormView extends LinearLayout {
             hideBottomNavigation();
         }
 
-        keyboardIsOpen = isKeyboardOpen();
-        setObserverForKeyboard();
-
         for (int i = 0; i < stepHelpers.size(); i++) {
             View stepLayout = initializeStepHelper(i);
             formContentView.addView(stepLayout);
         }
 
         goToStep(0, false);
+
+        initialized = true;
     }
 
     private View initializeStepHelper(int position) {
@@ -765,28 +768,6 @@ public class VerticalStepperFormView extends LinearLayout {
         }
     }
 
-    private void setObserverForKeyboard() {
-        getRootView().getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                boolean keyboardWasOpen = keyboardIsOpen;
-                keyboardIsOpen = isKeyboardOpen();
-                if (keyboardIsOpen != keyboardWasOpen) {
-                    scrollToOpenStepIfNecessary(true);
-                }
-            }
-        });
-    }
-
-    private boolean isKeyboardOpen() {
-        Rect r = new Rect();
-        formContentView.getWindowVisibleDisplayFrame(r);
-        int screenHeight = formContentView.getRootView().getHeight();
-        int keyboardHeight = screenHeight - r.bottom;
-
-        return keyboardHeight > screenHeight * 0.2;
-    }
-
     private synchronized void attemptToCompleteForm(boolean isCancellation) {
         if (formCompleted) {
             return;
@@ -857,6 +838,25 @@ public class VerticalStepperFormView extends LinearLayout {
                 goToNextStep(true);
             }
         });
+
+        keyboardIsOpen = isKeyboardOpen();
+        getRootView().getViewTreeObserver().addOnGlobalLayoutListener(formGlobalLayoutListener);
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+
+        getRootView().getViewTreeObserver().removeOnGlobalLayoutListener(formGlobalLayoutListener);
+    }
+
+    private boolean isKeyboardOpen() {
+        Rect r = new Rect();
+        formContentView.getWindowVisibleDisplayFrame(r);
+        int screenHeight = formContentView.getRootView().getHeight();
+        int keyboardHeight = screenHeight - r.bottom;
+
+        return keyboardHeight > screenHeight * 0.2;
     }
 
     private void restoreFromState(
@@ -1024,5 +1024,17 @@ public class VerticalStepperFormView extends LinearLayout {
         boolean allowNonLinearNavigation;
         boolean allowStepOpeningOnHeaderClick;
         float alphaOfDisabledElements;
+    }
+
+    private class FormGlobalLayoutListener implements ViewTreeObserver.OnGlobalLayoutListener {
+
+        @Override
+        public void onGlobalLayout() {
+            boolean keyboardWasOpen = keyboardIsOpen;
+            keyboardIsOpen = isKeyboardOpen();
+            if (initialized && keyboardIsOpen != keyboardWasOpen) {
+                scrollToOpenStepIfNecessary(true);
+            }
+        }
     }
 }
