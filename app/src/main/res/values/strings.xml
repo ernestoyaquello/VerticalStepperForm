@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">Vertical Stepper Form Example</string>
     <string name="add_alarm">Add Alarm</string>
-    <string name="add_alarm_confirm_subtitle">Confirm data and add alarm</string>
     <string name="new_alarm_added">New alarm added successfully</string>
     <string name="error_alarm_name_min_characters">At least %1$d character(s)</string>
     <string name="error_alarm_days_min_days">At least 1 day must be selected</string>
@@ -12,7 +11,6 @@
     <string name="form_hint_description">Alarm description (optional)</string>
     <string name="form_discard_question">Discard alarm?</string>
     <string name="form_info_will_be_lost">All the information about this new alarm will be lost</string>
-    <string name="form_confirm_button">Add alarm</string>
     <string name="form_sending_data_message">Adding new alarm…</string>
     <string name="form_discard_cancel">Cancel</string>
     <string name="form_discard">Discard</string>

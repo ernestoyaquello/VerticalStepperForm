@@ -217,25 +217,20 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
     }
 
     public static class DiscardAlarmConfirmationFragment extends DialogFragment {
-
-        private DialogInterface.OnClickListener listener;
-
-        @Override
-        public void onAttach(Context context) {
-            super.onAttach(context);
-
-            listener = (DialogInterface.OnClickListener) context;
-        }
-
         @Override
         @NonNull
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+            NewAlarmFormActivity activity = (NewAlarmFormActivity)getActivity();
+            if (activity == null) {
+                throw new IllegalStateException("Fragment " + this + " not attached to an activity.");
+            }
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(activity);
             builder.setTitle(R.string.form_discard_question)
                     .setMessage(R.string.form_info_will_be_lost)
-                    .setPositiveButton(R.string.form_discard, listener)
-                    .setNegativeButton(R.string.form_discard_cancel, listener)
-            .setCancelable(false);
+                    .setPositiveButton(R.string.form_discard, activity)
+                    .setNegativeButton(R.string.form_discard_cancel, activity)
+                    .setCancelable(false);
             Dialog dialog = builder.create();
             dialog.setCanceledOnTouchOutside(false);
 

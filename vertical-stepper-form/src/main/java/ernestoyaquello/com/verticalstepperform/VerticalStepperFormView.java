@@ -82,7 +82,7 @@ public class VerticalStepperFormView extends LinearLayout {
      * @return An instance of the stepper form builder. Use it to configure and initialize the form.
      */
     public Builder setup(StepperFormListener stepperFormListener, List<Step> steps) {
-        Step[] stepsArray = steps.toArray(new Step[steps.size()]);
+        Step[] stepsArray = steps.toArray(new Step[0]);
         return new Builder(this, stepperFormListener, stepsArray);
     }
 
@@ -533,124 +533,122 @@ public class VerticalStepperFormView extends LinearLayout {
                     R.styleable.VerticalStepperFormView,
                     defStyleAttr,
                     0);
-            if (vars != null) {
 
-                if (vars.hasValue(R.styleable.VerticalStepperFormView_form_next_button_text)) {
-                    style.stepNextButtonText = vars.getString(
-                            R.styleable.VerticalStepperFormView_form_next_button_text);
-                }
-                if (vars.hasValue(R.styleable.VerticalStepperFormView_form_last_button_text)) {
-                    style.lastStepNextButtonText = vars.getString(
-                            R.styleable.VerticalStepperFormView_form_last_button_text);
-                }
-                if (vars.hasValue(R.styleable.VerticalStepperFormView_form_cancel_button_text)) {
-                    style.lastStepCancelButtonText = vars.getString(
-                            R.styleable.VerticalStepperFormView_form_cancel_button_text);
-                }
-                if (vars.hasValue(R.styleable.VerticalStepperFormView_form_confirmation_step_title_text)) {
-                    style.confirmationStepTitle = vars.getString(
-                            R.styleable.VerticalStepperFormView_form_confirmation_step_title_text);
-                }
-                if (vars.hasValue(R.styleable.VerticalStepperFormView_form_confirmation_step_subtitle_text)) {
-                    style.confirmationStepSubtitle = vars.getString(
-                            R.styleable.VerticalStepperFormView_form_confirmation_step_subtitle_text);
-                }
-                style.leftCircleSizeInPx = vars.getDimensionPixelSize(
-                        R.styleable.VerticalStepperFormView_form_circle_size,
-                        style.leftCircleSizeInPx);
-                style.leftCircleTextSizeInPx = vars.getDimensionPixelSize(
-                        R.styleable.VerticalStepperFormView_form_circle_text_size,
-                        style.leftCircleTextSizeInPx);
-                style.stepTitleTextSizeInPx = vars.getDimensionPixelSize(
-                        R.styleable.VerticalStepperFormView_form_title_text_size,
-                        style.stepTitleTextSizeInPx);
-                style.stepSubtitleTextSizeInPx = vars.getDimensionPixelSize(
-                        R.styleable.VerticalStepperFormView_form_subtitle_text_size,
-                        style.stepSubtitleTextSizeInPx);
-                style.stepErrorMessageTextSizeInPx = vars.getDimensionPixelSize(
-                        R.styleable.VerticalStepperFormView_form_error_message_text_size,
-                        style.stepErrorMessageTextSizeInPx);
-                style.leftVerticalLineThicknessSizeInPx = vars.getDimensionPixelSize(
-                        R.styleable.VerticalStepperFormView_form_vertical_line_width,
-                        style.leftVerticalLineThicknessSizeInPx);
-                style.marginFromStepNumbersToContentInPx = vars.getDimensionPixelSize(
-                        R.styleable.VerticalStepperFormView_form_horizontal_margin_from_step_numbers_to_content,
-                        style.marginFromStepNumbersToContentInPx);
-                style.backgroundColorOfDisabledElements = vars.getColor(
-                        R.styleable.VerticalStepperFormView_form_disabled_elements_background_color,
-                        style.backgroundColorOfDisabledElements);
-                style.stepNumberBackgroundColor = vars.getColor(
-                        R.styleable.VerticalStepperFormView_form_circle_background_color,
-                        style.stepNumberBackgroundColor);
-                style.nextButtonBackgroundColor = vars.getColor(
-                        R.styleable.VerticalStepperFormView_form_next_button_background_color,
-                        style.nextButtonBackgroundColor);
-                style.nextButtonPressedBackgroundColor = vars.getColor(
-                        R.styleable.VerticalStepperFormView_form_next_button_pressed_background_color,
-                        style.nextButtonPressedBackgroundColor);
-                style.lastStepCancelButtonBackgroundColor = vars.getColor(
-                        R.styleable.VerticalStepperFormView_form_cancel_button_background_color,
-                        style.lastStepCancelButtonBackgroundColor);
-                style.lastStepCancelButtonPressedBackgroundColor = vars.getColor(
-                        R.styleable.VerticalStepperFormView_form_cancel_button_pressed_background_color,
-                        style.lastStepCancelButtonPressedBackgroundColor);
-                style.stepNumberTextColor = vars.getColor(
-                        R.styleable.VerticalStepperFormView_form_circle_text_color,
-                        style.stepNumberTextColor);
-                style.stepTitleTextColor = vars.getColor(
-                        R.styleable.VerticalStepperFormView_form_title_text_color,
-                        style.stepTitleTextColor);
-                style.stepSubtitleTextColor = vars.getColor(
-                        R.styleable.VerticalStepperFormView_form_subtitle_text_color,
-                        style.stepSubtitleTextColor);
-                style.nextButtonTextColor = vars.getColor(
-                        R.styleable.VerticalStepperFormView_form_next_button_text_color,
-                        style.nextButtonTextColor);
-                style.nextButtonPressedTextColor = vars.getColor(
-                        R.styleable.VerticalStepperFormView_form_next_button_pressed_text_color,
-                        style.nextButtonPressedTextColor);
-                style.lastStepCancelButtonTextColor = vars.getColor(
-                        R.styleable.VerticalStepperFormView_form_cancel_button_text_color,
-                        style.lastStepCancelButtonTextColor);
-                style.lastStepCancelButtonPressedTextColor = vars.getColor(
-                        R.styleable.VerticalStepperFormView_form_cancel_button_pressed_text_color,
-                        style.lastStepCancelButtonPressedTextColor);
-                style.errorMessageTextColor = vars.getColor(
-                        R.styleable.VerticalStepperFormView_form_error_message_text_color,
-                        style.errorMessageTextColor);
-                style.bottomNavigationBackgroundColor = vars.getColor(
-                        R.styleable.VerticalStepperFormView_form_bottom_navigation_background_color,
-                        style.bottomNavigationBackgroundColor);
-                style.displayBottomNavigation = vars.getBoolean(
-                        R.styleable.VerticalStepperFormView_form_display_bottom_navigation,
-                        style.displayBottomNavigation);
-                style.displayStepButtons = vars.getBoolean(
-                        R.styleable.VerticalStepperFormView_form_display_step_buttons,
-                        style.displayStepButtons);
-                style.displayCancelButtonInLastStep = vars.getBoolean(
-                        R.styleable.VerticalStepperFormView_form_display_cancel_button_in_last_step,
-                        style.displayCancelButtonInLastStep);
-                style.displayStepDataInSubtitleOfClosedSteps = vars.getBoolean(
-                        R.styleable.VerticalStepperFormView_form_display_step_data_in_subtitle_of_closed_steps,
-                        style.displayStepDataInSubtitleOfClosedSteps);
-                style.displayDifferentBackgroundColorOnDisabledElements = vars.getBoolean(
-                        R.styleable.VerticalStepperFormView_form_display_different_background_color_on_disabled_elements,
-                        style.displayDifferentBackgroundColorOnDisabledElements);
-                style.includeConfirmationStep = vars.getBoolean(
-                        R.styleable.VerticalStepperFormView_form_include_confirmation_step,
-                        style.includeConfirmationStep);
-                style.allowNonLinearNavigation = vars.getBoolean(
-                        R.styleable.VerticalStepperFormView_form_allow_non_linear_navigation,
-                        style.allowNonLinearNavigation);
-                style.allowStepOpeningOnHeaderClick = vars.getBoolean(
-                        R.styleable.VerticalStepperFormView_form_allow_step_opening_on_header_click,
-                        style.allowStepOpeningOnHeaderClick);
-                style.alphaOfDisabledElements = vars.getFloat(
-                        R.styleable.VerticalStepperFormView_form_alpha_of_disabled_elements,
-                        style.alphaOfDisabledElements);
-
-                vars.recycle();
+            if (vars.hasValue(R.styleable.VerticalStepperFormView_form_next_button_text)) {
+                style.stepNextButtonText = vars.getString(
+                        R.styleable.VerticalStepperFormView_form_next_button_text);
             }
+            if (vars.hasValue(R.styleable.VerticalStepperFormView_form_last_button_text)) {
+                style.lastStepNextButtonText = vars.getString(
+                        R.styleable.VerticalStepperFormView_form_last_button_text);
+            }
+            if (vars.hasValue(R.styleable.VerticalStepperFormView_form_cancel_button_text)) {
+                style.lastStepCancelButtonText = vars.getString(
+                        R.styleable.VerticalStepperFormView_form_cancel_button_text);
+            }
+            if (vars.hasValue(R.styleable.VerticalStepperFormView_form_confirmation_step_title_text)) {
+                style.confirmationStepTitle = vars.getString(
+                        R.styleable.VerticalStepperFormView_form_confirmation_step_title_text);
+            }
+            if (vars.hasValue(R.styleable.VerticalStepperFormView_form_confirmation_step_subtitle_text)) {
+                style.confirmationStepSubtitle = vars.getString(
+                        R.styleable.VerticalStepperFormView_form_confirmation_step_subtitle_text);
+            }
+            style.leftCircleSizeInPx = vars.getDimensionPixelSize(
+                    R.styleable.VerticalStepperFormView_form_circle_size,
+                    style.leftCircleSizeInPx);
+            style.leftCircleTextSizeInPx = vars.getDimensionPixelSize(
+                    R.styleable.VerticalStepperFormView_form_circle_text_size,
+                    style.leftCircleTextSizeInPx);
+            style.stepTitleTextSizeInPx = vars.getDimensionPixelSize(
+                    R.styleable.VerticalStepperFormView_form_title_text_size,
+                    style.stepTitleTextSizeInPx);
+            style.stepSubtitleTextSizeInPx = vars.getDimensionPixelSize(
+                    R.styleable.VerticalStepperFormView_form_subtitle_text_size,
+                    style.stepSubtitleTextSizeInPx);
+            style.stepErrorMessageTextSizeInPx = vars.getDimensionPixelSize(
+                    R.styleable.VerticalStepperFormView_form_error_message_text_size,
+                    style.stepErrorMessageTextSizeInPx);
+            style.leftVerticalLineThicknessSizeInPx = vars.getDimensionPixelSize(
+                    R.styleable.VerticalStepperFormView_form_vertical_line_width,
+                    style.leftVerticalLineThicknessSizeInPx);
+            style.marginFromStepNumbersToContentInPx = vars.getDimensionPixelSize(
+                    R.styleable.VerticalStepperFormView_form_horizontal_margin_from_step_numbers_to_content,
+                    style.marginFromStepNumbersToContentInPx);
+            style.backgroundColorOfDisabledElements = vars.getColor(
+                    R.styleable.VerticalStepperFormView_form_disabled_elements_background_color,
+                    style.backgroundColorOfDisabledElements);
+            style.stepNumberBackgroundColor = vars.getColor(
+                    R.styleable.VerticalStepperFormView_form_circle_background_color,
+                    style.stepNumberBackgroundColor);
+            style.nextButtonBackgroundColor = vars.getColor(
+                    R.styleable.VerticalStepperFormView_form_next_button_background_color,
+                    style.nextButtonBackgroundColor);
+            style.nextButtonPressedBackgroundColor = vars.getColor(
+                    R.styleable.VerticalStepperFormView_form_next_button_pressed_background_color,
+                    style.nextButtonPressedBackgroundColor);
+            style.lastStepCancelButtonBackgroundColor = vars.getColor(
+                    R.styleable.VerticalStepperFormView_form_cancel_button_background_color,
+                    style.lastStepCancelButtonBackgroundColor);
+            style.lastStepCancelButtonPressedBackgroundColor = vars.getColor(
+                    R.styleable.VerticalStepperFormView_form_cancel_button_pressed_background_color,
+                    style.lastStepCancelButtonPressedBackgroundColor);
+            style.stepNumberTextColor = vars.getColor(
+                    R.styleable.VerticalStepperFormView_form_circle_text_color,
+                    style.stepNumberTextColor);
+            style.stepTitleTextColor = vars.getColor(
+                    R.styleable.VerticalStepperFormView_form_title_text_color,
+                    style.stepTitleTextColor);
+            style.stepSubtitleTextColor = vars.getColor(
+                    R.styleable.VerticalStepperFormView_form_subtitle_text_color,
+                    style.stepSubtitleTextColor);
+            style.nextButtonTextColor = vars.getColor(
+                    R.styleable.VerticalStepperFormView_form_next_button_text_color,
+                    style.nextButtonTextColor);
+            style.nextButtonPressedTextColor = vars.getColor(
+                    R.styleable.VerticalStepperFormView_form_next_button_pressed_text_color,
+                    style.nextButtonPressedTextColor);
+            style.lastStepCancelButtonTextColor = vars.getColor(
+                    R.styleable.VerticalStepperFormView_form_cancel_button_text_color,
+                    style.lastStepCancelButtonTextColor);
+            style.lastStepCancelButtonPressedTextColor = vars.getColor(
+                    R.styleable.VerticalStepperFormView_form_cancel_button_pressed_text_color,
+                    style.lastStepCancelButtonPressedTextColor);
+            style.errorMessageTextColor = vars.getColor(
+                    R.styleable.VerticalStepperFormView_form_error_message_text_color,
+                    style.errorMessageTextColor);
+            style.bottomNavigationBackgroundColor = vars.getColor(
+                    R.styleable.VerticalStepperFormView_form_bottom_navigation_background_color,
+                    style.bottomNavigationBackgroundColor);
+            style.displayBottomNavigation = vars.getBoolean(
+                    R.styleable.VerticalStepperFormView_form_display_bottom_navigation,
+                    style.displayBottomNavigation);
+            style.displayStepButtons = vars.getBoolean(
+                    R.styleable.VerticalStepperFormView_form_display_step_buttons,
+                    style.displayStepButtons);
+            style.displayCancelButtonInLastStep = vars.getBoolean(
+                    R.styleable.VerticalStepperFormView_form_display_cancel_button_in_last_step,
+                    style.displayCancelButtonInLastStep);
+            style.displayStepDataInSubtitleOfClosedSteps = vars.getBoolean(
+                    R.styleable.VerticalStepperFormView_form_display_step_data_in_subtitle_of_closed_steps,
+                    style.displayStepDataInSubtitleOfClosedSteps);
+            style.displayDifferentBackgroundColorOnDisabledElements = vars.getBoolean(
+                    R.styleable.VerticalStepperFormView_form_display_different_background_color_on_disabled_elements,
+                    style.displayDifferentBackgroundColorOnDisabledElements);
+            style.includeConfirmationStep = vars.getBoolean(
+                    R.styleable.VerticalStepperFormView_form_include_confirmation_step,
+                    style.includeConfirmationStep);
+            style.allowNonLinearNavigation = vars.getBoolean(
+                    R.styleable.VerticalStepperFormView_form_allow_non_linear_navigation,
+                    style.allowNonLinearNavigation);
+            style.allowStepOpeningOnHeaderClick = vars.getBoolean(
+                    R.styleable.VerticalStepperFormView_form_allow_step_opening_on_header_click,
+                    style.allowStepOpeningOnHeaderClick);
+            style.alphaOfDisabledElements = vars.getFloat(
+                    R.styleable.VerticalStepperFormView_form_alpha_of_disabled_elements,
+                    style.alphaOfDisabledElements);
+
+            vars.recycle();
         }
 
         internalListener = new FormStepListener();
