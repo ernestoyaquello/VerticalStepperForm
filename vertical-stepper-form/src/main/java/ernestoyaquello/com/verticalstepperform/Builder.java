@@ -423,6 +423,19 @@ public class Builder {
     }
 
     /**
+     * Specifies whether or not the last step will be closed when the form is completed.
+     *
+     * @param closeLastStepOnCompletion True to make the last step close automatically on completion;
+     *                                  false to not.
+     * @return The builder instance.
+     */
+    public Builder closeLastStepOnCompletion(boolean closeLastStepOnCompletion) {
+        formView.style.closeLastStepOnCompletion = closeLastStepOnCompletion;
+
+        return this;
+    }
+
+    /**
      * Sets up the form and initializes it.
      */
     public void init() {

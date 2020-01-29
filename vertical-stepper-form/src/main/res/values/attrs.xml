@@ -37,6 +37,7 @@
         <attr name="form_include_confirmation_step" format="boolean" />
         <attr name="form_allow_non_linear_navigation" format="boolean" />
         <attr name="form_allow_step_opening_on_header_click" format="boolean" />
+        <attr name="form_close_last_step_on_completion" format="boolean" />
         <attr name="form_alpha_of_disabled_elements" format="float" />
     </declare-styleable>
 

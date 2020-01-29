@@ -223,6 +223,17 @@ public class VerticalStepperFormView extends LinearLayout {
     }
 
     /**
+     * Determines whether the form has already been completed or cancelled.
+     * Please note that this could return false even if all the steps are completed (for example,
+     * if the user has filled in all the required data but hasn't submitted the form yet).
+     *
+     * @return True if the form has been completed or cancelled; false otherwise.
+     */
+    public boolean isFormCompleted() {
+        return formCompleted;
+    }
+
+    /**
      * If possible, goes to the step that is positioned after the currently open one, closing the
      * current one and opening the next one.
      * Please note that, unless allowNonLinearNavigation is set to true, it will only be possible to
@@ -413,17 +424,24 @@ public class VerticalStepperFormView extends LinearLayout {
         }
 
         int openedStepPosition = getOpenStepPosition();
-        if (openedStepPosition >= 0 && openedStepPosition < stepHelpers.size()) {
-            StepHelper stepHelper = stepHelpers.get(openedStepPosition);
-            if ((openedStepPosition + 1) < stepHelpers.size() || areAllStepsCompleted()) {
-                stepHelper.enableAllButtons();
-            } else {
-                stepHelper.enableCancelButton();
-            }
+        openedStepPosition = openedStepPosition == -1 ? stepHelpers.size() - 1 : openedStepPosition;
+        StepHelper stepHelper = stepHelpers.get(openedStepPosition);
 
-            formCompleted = false;
-            updateBottomNavigationButtons();
+        if (style.closeLastStepOnCompletion) {
+            Step step = stepHelper.getStepInstance();
+            if (!step.isOpen()) {
+                step.openInternal(true);
+            }
         }
+
+        if ((openedStepPosition + 1) < stepHelpers.size() || areAllStepsCompleted()) {
+            stepHelper.enableAllButtons();
+        } else {
+            stepHelper.enableCancelButton();
+        }
+
+        formCompleted = false;
+        updateBottomNavigationButtons();
     }
 
     /**
@@ -523,6 +541,7 @@ public class VerticalStepperFormView extends LinearLayout {
         style.includeConfirmationStep = true;
         style.allowNonLinearNavigation = false;
         style.allowStepOpeningOnHeaderClick = true;
+        style.closeLastStepOnCompletion = false;
         style.alphaOfDisabledElements = 0.3f;
 
         // Try to get the user values for the style properties to replace the default ones
@@ -644,6 +663,9 @@ public class VerticalStepperFormView extends LinearLayout {
             style.allowStepOpeningOnHeaderClick = vars.getBoolean(
                     R.styleable.VerticalStepperFormView_form_allow_step_opening_on_header_click,
                     style.allowStepOpeningOnHeaderClick);
+            style.closeLastStepOnCompletion = vars.getBoolean(
+                    R.styleable.VerticalStepperFormView_form_close_last_step_on_completion,
+                    style.closeLastStepOnCompletion);
             style.alphaOfDisabledElements = vars.getFloat(
                     R.styleable.VerticalStepperFormView_form_alpha_of_disabled_elements,
                     style.alphaOfDisabledElements);
@@ -803,6 +825,10 @@ public class VerticalStepperFormView extends LinearLayout {
         } else if (markedConfirmationStepAsCompleted) {
             // If the completion attempt fails, we restore the confirmation step to its previous state
             lastStep.markAsUncompleted(confirmationStepErrorMessage, true);
+        }
+
+        if (!isCancellation && style.closeLastStepOnCompletion) {
+            lastStep.closeInternal(true);
         }
     }
 
@@ -1029,6 +1055,7 @@ public class VerticalStepperFormView extends LinearLayout {
         boolean includeConfirmationStep;
         boolean allowNonLinearNavigation;
         boolean allowStepOpeningOnHeaderClick;
+        boolean closeLastStepOnCompletion;
         float alphaOfDisabledElements;
     }
 
