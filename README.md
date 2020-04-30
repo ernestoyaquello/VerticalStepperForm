@@ -1,4 +1,8 @@
 # Vertical Stepper Form Library
+[![issues](https://img.shields.io/github/issues/ernestoyaquello/VerticalStepperForm?style=for-the-badge)](https://github.com/ernestoyaquello/VerticalStepperForm/issues)
+[![pull requests](https://img.shields.io/github/issues-pr/ernestoyaquello/VerticalStepperForm?style=for-the-badge)](https://github.com/ernestoyaquello/VerticalStepperForm/pulls)
+[![contributors](https://img.shields.io/github/contributors/ernestoyaquello/VerticalStepperForm?style=for-the-badge)](https://github.com/ernestoyaquello/VerticalStepperForm/graphs/contributors)
+
 This Android library implements a highly customizable **vertical stepper form**.
 
 ## Demo
