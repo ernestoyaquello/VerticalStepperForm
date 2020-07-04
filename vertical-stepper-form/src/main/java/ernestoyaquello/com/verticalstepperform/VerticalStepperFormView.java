@@ -17,6 +17,7 @@ import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.ScrollView;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -463,6 +464,80 @@ public class VerticalStepperFormView extends LinearLayout {
     }
 
     /**
+     * Adds a step to the form in the specified position.
+     *
+     * @param index The index where the step will be added.
+     * @param stepToAdd The step to add.
+     * @return True if the step was added successfully; false otherwise.
+     */
+    public boolean addStep(int index, Step stepToAdd) {
+        StepHelper lastStep = stepHelpers.get(stepHelpers.size() - 1);
+        int lastAllowedIndex = lastStep.isConfirmationStep() ? stepHelpers.size() - 1 : stepHelpers.size();
+        if (!initialized || formCompleted || index < 0 || index > lastAllowedIndex) {
+            return false;
+        }
+
+        StepHelper stepHelper = new StepHelper(internalListener, stepToAdd);
+        stepHelpers.add(index, stepHelper);
+        for (int i = 0; i < stepHelpers.size(); i++) {
+            if (i != index) {
+                StepHelper previouslyExistingStepHelper = stepHelpers.get(i);
+                boolean isLastStep = (i + 1) == stepHelpers.size();
+                previouslyExistingStepHelper.updateStepViewsForLastOrNotLast(isLastStep);
+            }
+        }
+
+        View stepLayout = initializeStepHelper(index);
+        stepToAdd.markAsCompletedOrUncompleted(false);
+
+        progressBar.setMax(stepHelpers.size());
+        refreshFormProgress();
+        updateBottomNavigationButtons();
+
+        formContentView.addView(stepLayout, index);
+        int openStepPosition = getOpenStepPosition();
+        if (!style.allowNonLinearNavigation && !isStepCompleted(index) && index < openStepPosition) {
+            goToStep(index, true);
+        }
+
+        return true;
+    }
+
+    /**
+     * Removes the step that is placed at the specified position.
+     *
+     * @param index The index where the step to delete is.
+     * @return True if the step was deleted successfully; false otherwise.
+     */
+    public boolean removeStep(int index) {
+        StepHelper lastStep = stepHelpers.get(stepHelpers.size() - 1);
+        int lastAllowedIndex = lastStep.isConfirmationStep() ? stepHelpers.size() - 2 : stepHelpers.size() - 1;
+        if (!initialized || formCompleted || index < 0 || index > lastAllowedIndex) {
+            return false;
+        }
+
+        stepHelpers.remove(index);
+        for (int i = 0; i < stepHelpers.size(); i++) {
+            StepHelper previouslyExistingStepHelper = stepHelpers.get(i);
+            boolean isLastStep = (i + 1) == stepHelpers.size();
+            previouslyExistingStepHelper.updateStepViewsForLastOrNotLast(isLastStep);
+        }
+
+        progressBar.setMax(stepHelpers.size());
+        refreshFormProgress();
+        updateBottomNavigationButtons();
+
+        formContentView.removeViewAt(index);
+        int openStepPosition = getOpenStepPosition();
+        if (openStepPosition == -1) {
+            int replacementStep = index > 0 ? index - 1 : 0;
+            goToStep(replacementStep, true);
+        }
+
+        return true;
+    }
+
+    /**
      * Gets the total number of steps of the form.
      *
      * @return The total number of steps, including the confirmation step, if any.
@@ -678,7 +753,7 @@ public class VerticalStepperFormView extends LinearLayout {
 
     void initializeForm(StepperFormListener listener, StepHelper[] stepsArray) {
         this.listener = listener;
-        this.stepHelpers = Arrays.asList(stepsArray);
+        this.stepHelpers = new ArrayList<StepHelper>(Arrays.asList(stepsArray));
 
         progressBar.setMax(stepHelpers.size());
 

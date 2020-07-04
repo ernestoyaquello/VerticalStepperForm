@@ -214,6 +214,25 @@ class StepHelper implements Step.InternalFormStepListener {
         onUpdatedStepVisibility(position, false);
     }
 
+    void updateStepViewsForLastOrNotLast(boolean isLast) {
+        String stepNextButtonText = !step.getOriginalNextButtonText().isEmpty()
+                ? step.getOriginalNextButtonText()
+                : isLast ? formStyle.lastStepNextButtonText : formStyle.stepNextButtonText;
+        step.updateNextButtonText(stepNextButtonText, false);
+
+        if (formStyle.displayCancelButtonInLastStep && isLast) {
+            String cancelButtonText = formStyle.lastStepCancelButtonText == null
+                    ? "" : formStyle.lastStepCancelButtonText;
+            cancelButtonView.setText(cancelButtonText);
+            cancelButtonView.setVisibility(View.VISIBLE);
+        } else {
+            cancelButtonView.setVisibility(View.GONE);
+        }
+
+        lineView1.setVisibility(isLast ? View.GONE : View.VISIBLE);
+        lineView2.setVisibility(isLast ? View.GONE : View.VISIBLE);
+    }
+
     public Step getStepInstance() {
         return step;
     }

@@ -14,6 +14,7 @@ import java.util.List;
  */
 public abstract class Step<T> {
 
+    private String originalNextButtonText;
     private String title;
     private String subtitle;
     private String nextButtonText;
@@ -39,6 +40,7 @@ public abstract class Step<T> {
         this.title = title;
         this.subtitle = subtitle;
         this.nextButtonText = nextButtonText;
+        this.originalNextButtonText = nextButtonText;
         this.errorMessage = "";
         this.internalListeners = new ArrayList<>();
     }
@@ -375,6 +377,10 @@ public abstract class Step<T> {
         for (InternalFormStepListener listener: internalListeners) {
             listener.onUpdatedStepVisibility(getPosition(), useAnimations);
         }
+    }
+
+    String getOriginalNextButtonText() {
+        return originalNextButtonText == null ? "" : originalNextButtonText;
     }
 
     void addListenerInternal(InternalFormStepListener listener) {
