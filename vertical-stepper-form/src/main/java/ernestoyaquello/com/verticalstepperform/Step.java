@@ -14,6 +14,7 @@ import java.util.List;
  */
 public abstract class Step<T> {
 
+    private String originalNextButtonText;
     private String title;
     private String subtitle;
     private String nextButtonText;
@@ -22,7 +23,6 @@ public abstract class Step<T> {
     private boolean open;
     private View stepLayout;
     private View contentLayout;
-    private int position;
     private VerticalStepperFormView formView;
 
     private List<InternalFormStepListener> internalListeners;
@@ -39,6 +39,7 @@ public abstract class Step<T> {
         this.title = title;
         this.subtitle = subtitle;
         this.nextButtonText = nextButtonText;
+        this.originalNextButtonText = nextButtonText;
         this.errorMessage = "";
         this.internalListeners = new ArrayList<>();
     }
@@ -199,7 +200,7 @@ public abstract class Step<T> {
      * @return The position of the step.
      */
     public int getPosition() {
-        return position;
+        return formView.getStepPosition(this);
     }
 
     /**
@@ -377,6 +378,10 @@ public abstract class Step<T> {
         }
     }
 
+    String getOriginalNextButtonText() {
+        return originalNextButtonText == null ? "" : originalNextButtonText;
+    }
+
     void addListenerInternal(InternalFormStepListener listener) {
         if (!internalListeners.contains(listener)) {
             internalListeners.add(listener);
@@ -395,10 +400,9 @@ public abstract class Step<T> {
         }
     }
 
-    void initializeStepInternal(View stepLayout, VerticalStepperFormView formView, int position) {
+    void initializeStepInternal(View stepLayout, VerticalStepperFormView formView) {
         this.stepLayout = stepLayout;
         this.formView = formView;
-        this.position = position;
     }
 
     void setContentLayoutInternal(View contentLayout) {

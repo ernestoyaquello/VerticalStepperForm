@@ -58,7 +58,7 @@ class StepHelper implements Step.InternalFormStepListener {
         this.step.addListenerInternal(formListener);
     }
 
-    View initialize(VerticalStepperFormView form, ViewGroup parent, @LayoutRes int stepLayoutResourceId, int position, boolean isLast) {
+    View initialize(VerticalStepperFormView form, ViewGroup parent, @LayoutRes int stepLayoutResourceId) {
         if (step.getEntireStepLayout() == null) {
             formStyle = form.style;
 
@@ -66,10 +66,10 @@ class StepHelper implements Step.InternalFormStepListener {
             LayoutInflater inflater = LayoutInflater.from(context);
             View stepLayout = inflater.inflate(stepLayoutResourceId, parent, false);
 
-            step.initializeStepInternal(stepLayout, form, position);
+            step.initializeStepInternal(stepLayout, form);
             step.setContentLayoutInternal(step.createStepContentLayout());
 
-            setupStepViews(form, stepLayout, position, isLast);
+            setupStepViews(form, stepLayout);
         } else {
             throw new IllegalStateException("This step has already been initialized");
         }
@@ -77,11 +77,7 @@ class StepHelper implements Step.InternalFormStepListener {
         return step.getEntireStepLayout();
     }
 
-    private void setupStepViews(
-            final VerticalStepperFormView form,
-            View stepLayout,
-            final int position,
-            boolean isLast) {
+    private void setupStepViews(final VerticalStepperFormView form, View stepLayout) {
 
         if (step.getContentLayout() != null) {
             ViewGroup contentContainerLayout = step.getEntireStepLayout().findViewById(R.id.step_content);
@@ -162,14 +158,14 @@ class StepHelper implements Step.InternalFormStepListener {
             @Override
             public void onClick(View view) {
                 if (formStyle.allowStepOpeningOnHeaderClick) {
-                    form.goToStep(position, true);
+                    form.goToStep(form.getStepPosition(step), true);
                 }
             }
         });
         nextButtonView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                form.goToStep(position + 1, true);
+                form.goToStep(form.getStepPosition(step) + 1, true);
             }
         });
         cancelButtonView.setOnClickListener(new View.OnClickListener() {
@@ -178,6 +174,9 @@ class StepHelper implements Step.InternalFormStepListener {
                 form.cancelForm();
             }
         });
+
+        int position = form.getStepPosition(step);
+        boolean isLast = (position + 1) == form.getTotalNumberOfSteps();
 
         String title = !isConfirmationStep()
                 ? step.getTitle()
@@ -209,6 +208,33 @@ class StepHelper implements Step.InternalFormStepListener {
             lineView1.setVisibility(View.GONE);
             lineView2.setVisibility(View.GONE);
         }
+
+        onUpdatedStepCompletionState(position, false);
+        onUpdatedStepVisibility(position, false);
+    }
+
+    void updateStepViewsAfterPositionChange(VerticalStepperFormView form) {
+        int position = form.getStepPosition(step);
+        boolean isLast = (position + 1) == form.getTotalNumberOfSteps();
+
+        stepNumberTextView.setText(String.valueOf(position + 1));
+
+        String stepNextButtonText = !step.getOriginalNextButtonText().isEmpty()
+                ? step.getOriginalNextButtonText()
+                : isLast ? formStyle.lastStepNextButtonText : formStyle.stepNextButtonText;
+        step.updateNextButtonText(stepNextButtonText, false);
+
+        if (formStyle.displayCancelButtonInLastStep && isLast) {
+            String cancelButtonText = formStyle.lastStepCancelButtonText == null
+                    ? "" : formStyle.lastStepCancelButtonText;
+            cancelButtonView.setText(cancelButtonText);
+            cancelButtonView.setVisibility(View.VISIBLE);
+        } else {
+            cancelButtonView.setVisibility(View.GONE);
+        }
+
+        lineView1.setVisibility(isLast ? View.GONE : View.VISIBLE);
+        lineView2.setVisibility(isLast ? View.GONE : View.VISIBLE);
 
         onUpdatedStepCompletionState(position, false);
         onUpdatedStepVisibility(position, false);
