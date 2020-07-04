@@ -489,6 +489,7 @@ public class VerticalStepperFormView extends LinearLayout {
         progressBar.setMax(stepHelpers.size());
         refreshFormProgress();
         updateBottomNavigationButtons();
+        enableOrDisableLastStepNextButton();
 
         formContentView.addView(stepLayout, index);
         int openStepPosition = getOpenStepPosition();
@@ -525,6 +526,7 @@ public class VerticalStepperFormView extends LinearLayout {
         progressBar.setMax(stepHelpers.size());
         refreshFormProgress();
         updateBottomNavigationButtons();
+        enableOrDisableLastStepNextButton();
 
         formContentView.removeViewAt(index);
         int openStepPosition = getOpenStepPosition();
