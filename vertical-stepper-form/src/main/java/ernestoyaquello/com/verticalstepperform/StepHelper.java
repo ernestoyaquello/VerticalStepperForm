@@ -213,7 +213,7 @@ class StepHelper implements Step.InternalFormStepListener {
         onUpdatedStepVisibility(position, false);
     }
 
-    void updateStepsViewAfterPositionChange(VerticalStepperFormView form) {
+    void updateStepViewsAfterPositionChange(VerticalStepperFormView form) {
         int position = form.getStepPosition(step);
         boolean isLast = (position + 1) == form.getTotalNumberOfSteps();
 

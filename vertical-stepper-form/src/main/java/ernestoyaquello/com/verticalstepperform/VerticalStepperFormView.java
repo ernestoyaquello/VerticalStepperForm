@@ -479,7 +479,7 @@ public class VerticalStepperFormView extends LinearLayout {
         for (int i = 0; i < stepHelpers.size(); i++) {
             if (i != index) {
                 StepHelper previouslyExistingStepHelper = stepHelpers.get(i);
-                previouslyExistingStepHelper.updateStepsViewAfterPositionChange(this);
+                previouslyExistingStepHelper.updateStepViewsAfterPositionChange(this);
             }
         }
 
@@ -508,6 +508,8 @@ public class VerticalStepperFormView extends LinearLayout {
      * @return True if the step was deleted successfully; false otherwise.
      */
     public boolean removeStep(int index) {
+        int previousOpenStepPosition = getOpenStepPosition();
+
         StepHelper lastStep = stepHelpers.get(stepHelpers.size() - 1);
         int lastAllowedIndex = lastStep.isConfirmationStep() ? stepHelpers.size() - 2 : stepHelpers.size() - 1;
         if (!initialized || formCompleted || index < 0 || index > lastAllowedIndex || stepHelpers.size() <= 1) {
@@ -517,7 +519,7 @@ public class VerticalStepperFormView extends LinearLayout {
         stepHelpers.remove(index);
         for (int i = 0; i < stepHelpers.size(); i++) {
             StepHelper previouslyExistingStepHelper = stepHelpers.get(i);
-            previouslyExistingStepHelper.updateStepsViewAfterPositionChange(this);
+            previouslyExistingStepHelper.updateStepViewsAfterPositionChange(this);
         }
 
         progressBar.setMax(stepHelpers.size());
@@ -526,9 +528,9 @@ public class VerticalStepperFormView extends LinearLayout {
 
         formContentView.removeViewAt(index);
         int openStepPosition = getOpenStepPosition();
-        if (openStepPosition == -1) {
-            int replacementStep = index > 0 ? index - 1 : 0;
-            goToStep(replacementStep, true);
+        if (previousOpenStepPosition != -1 && openStepPosition == -1) {
+            int stepToOpen = index > 0 ? index - 1 : 0;
+            goToStep(stepToOpen, true);
         }
 
         return true;
@@ -990,39 +992,6 @@ public class VerticalStepperFormView extends LinearLayout {
         return keyboardHeight > screenHeight * 0.2;
     }
 
-    private void restoreFromState(
-            int positionToOpen,
-            boolean[] completedSteps,
-            String[] titles,
-            String[] subtitles,
-            String[] buttonTexts,
-            String[] errorMessages,
-            boolean formCompleted) {
-
-        for (int i = 0; i < completedSteps.length; i++) {
-            StepHelper stepHelper = originalStepHelpers.get(i);
-            Step step = stepHelper.getStepInstance();
-            step.updateTitle(titles[i], false);
-            step.updateSubtitle(subtitles[i], false);
-            step.updateNextButtonText(buttonTexts[i], false);
-            if (completedSteps[i]) {
-                step.markAsCompleted(false);
-            } else {
-                step.markAsUncompleted(errorMessages[i], false);
-            }
-        }
-
-        goToStep(positionToOpen, false);
-
-        if (formCompleted) {
-            this.formCompleted = true;
-            originalStepHelpers.get(getOpenStepPosition()).disableAllButtons();
-            updateBottomNavigationButtons();
-        }
-
-        refreshFormProgress();
-    }
-
     @Override
     public Parcelable onSaveInstanceState() {
         Bundle bundle = new Bundle();
@@ -1081,7 +1050,41 @@ public class VerticalStepperFormView extends LinearLayout {
                     errorMessages,
                     formCompleted);
         }
+
         super.onRestoreInstanceState(state);
+    }
+
+    private void restoreFromState(
+            int positionToOpen,
+            boolean[] completedSteps,
+            String[] titles,
+            String[] subtitles,
+            String[] buttonTexts,
+            String[] errorMessages,
+            boolean formCompleted) {
+
+        for (int i = 0; i < completedSteps.length; i++) {
+            StepHelper stepHelper = stepHelpers.get(i);
+            Step step = stepHelper.getStepInstance();
+            step.updateTitle(titles[i], false);
+            step.updateSubtitle(subtitles[i], false);
+            step.updateNextButtonText(buttonTexts[i], false);
+            if (completedSteps[i]) {
+                step.markAsCompleted(false);
+            } else {
+                step.markAsUncompleted(errorMessages[i], false);
+            }
+        }
+
+        goToStep(positionToOpen, false);
+
+        if (formCompleted) {
+            this.formCompleted = true;
+            stepHelpers.get(getOpenStepPosition()).disableAllButtons();
+            updateBottomNavigationButtons();
+        }
+
+        refreshFormProgress();
     }
 
     class FormStepListener implements Step.InternalFormStepListener {
