@@ -479,8 +479,7 @@ public class VerticalStepperFormView extends LinearLayout {
         for (int i = 0; i < stepHelpers.size(); i++) {
             if (i != index) {
                 StepHelper previouslyExistingStepHelper = stepHelpers.get(i);
-                boolean isLastStep = (i + 1) == stepHelpers.size();
-                previouslyExistingStepHelper.updateStepViewsForLastOrNotLast(isLastStep);
+                previouslyExistingStepHelper.updateStepsViewAfterPositionChange(this);
             }
         }
 
@@ -518,8 +517,7 @@ public class VerticalStepperFormView extends LinearLayout {
         stepHelpers.remove(index);
         for (int i = 0; i < stepHelpers.size(); i++) {
             StepHelper previouslyExistingStepHelper = stepHelpers.get(i);
-            boolean isLastStep = (i + 1) == stepHelpers.size();
-            previouslyExistingStepHelper.updateStepViewsForLastOrNotLast(isLastStep);
+            previouslyExistingStepHelper.updateStepsViewAfterPositionChange(this);
         }
 
         progressBar.setMax(stepHelpers.size());
@@ -543,6 +541,21 @@ public class VerticalStepperFormView extends LinearLayout {
      */
     public int getTotalNumberOfSteps() {
         return stepHelpers.size();
+    }
+
+    /**
+     * Gets the position of the specified step within the list of steps of the form.
+     *
+     * @param step The step to find the position of.
+     * @return The position of the step, or -1 if the step is not found.
+     */
+    public int getStepPosition(Step step) {
+        for (int i = 0; i < stepHelpers.size(); i++) {
+            if (stepHelpers.get(i).getStepInstance() == step)
+                return i;
+        }
+
+        return -1;
     }
 
     private void onConstructed(Context context, AttributeSet attrs, int defStyleAttr) {
@@ -777,7 +790,7 @@ public class VerticalStepperFormView extends LinearLayout {
         boolean isLast = (position + 1) == stepHelpers.size();
         int stepLayoutResourceId = getStepLayoutResourceId(position, isLast);
 
-        return stepHelper.initialize(this, formContentView, stepLayoutResourceId, position, isLast);
+        return stepHelper.initialize(this, formContentView, stepLayoutResourceId);
     }
 
     @LayoutRes
