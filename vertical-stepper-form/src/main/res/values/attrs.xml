@@ -16,6 +16,8 @@
         <attr name="form_horizontal_margin_from_step_numbers_to_content" format="dimension" />
         <attr name="form_disabled_elements_background_color" format="color" />
         <attr name="form_circle_background_color" format="color" />
+        <attr name="form_circle_completed_background_color" format="color" />
+        <attr name="form_circle_error_background_color" format="color" />
         <attr name="form_next_button_background_color" format="color" />
         <attr name="form_next_button_pressed_background_color" format="color" />
         <attr name="form_cancel_button_background_color" format="color" />

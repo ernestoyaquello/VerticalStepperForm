@@ -102,6 +102,8 @@ public class Builder {
             int textColorOfElementsDisplayedOverThePrimaryColor) {
 
         formView.style.stepNumberBackgroundColor = primaryColor;
+        formView.style.stepNumberCompletedBackgroundColor = primaryColor;
+        formView.style.stepNumberErrorBackgroundColor = primaryColor;
         formView.style.stepNumberTextColor = textColorOfElementsDisplayedOverThePrimaryColor;
         formView.style.nextButtonBackgroundColor = primaryColor;
         formView.style.nextButtonTextColor = textColorOfElementsDisplayedOverThePrimaryColor;
@@ -120,7 +122,37 @@ public class Builder {
      */
     public Builder stepNumberColors(int stepNumberBackgroundColor, int stepNumberTextColor) {
         formView.style.stepNumberBackgroundColor = stepNumberBackgroundColor;
+        formView.style.stepNumberCompletedBackgroundColor = stepNumberBackgroundColor;
+        formView.style.stepNumberErrorBackgroundColor = stepNumberBackgroundColor;
         formView.style.stepNumberTextColor = stepNumberTextColor;
+
+        return this;
+    }
+
+    /**
+     * Sets the color of the left circles in which the step numbers are displayed, but only for
+     * the steps that are completed.
+     *
+     * @param stepNumberCompletedBackgroundColor Background color of the left circles in completed
+     *                                           steps.
+     * @return The builder instance.
+     */
+    public Builder stepNumberCompletedBackgroundColor(int stepNumberCompletedBackgroundColor) {
+        formView.style.stepNumberCompletedBackgroundColor = stepNumberCompletedBackgroundColor;
+
+        return this;
+    }
+
+    /**
+     * Sets the color of the left circles in which the step numbers are displayed, but only for
+     * the steps that are in an error state.
+     *
+     * @param stepNumberErrorBackgroundColor Background color of the left circles in steps that are
+     *                                       in an error state.
+     * @return The builder instance.
+     */
+    public Builder stepNumberErrorBackgroundColor(int stepNumberErrorBackgroundColor) {
+        formView.style.stepNumberErrorBackgroundColor = stepNumberErrorBackgroundColor;
 
         return this;
     }

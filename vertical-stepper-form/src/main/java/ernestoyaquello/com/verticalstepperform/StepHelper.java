@@ -318,14 +318,20 @@ class StepHelper implements Step.InternalFormStepListener {
         stepNumberCircleView.setAlpha(alpha);
 
         // Update background color of left circle
-        if (formStyle.displayDifferentBackgroundColorOnDisabledElements) {
-            Drawable circleDrawable = ContextCompat.getDrawable(stepNumberCircleView.getContext(),
-                    R.drawable.circle_step_done);
-            circleDrawable.setColorFilter(new PorterDuffColorFilter(enableHeader
-                    ? formStyle.stepNumberBackgroundColor
-                    : formStyle.backgroundColorOfDisabledElements, PorterDuff.Mode.SRC_IN));
-            stepNumberCircleView.setBackground(circleDrawable);
+        int stepNumberBackgroundColor = !step.hasError()
+                ? enableHeader
+                    ? formStyle.stepNumberCompletedBackgroundColor
+                    : formStyle.stepNumberBackgroundColor
+                : formStyle.stepNumberErrorBackgroundColor;
+        if (formStyle.displayDifferentBackgroundColorOnDisabledElements && !enableHeader) {
+            stepNumberBackgroundColor = formStyle.backgroundColorOfDisabledElements;
         }
+
+        Drawable circleDrawable = ContextCompat.getDrawable(stepNumberCircleView.getContext(),
+                R.drawable.circle_step_done);
+        circleDrawable.setColorFilter(
+                new PorterDuffColorFilter(stepNumberBackgroundColor, PorterDuff.Mode.SRC_IN));
+        stepNumberCircleView.setBackground(circleDrawable);
 
         // Update step position circle indicator layout
         if (step.isOpen() || !step.isCompleted()) {

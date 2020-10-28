@@ -484,7 +484,7 @@ public class VerticalStepperFormView extends LinearLayout {
         }
 
         View stepLayout = initializeStepHelper(index);
-        stepToAdd.markAsCompletedOrUncompleted(false);
+        stepToAdd.markAsCompletedOrUncompletedInternal(false, true);
 
         progressBar.setMax(stepHelpers.size());
         refreshFormProgress();
@@ -598,6 +598,10 @@ public class VerticalStepperFormView extends LinearLayout {
                 ContextCompat.getColor(context, R.color.vertical_stepper_form_background_color_disabled_elements);
         style.stepNumberBackgroundColor =
                 ContextCompat.getColor(context, R.color.vertical_stepper_form_background_color_circle);
+        style.stepNumberCompletedBackgroundColor =
+                ContextCompat.getColor(context, R.color.vertical_stepper_form_background_color_circle);
+        style.stepNumberErrorBackgroundColor =
+                ContextCompat.getColor(context, R.color.vertical_stepper_form_background_color_circle);
         style.nextButtonBackgroundColor =
                 ContextCompat.getColor(context, R.color.vertical_stepper_form_background_color_next_button);
         style.nextButtonPressedBackgroundColor =
@@ -691,6 +695,12 @@ public class VerticalStepperFormView extends LinearLayout {
             style.stepNumberBackgroundColor = vars.getColor(
                     R.styleable.VerticalStepperFormView_form_circle_background_color,
                     style.stepNumberBackgroundColor);
+            style.stepNumberCompletedBackgroundColor = vars.getColor(
+                    R.styleable.VerticalStepperFormView_form_circle_completed_background_color,
+                    style.stepNumberCompletedBackgroundColor);
+            style.stepNumberErrorBackgroundColor = vars.getColor(
+                    R.styleable.VerticalStepperFormView_form_circle_error_background_color,
+                    style.stepNumberErrorBackgroundColor);
             style.nextButtonBackgroundColor = vars.getColor(
                     R.styleable.VerticalStepperFormView_form_next_button_background_color,
                     style.nextButtonBackgroundColor);
@@ -999,18 +1009,22 @@ public class VerticalStepperFormView extends LinearLayout {
         Bundle bundle = new Bundle();
 
         boolean[] completedSteps = new boolean[originalStepHelpers.size()];
+        boolean[] errorSteps = new boolean[originalStepHelpers.size()];
         String[] titles = new String[originalStepHelpers.size()];
         String[] subtitles = new String[originalStepHelpers.size()];
         String[] buttonTexts = new String[originalStepHelpers.size()];
         String[] errorMessages = new String[originalStepHelpers.size()];
         for (int i = 0; i < completedSteps.length; i++) {
             StepHelper stepHelper = originalStepHelpers.get(i);
-            completedSteps[i] = stepHelper.getStepInstance().isCompleted();
-            titles[i] = stepHelper.getStepInstance().getTitle();
-            subtitles[i] = stepHelper.getStepInstance().getSubtitle();
-            buttonTexts[i] = stepHelper.getStepInstance().getNextButtonText();
-            if (!stepHelper.getStepInstance().isCompleted()) {
-                errorMessages[i] = stepHelper.getStepInstance().getErrorMessage();
+            Step step = stepHelper.getStepInstance();
+
+            completedSteps[i] = step.isCompleted();
+            errorSteps[i] = step.hasError();
+            titles[i] = step.getTitle();
+            subtitles[i] = step.getSubtitle();
+            buttonTexts[i] = step.getNextButtonText();
+            if (!step.isCompleted()) {
+                errorMessages[i] = step.getErrorMessage();
             }
         }
 
@@ -1020,6 +1034,7 @@ public class VerticalStepperFormView extends LinearLayout {
         bundle.putParcelable("superState", super.onSaveInstanceState());
         bundle.putInt("openStep", openStepPosition);
         bundle.putBooleanArray("completedSteps", completedSteps);
+        bundle.putBooleanArray("errorSteps", errorSteps);
         bundle.putStringArray("titles", titles);
         bundle.putStringArray("subtitles", subtitles);
         bundle.putStringArray("buttonTexts", buttonTexts);
@@ -1040,12 +1055,14 @@ public class VerticalStepperFormView extends LinearLayout {
             String[] subtitles = bundle.getStringArray("subtitles");
             String[] titles = bundle.getStringArray("titles");
             boolean[] completedSteps = bundle.getBooleanArray("completedSteps");
+            boolean[] errorSteps = bundle.getBooleanArray("errorSteps");
             int positionToOpen = bundle.getInt("openStep");
             state = bundle.getParcelable("superState");
 
             restoreFromState(
                     positionToOpen,
                     completedSteps,
+                    errorSteps,
                     titles,
                     subtitles,
                     buttonTexts,
@@ -1059,6 +1076,7 @@ public class VerticalStepperFormView extends LinearLayout {
     private void restoreFromState(
             int positionToOpen,
             boolean[] completedSteps,
+            boolean[] errorSteps,
             String[] titles,
             String[] subtitles,
             String[] buttonTexts,
@@ -1068,6 +1086,8 @@ public class VerticalStepperFormView extends LinearLayout {
         for (int i = 0; i < completedSteps.length; i++) {
             StepHelper stepHelper = stepHelpers.get(i);
             Step step = stepHelper.getStepInstance();
+
+            step.restoreErrorState(errorSteps[i]);
             step.updateTitle(titles[i], false);
             step.updateSubtitle(subtitles[i], false);
             step.updateNextButtonText(buttonTexts[i], false);
@@ -1141,6 +1161,8 @@ public class VerticalStepperFormView extends LinearLayout {
         int marginFromStepNumbersToContentInPx;
         int backgroundColorOfDisabledElements;
         int stepNumberBackgroundColor;
+        int stepNumberCompletedBackgroundColor;
+        int stepNumberErrorBackgroundColor;
         int nextButtonBackgroundColor;
         int nextButtonPressedBackgroundColor;
         int lastStepCancelButtonBackgroundColor;

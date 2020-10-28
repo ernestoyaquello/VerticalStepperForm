@@ -21,6 +21,7 @@ public abstract class Step<T> {
     private String errorMessage;
     private boolean completed;
     private boolean open;
+    private boolean hasError;
     private View stepLayout;
     private View contentLayout;
     private VerticalStepperFormView formView;
@@ -174,6 +175,23 @@ public abstract class Step<T> {
     }
 
     /**
+     * Returns whether or not the step is currently considered to be in an error state because its
+     * data is invalid.
+     *
+     * Please note that even if the data is invalid, this method will only return true after the
+     * step has been opened at least once (or after its completion state has been updated manually).
+     * This way, a step with invalid data whose content hasn't been seen by the user won't appear
+     * to be in an error state until the user opens it for the first time.
+     * On this regard, it is also worth noting that this method won't update the state of the step;
+     * it will just return the value that indicates whether the step is currently in an error state.
+     *
+     * @return True if the step is in an error state; false otherwise.
+     */
+    public boolean hasError() {
+        return hasError;
+    }
+
+    /**
      * Gets the content layout of the step, which was generated on createStepContentLayout(), if any.
      *
      * @return The step's content layout.
@@ -242,20 +260,7 @@ public abstract class Step<T> {
      * @return True if the step was marked as completed; false otherwise.
      */
     public boolean markAsCompletedOrUncompleted(boolean useAnimations) {
-        IsDataValid isDataValid = isStepDataValid(getStepData());
-        isDataValid = isDataValid == null ? new IsDataValid(true) : isDataValid;
-
-        if (completed != isDataValid.isValid()) {
-            if(isDataValid.isValid()) {
-                markAsCompleted(useAnimations);
-            } else {
-                markAsUncompleted(isDataValid.getErrorMessage(), useAnimations);
-            }
-        } else {
-            updateErrorMessage(isDataValid.isValid() ? "" : isDataValid.getErrorMessage(), useAnimations);
-        }
-
-        return isDataValid.isValid();
+        return markAsCompletedOrUncompletedInternal(useAnimations, false);
     }
 
     /**
@@ -398,6 +403,31 @@ public abstract class Step<T> {
         if (open) {
             updateStepVisibility(false, useAnimations);
         }
+    }
+
+    void restoreErrorState(boolean hasError) {
+        this.hasError = hasError;
+    }
+
+    boolean markAsCompletedOrUncompletedInternal(boolean useAnimations, boolean isAddingNewStep) {
+        IsDataValid isDataValid = isStepDataValid(getStepData());
+        isDataValid = isDataValid == null ? new IsDataValid(true) : isDataValid;
+        boolean isValid = isDataValid.isValid();
+
+        if (completed != isValid) {
+            if(isValid) {
+                hasError = false;
+                markAsCompleted(useAnimations);
+            } else {
+                hasError = !isAddingNewStep;
+                markAsUncompleted(isDataValid.getErrorMessage(), useAnimations);
+            }
+        } else {
+            hasError = !isAddingNewStep && !isValid;
+            updateErrorMessage(isValid ? "" : isDataValid.getErrorMessage(), useAnimations);
+        }
+
+        return isValid;
     }
 
     void initializeStepInternal(View stepLayout, VerticalStepperFormView formView) {
