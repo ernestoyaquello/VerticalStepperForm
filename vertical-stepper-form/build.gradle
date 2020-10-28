@@ -27,11 +27,11 @@ ext {
 }
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
     defaultConfig {
         minSdkVersion 19
-        targetSdkVersion 29
+        targetSdkVersion 30
         versionCode 18
         versionName libraryVersion
     }
@@ -47,8 +47,8 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'com.google.android.material:material:1.1.0'
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'com.google.android.material:material:1.2.1'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
 }
 
 group = publishedGroupId
