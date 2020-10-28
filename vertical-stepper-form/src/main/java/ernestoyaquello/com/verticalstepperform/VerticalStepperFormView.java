@@ -7,6 +7,7 @@ import android.graphics.Rect;
 import androidx.annotation.LayoutRes;
 import androidx.appcompat.widget.AppCompatImageButton;
 
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.os.Parcelable;
 import android.util.AttributeSet;
@@ -22,6 +23,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
+
 import ernestoyaquello.com.verticalstepperform.listener.StepperFormListener;
 
 /**
@@ -638,6 +641,10 @@ public class VerticalStepperFormView extends LinearLayout {
         style.allowStepOpeningOnHeaderClick = true;
         style.closeLastStepOnCompletion = false;
         style.alphaOfDisabledElements = 0.3f;
+        style.stepNumberFontFamily = Typeface.defaultFromStyle(defStyleAttr);
+        style.stepTitleFontFamily = Typeface.defaultFromStyle(defStyleAttr);
+        style.stepSubtitleFontFamily = Typeface.defaultFromStyle(defStyleAttr);
+        style.stepErrorMessageFontFamily = Typeface.defaultFromStyle(defStyleAttr);
 
         // Try to get the user values for the style properties to replace the default ones
         TypedArray vars;
@@ -770,6 +777,30 @@ public class VerticalStepperFormView extends LinearLayout {
             style.alphaOfDisabledElements = vars.getFloat(
                     R.styleable.VerticalStepperFormView_form_alpha_of_disabled_elements,
                     style.alphaOfDisabledElements);
+            int stepNumberFontFamilyResourceId = vars.getResourceId(
+                    R.styleable.VerticalStepperFormView_form_step_number_font_family,
+                    -1);
+            if (stepNumberFontFamilyResourceId != -1) {
+                style.stepNumberFontFamily = ResourcesCompat.getFont(context, stepNumberFontFamilyResourceId);
+            }
+            int stepTitleFontFamilyResourceId = vars.getResourceId(
+                    R.styleable.VerticalStepperFormView_form_step_title_font_family,
+                    -1);
+            if (stepTitleFontFamilyResourceId != -1) {
+                style.stepTitleFontFamily = ResourcesCompat.getFont(context, stepTitleFontFamilyResourceId);
+            }
+            int stepSubtitleFontFamilyResourceId = vars.getResourceId(
+                    R.styleable.VerticalStepperFormView_form_step_subtitle_font_family,
+                    -1);
+            if (stepSubtitleFontFamilyResourceId != -1) {
+                style.stepSubtitleFontFamily = ResourcesCompat.getFont(context, stepSubtitleFontFamilyResourceId);
+            }
+            int stepErrorMessageFontFamilyResourceId = vars.getResourceId(
+                    R.styleable.VerticalStepperFormView_form_step_error_message_font_family,
+                    -1);
+            if (stepErrorMessageFontFamilyResourceId != -1) {
+                style.stepErrorMessageFontFamily = ResourcesCompat.getFont(context, stepErrorMessageFontFamilyResourceId);
+            }
 
             vars.recycle();
         }
@@ -1186,6 +1217,10 @@ public class VerticalStepperFormView extends LinearLayout {
         boolean allowStepOpeningOnHeaderClick;
         boolean closeLastStepOnCompletion;
         float alphaOfDisabledElements;
+        Typeface stepNumberFontFamily;
+        Typeface stepTitleFontFamily;
+        Typeface stepSubtitleFontFamily;
+        Typeface stepErrorMessageFontFamily;
     }
 
     private class KeyboardTogglingObserver implements ViewTreeObserver.OnGlobalLayoutListener {

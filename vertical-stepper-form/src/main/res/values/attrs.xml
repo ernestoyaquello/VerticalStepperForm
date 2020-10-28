@@ -41,6 +41,10 @@
         <attr name="form_allow_step_opening_on_header_click" format="boolean" />
         <attr name="form_close_last_step_on_completion" format="boolean" />
         <attr name="form_alpha_of_disabled_elements" format="float" />
+        <attr name="form_step_number_font_family" format="reference" />
+        <attr name="form_step_title_font_family" format="reference" />
+        <attr name="form_step_subtitle_font_family" format="reference" />
+        <attr name="form_step_error_message_font_family" format="reference" />
     </declare-styleable>
 
 </resources>

@@ -1,5 +1,7 @@
 package ernestoyaquello.com.verticalstepperform;
 
+import android.graphics.Typeface;
+
 import ernestoyaquello.com.verticalstepperform.listener.StepperFormListener;
 
 /**
@@ -337,6 +339,54 @@ public class Builder {
      */
     public Builder alphaOfDisabledElements(float alpha) {
         formView.style.alphaOfDisabledElements = alpha;
+
+        return this;
+    }
+
+    /**
+     * Sets the font that will be used for the step numbers.
+     *
+     * @param stepNumberFontFamily The font for the step numbers.
+     * @return The builder instance.
+     */
+    public Builder stepNumberFontFamily(Typeface stepNumberFontFamily) {
+        formView.style.stepNumberFontFamily = stepNumberFontFamily;
+
+        return this;
+    }
+
+    /**
+     * Sets the font that will be used for the step titles.
+     *
+     * @param stepTitleFontFamily The font for the step titles.
+     * @return The builder instance.
+     */
+    public Builder stepTitleFontFamily(Typeface stepTitleFontFamily) {
+        formView.style.stepTitleFontFamily = stepTitleFontFamily;
+
+        return this;
+    }
+
+    /**
+     * Sets the font that will be used for the step subtitles.
+     *
+     * @param stepSubtitleFontFamily The font for the step subtitles.
+     * @return The builder instance.
+     */
+    public Builder stepSubtitleFontFamily(Typeface stepSubtitleFontFamily) {
+        formView.style.stepSubtitleFontFamily = stepSubtitleFontFamily;
+
+        return this;
+    }
+
+    /**
+     * Sets the font that will be used for the step error messages.
+     *
+     * @param stepErrorMessageFontFamily The font for the step error messages.
+     * @return The builder instance.
+     */
+    public Builder stepErrorMessageFontFamily(Typeface stepErrorMessageFontFamily) {
+        formView.style.stepErrorMessageFontFamily = stepErrorMessageFontFamily;
 
         return this;
     }

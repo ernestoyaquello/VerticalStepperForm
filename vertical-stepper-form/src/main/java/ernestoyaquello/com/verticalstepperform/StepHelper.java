@@ -17,6 +17,7 @@ import com.google.android.material.button.MaterialButton;
 import androidx.annotation.LayoutRes;
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormView.FormStyle;
 
 /**
@@ -100,6 +101,11 @@ class StepHelper implements Step.InternalFormStepListener {
         errorMessageContainerView = step.getEntireStepLayout().findViewById(R.id.step_error_container);
         titleAndSubtitleContainerView = step.getEntireStepLayout().findViewById(R.id.title_subtitle_container);
         errorContentAndButtonContainerView = step.getEntireStepLayout().findViewById(R.id.error_content_button_container);
+
+        stepNumberTextView.setTypeface(formStyle.stepNumberFontFamily);
+        titleView.setTypeface(formStyle.stepTitleFontFamily);
+        subtitleView.setTypeface(formStyle.stepSubtitleFontFamily);
+        errorMessageView.setTypeface(formStyle.stepErrorMessageFontFamily);
 
         titleView.setTextColor(formStyle.stepTitleTextColor);
         subtitleView.setTextColor(formStyle.stepSubtitleTextColor);
