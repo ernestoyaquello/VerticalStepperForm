@@ -1,27 +1,38 @@
 package verticalstepperform.ernestoyaquello.com.verticalstepperform;
 
+import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
-import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
+
+import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+
 import ernestoyaquello.com.verticalstepperform.VerticalStepperFormView;
 import ernestoyaquello.com.verticalstepperform.listener.StepperFormListener;
 import verticalstepperform.ernestoyaquello.com.verticalstepperform.form.steps.AlarmDaysStep;
 import verticalstepperform.ernestoyaquello.com.verticalstepperform.form.steps.AlarmDescriptionStep;
 import verticalstepperform.ernestoyaquello.com.verticalstepperform.form.steps.AlarmNameStep;
 import verticalstepperform.ernestoyaquello.com.verticalstepperform.form.steps.AlarmTimeStep;
+import verticalstepperform.ernestoyaquello.com.verticalstepperform.models.Alarm;
 
-public class NewAlarmFormActivity extends AppCompatActivity implements StepperFormListener, DialogInterface.OnClickListener {
-    
-    public static final String STATE_NEW_ALARM_ADDED = "new_alarm_added";
+public class NewAlarmFormFragment extends Fragment implements StepperFormListener, DialogInterface.OnClickListener {
+
+    public static final String ALARM_DATA_SERIALIZED_KEY = "newAlarmData";
+
     public static final String STATE_TITLE = "title";
     public static final String STATE_DESCRIPTION = "description";
     public static final String STATE_TIME_HOUR = "time_hour";
@@ -36,10 +47,10 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
     private AlarmTimeStep timeStep;
     private AlarmDaysStep daysStep;
 
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_alarm);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_new_alarm, container, false);
 
         String[] stepTitles = getResources().getStringArray(R.array.steps_titles);
         //String[] stepSubtitles = getResources().getStringArray(R.array.steps_subtitles);
@@ -49,15 +60,30 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
         timeStep = new AlarmTimeStep(stepTitles[2]);//, stepSubtitles[2]);
         daysStep = new AlarmDaysStep(stepTitles[3]);//, stepSubtitles[3]);
 
-        verticalStepperForm = findViewById(R.id.stepper_form);
+        verticalStepperForm = view.findViewById(R.id.stepper_form);
         verticalStepperForm.setup(this, nameStep, descriptionStep, timeStep, daysStep).init();
+
+        return view;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        // Intercept back button
+        requireActivity().getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
+                goBackIfPossible();
+            }
+        });
     }
 
     @Override
     public void onCompletedForm() {
         final Thread dataSavingThread = saveData();
 
-        progressDialog = new ProgressDialog(this);
+        progressDialog = new ProgressDialog(getActivity());
         progressDialog.setCancelable(true);
         progressDialog.show();
         progressDialog.setMessage(getString(R.string.form_sending_data_message));
@@ -81,43 +107,50 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
     }
 
     private Thread saveData() {
-
         // Fake data saving effect
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
                 try {
                     Thread.sleep(1000);
-                    Intent intent = getIntent();
-                    setResult(RESULT_OK, intent);
-                    intent.putExtra(STATE_NEW_ALARM_ADDED, true);
-                    intent.putExtra(STATE_TITLE, nameStep.getStepData());
-                    intent.putExtra(STATE_DESCRIPTION, descriptionStep.getStepData());
-                    intent.putExtra(STATE_TIME_HOUR, timeStep.getStepData().hour);
-                    intent.putExtra(STATE_TIME_MINUTES, timeStep.getStepData().minutes);
-                    intent.putExtra(STATE_WEEK_DAYS, daysStep.getStepData());
-
-                    finish();
+                    sendAlarmDataBack();
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         });
         thread.start();
-
         return thread;
     }
 
-    private void finishIfPossible() {
+    private void sendAlarmDataBack() {
+        Activity activity = getActivity();
+        if (activity != null) {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Alarm alarm = new Alarm(
+                            nameStep.getStepData(),
+                            descriptionStep.getStepData(),
+                            timeStep.getStepData().hour,
+                            timeStep.getStepData().minutes,
+                            daysStep.getStepData());
+                    goBack(alarm);
+                }
+            });
+        }
+    }
+
+    private void goBackIfPossible() {
         if(verticalStepperForm.isAnyStepCompleted()) {
             showCloseConfirmationDialog();
         } else {
-            finish();
+            goBack(null);
         }
     }
 
     private void showCloseConfirmationDialog() {
-        new DiscardAlarmConfirmationFragment().show(getSupportFragmentManager(), null);
+        new DiscardAlarmConfirmationFragment(this).show(getParentFragmentManager(), null);
     }
 
     private void dismissDialogIfNecessary() {
@@ -130,7 +163,7 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if(item.getItemId() == android.R.id.home) {
-            finishIfPossible();
+            goBackIfPossible();
             return true;
         }
 
@@ -142,63 +175,57 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
         switch (which) {
 
             // "Discard" button of the Discard Alarm dialog
-            case -1:
-                finish();
+            case DialogInterface.BUTTON_POSITIVE:
+                goBack(null);
                 break;
 
             // "Cancel" button of the Discard Alarm dialog
-            case -2:
+            case DialogInterface.BUTTON_NEGATIVE:
                 verticalStepperForm.cancelFormCompletionOrCancellationAttempt();
                 break;
         }
     }
 
     @Override
-    public void onBackPressed(){
-        finishIfPossible();
-    }
-
-    @Override
-    protected void onPause() {
+    public void onPause() {
         super.onPause();
 
         dismissDialogIfNecessary();
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
 
         dismissDialogIfNecessary();
     }
 
     @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
+    public void onSaveInstanceState(@NonNull Bundle outState) {
 
-        savedInstanceState.putString(STATE_TITLE, nameStep.getStepData());
-        savedInstanceState.putString(STATE_DESCRIPTION, descriptionStep.getStepData());
-        savedInstanceState.putInt(STATE_TIME_HOUR, timeStep.getStepData().hour);
-        savedInstanceState.putInt(STATE_TIME_MINUTES, timeStep.getStepData().minutes);
-        savedInstanceState.putBooleanArray(STATE_WEEK_DAYS, daysStep.getStepData());
+        outState.putString(STATE_TITLE, nameStep.getStepData());
+        outState.putString(STATE_DESCRIPTION, descriptionStep.getStepData());
+        outState.putInt(STATE_TIME_HOUR, timeStep.getStepData().hour);
+        outState.putInt(STATE_TIME_MINUTES, timeStep.getStepData().minutes);
+        outState.putBooleanArray(STATE_WEEK_DAYS, daysStep.getStepData());
 
-        // IMPORTANT: The call to super method must be here at the end
-        super.onSaveInstanceState(savedInstanceState);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
-    public void onRestoreInstanceState(Bundle savedInstanceState) {
+    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
 
-        if(savedInstanceState.containsKey(STATE_TITLE)) {
+        if(savedInstanceState != null && savedInstanceState.containsKey(STATE_TITLE)) {
             String title = savedInstanceState.getString(STATE_TITLE);
             nameStep.restoreStepData(title);
         }
 
-        if(savedInstanceState.containsKey(STATE_DESCRIPTION)) {
+        if(savedInstanceState != null && savedInstanceState.containsKey(STATE_DESCRIPTION)) {
             String description = savedInstanceState.getString(STATE_DESCRIPTION);
             descriptionStep.restoreStepData(description);
         }
 
-        if(savedInstanceState.containsKey(STATE_TIME_HOUR)
+        if(savedInstanceState != null && savedInstanceState.containsKey(STATE_TIME_HOUR)
                 && savedInstanceState.containsKey(STATE_TIME_MINUTES)) {
             int hour = savedInstanceState.getInt(STATE_TIME_HOUR);
             int minutes = savedInstanceState.getInt(STATE_TIME_MINUTES);
@@ -206,20 +233,33 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
             timeStep.restoreStepData(time);
         }
 
-        if(savedInstanceState.containsKey(STATE_WEEK_DAYS)) {
+        if(savedInstanceState != null && savedInstanceState.containsKey(STATE_WEEK_DAYS)) {
             boolean[] alarmDays = savedInstanceState.getBooleanArray(STATE_WEEK_DAYS);
             daysStep.restoreStepData(alarmDays);
         }
 
         // IMPORTANT: The call to super method must be here at the end
-        super.onRestoreInstanceState(savedInstanceState);
+        super.onViewStateRestored(savedInstanceState);
+    }
+
+    private void goBack(Alarm alarm) {
+        NavController navController = NavHostFragment.findNavController(this);
+        String alarmSerialized = alarm != null ? alarm.serialize() : "";
+        navController.getPreviousBackStackEntry().getSavedStateHandle().set(ALARM_DATA_SERIALIZED_KEY, alarmSerialized);
+        navController.navigateUp();
     }
 
     public static class DiscardAlarmConfirmationFragment extends DialogFragment {
+        private final DialogInterface.OnClickListener onDialogButtonClicked;
+
+        public DiscardAlarmConfirmationFragment(DialogInterface.OnClickListener onDialogButtonClicked) {
+            this.onDialogButtonClicked = onDialogButtonClicked;
+        }
+
         @Override
         @NonNull
         public Dialog onCreateDialog(Bundle savedInstanceState) {
-            NewAlarmFormActivity activity = (NewAlarmFormActivity)getActivity();
+            Activity activity = getActivity();
             if (activity == null) {
                 throw new IllegalStateException("Fragment " + this + " not attached to an activity.");
             }
@@ -227,8 +267,8 @@ public class NewAlarmFormActivity extends AppCompatActivity implements StepperFo
             AlertDialog.Builder builder = new AlertDialog.Builder(activity);
             builder.setTitle(R.string.form_discard_question)
                     .setMessage(R.string.form_info_will_be_lost)
-                    .setPositiveButton(R.string.form_discard, activity)
-                    .setNegativeButton(R.string.form_discard_cancel, activity)
+                    .setPositiveButton(R.string.form_discard, onDialogButtonClicked)
+                    .setNegativeButton(R.string.form_discard_cancel, onDialogButtonClicked)
                     .setCancelable(false);
             Dialog dialog = builder.create();
             dialog.setCanceledOnTouchOutside(false);
