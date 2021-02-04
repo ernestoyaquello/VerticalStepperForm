@@ -2,7 +2,6 @@ package verticalstepperform.ernestoyaquello.com.verticalstepperform;
 
 import android.content.Context;
 import android.os.Bundle;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
 
 import androidx.annotation.NonNull;
@@ -17,8 +16,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.TextView;
 
+import verticalstepperform.ernestoyaquello.com.verticalstepperform.databinding.FragmentLandingBinding;
 import verticalstepperform.ernestoyaquello.com.verticalstepperform.models.Alarm;
 
 public class LandingFragment extends Fragment {
@@ -27,18 +26,16 @@ public class LandingFragment extends Fragment {
     private static final String INFORMATION = "information";
     private static final String DISCLAIMER = "disclaimer";
 
-    private FloatingActionButton fab;
-    private TextView information, disclaimer;
+    private FragmentLandingBinding binding;
     private boolean dataReceived = false;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_landing, container, false);
+        binding = FragmentLandingBinding.inflate(inflater, container, false);
 
         final Fragment fragment = this;
-        fab = view.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
+        binding.fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 NavController navController = NavHostFragment.findNavController(fragment);
@@ -46,10 +43,7 @@ public class LandingFragment extends Fragment {
             }
         });
 
-        information = view.findViewById(R.id.information);
-        disclaimer = view.findViewById(R.id.disclaimer);
-
-        return view;
+        return binding.getRoot();
     }
 
     @Override
@@ -71,13 +65,13 @@ public class LandingFragment extends Fragment {
                     String alertTime = ((hour > 9) ? hour : ("0" + hour)) + ":" + ((minutes > 9) ? minutes : ("0" + minutes));
                     String alertInformationText = getResources().getString(R.string.main_activity_alarm_added_info, alarm.getTitle(), alertTime);
 
-                    information.setText(alertInformationText);
-                    disclaimer.setVisibility(View.VISIBLE);
+                    binding.information.setText(alertInformationText);
+                    binding.disclaimer.setVisibility(View.VISIBLE);
 
-                    Snackbar.make(fab, getString(R.string.new_alarm_added), Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(binding.fab, getString(R.string.new_alarm_added), Snackbar.LENGTH_LONG).show();
                 } else {
-                    information.setText(R.string.main_activity_explanation);
-                    disclaimer.setVisibility(View.GONE);
+                    binding.information.setText(R.string.main_activity_explanation);
+                    binding.disclaimer.setVisibility(View.GONE);
                 }
             }
         });
@@ -97,8 +91,8 @@ public class LandingFragment extends Fragment {
 
         savedInstanceState.putBoolean(DATA_RECEIVED, dataReceived);
         if (dataReceived) {
-            savedInstanceState.putString(INFORMATION, information.getText().toString());
-            savedInstanceState.putString(DISCLAIMER, disclaimer.getText().toString());
+            savedInstanceState.putString(INFORMATION, binding.information.getText().toString());
+            savedInstanceState.putString(DISCLAIMER, binding.disclaimer.getText().toString());
         }
     }
 
@@ -108,12 +102,18 @@ public class LandingFragment extends Fragment {
 
         dataReceived = savedInstanceState != null && savedInstanceState.getBoolean(DATA_RECEIVED, false);
         if(dataReceived) {
-            information.setText(savedInstanceState.getString(INFORMATION));
-            disclaimer.setText(savedInstanceState.getString(DISCLAIMER));
-            disclaimer.setVisibility(View.VISIBLE);
+            binding.information.setText(savedInstanceState.getString(INFORMATION));
+            binding.disclaimer.setText(savedInstanceState.getString(DISCLAIMER));
+            binding.disclaimer.setVisibility(View.VISIBLE);
         } else {
-            information.setText(R.string.main_activity_explanation);
-            disclaimer.setVisibility(View.GONE);
+            binding.information.setText(R.string.main_activity_explanation);
+            binding.disclaimer.setVisibility(View.GONE);
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }

@@ -21,8 +21,8 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
-import ernestoyaquello.com.verticalstepperform.VerticalStepperFormView;
 import ernestoyaquello.com.verticalstepperform.listener.StepperFormListener;
+import verticalstepperform.ernestoyaquello.com.verticalstepperform.databinding.FragmentNewAlarmBinding;
 import verticalstepperform.ernestoyaquello.com.verticalstepperform.form.steps.AlarmDaysStep;
 import verticalstepperform.ernestoyaquello.com.verticalstepperform.form.steps.AlarmDescriptionStep;
 import verticalstepperform.ernestoyaquello.com.verticalstepperform.form.steps.AlarmNameStep;
@@ -40,7 +40,7 @@ public class NewAlarmFormFragment extends Fragment implements StepperFormListene
     public static final String STATE_WEEK_DAYS = "week_days";
 
     private ProgressDialog progressDialog;
-    private VerticalStepperFormView verticalStepperForm;
+    private FragmentNewAlarmBinding binding;
 
     private AlarmNameStep nameStep;
     private AlarmDescriptionStep descriptionStep;
@@ -50,7 +50,7 @@ public class NewAlarmFormFragment extends Fragment implements StepperFormListene
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_new_alarm, container, false);
+        binding = FragmentNewAlarmBinding.inflate(inflater, container, false);
 
         String[] stepTitles = getResources().getStringArray(R.array.steps_titles);
         //String[] stepSubtitles = getResources().getStringArray(R.array.steps_subtitles);
@@ -60,10 +60,9 @@ public class NewAlarmFormFragment extends Fragment implements StepperFormListene
         timeStep = new AlarmTimeStep(stepTitles[2]);//, stepSubtitles[2]);
         daysStep = new AlarmDaysStep(stepTitles[3]);//, stepSubtitles[3]);
 
-        verticalStepperForm = view.findViewById(R.id.stepper_form);
-        verticalStepperForm.setup(this, nameStep, descriptionStep, timeStep, daysStep).init();
+        binding.stepperForm.setup(this, nameStep, descriptionStep, timeStep, daysStep).init();
 
-        return view;
+        return binding.getRoot();
     }
 
     @Override
@@ -95,7 +94,7 @@ public class NewAlarmFormFragment extends Fragment implements StepperFormListene
                 } catch (RuntimeException e) {
                     // No need to do anything here
                 } finally {
-                    verticalStepperForm.cancelFormCompletionOrCancellationAttempt();
+                    binding.stepperForm.cancelFormCompletionOrCancellationAttempt();
                 }
             }
         });
@@ -142,7 +141,7 @@ public class NewAlarmFormFragment extends Fragment implements StepperFormListene
     }
 
     private void goBackIfPossible() {
-        if(verticalStepperForm.isAnyStepCompleted()) {
+        if(binding.stepperForm.isAnyStepCompleted()) {
             showCloseConfirmationDialog();
         } else {
             goBack(null);
@@ -181,7 +180,7 @@ public class NewAlarmFormFragment extends Fragment implements StepperFormListene
 
             // "Cancel" button of the Discard Alarm dialog
             case DialogInterface.BUTTON_NEGATIVE:
-                verticalStepperForm.cancelFormCompletionOrCancellationAttempt();
+                binding.stepperForm.cancelFormCompletionOrCancellationAttempt();
                 break;
         }
     }
@@ -275,5 +274,11 @@ public class NewAlarmFormFragment extends Fragment implements StepperFormListene
 
             return dialog;
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        binding = null;
     }
 }
