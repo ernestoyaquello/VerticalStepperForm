@@ -15,11 +15,11 @@ The creation (and maintenance) of this library requires time and effort. If you 
 
 ## How To Use It
 ### 1. Reference The Library
-Add the library to your project via Gradle:
+Add the library to your project via `mavenCentral` by adding the following in the app's `build.gradle` file:
 
 ```
 dependencies {
-    implementation 'com.ernestoyaquello.stepperform:vertical-stepper-form:2.4.0'
+    implementation 'com.ernestoyaquello.stepperform:vertical-stepper-form:2.4.1'
 }
 ```
 
