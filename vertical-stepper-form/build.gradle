@@ -29,4 +29,4 @@ ext {
     PUBLISH_VERSION = android.defaultConfig.versionName
 }
 
-apply from: "${rootProject.projectDir}/scripts/publish-mavencentral.gradle"
+apply from: "${rootProject.projectDir}/scripts/publish-module.gradle"

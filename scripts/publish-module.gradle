@@ -1,0 +1,77 @@
+apply plugin: 'maven-publish'
+apply plugin: 'signing'
+
+task androidSourcesJar(type: Jar) {
+    archiveClassifier.set('sources')
+    from android.sourceSets.main.java.srcDirs
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    archiveClassifier.set('javadoc')
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives javadocJar
+    archives androidSourcesJar
+}
+
+group = PUBLISH_GROUP_ID
+version = PUBLISH_VERSION
+
+afterEvaluate {
+    javadoc.classpath += files(android.libraryVariants.collect { variant ->
+        variant.javaCompileProvider.get().classpath.files
+    })
+
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId PUBLISH_GROUP_ID
+                artifactId PUBLISH_ARTIFACT_ID
+                version PUBLISH_VERSION
+
+                from components.release
+                artifact androidSourcesJar
+                artifact javadocJar
+
+                pom {
+                    name = PUBLISH_ARTIFACT_ID
+                    description = 'Vertical Stepper Form Library for Android. It follows Google Material Design guidelines.'
+                    url = 'https://github.com/ernestoyaquello/VerticalStepperForm'
+                    licenses {
+                        license {
+                            name = 'The Apache License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id = 'ernestoyaquello'
+                            name = 'Julio Ernesto Rodríguez Cabañas'
+                            email = 'julioernesto90@gmail.com'
+                        }
+                    }
+                    scm {
+                        connection = 'scm:git:github.com/ernestoyaquello/VerticalStepperForm.git'
+                        developerConnection = 'scm:git:ssh://github.com/ernestoyaquello/VerticalStepperForm.git'
+                        url = 'https://github.com/ernestoyaquello/VerticalStepperForm'
+                    }
+                }
+            }
+        }
+    }
+}
+
+ext["signing.keyId"] = rootProject.ext["signing.keyId"]
+ext["signing.password"] = rootProject.ext["signing.password"]
+ext["signing.secretKeyRingFile"] = rootProject.ext["signing.secretKeyRingFile"]
+
+signing {
+    sign publishing.publications
+}
