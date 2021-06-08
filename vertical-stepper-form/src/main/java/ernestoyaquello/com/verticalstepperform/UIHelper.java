@@ -105,15 +105,12 @@ class UIHelper {
         final ObjectAnimator animator = ObjectAnimator.ofFloat(view, View.ALPHA, correctedInitialValue, finalValue);
         animator.setDuration(durationMillis);
 
-        animator.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                float scaleYCurrentValue = (float) valueAnimator.getAnimatedValue();
-                int newHeight = (int) (expandedHeight * scaleYCurrentValue);
+        animator.addUpdateListener(valueAnimator -> {
+            float scaleYCurrentValue = (float) valueAnimator.getAnimatedValue();
+            int newHeight = (int) (expandedHeight * scaleYCurrentValue);
 
-                setViewHeight(view, newHeight);
-                view.requestLayout();
-            }
+            setViewHeight(view, newHeight);
+            view.requestLayout();
         });
         animator.addListener(new AnimatorListenerAdapter() {
             @Override

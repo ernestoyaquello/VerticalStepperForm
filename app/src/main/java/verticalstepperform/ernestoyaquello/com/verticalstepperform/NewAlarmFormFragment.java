@@ -88,16 +88,13 @@ public class NewAlarmFormFragment extends Fragment implements StepperFormListene
         progressDialog.setCancelable(true);
         progressDialog.show();
         progressDialog.setMessage(getString(R.string.form_sending_data_message));
-        progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialogInterface) {
-                try {
-                    dataSavingThread.interrupt();
-                } catch (RuntimeException e) {
-                    // No need to do anything here
-                } finally {
-                    binding.stepperForm.cancelFormCompletionOrCancellationAttempt();
-                }
+        progressDialog.setOnCancelListener(dialogInterface -> {
+            try {
+                dataSavingThread.interrupt();
+            } catch (RuntimeException e) {
+                // No need to do anything here
+            } finally {
+                binding.stepperForm.cancelFormCompletionOrCancellationAttempt();
             }
         });
     }
@@ -109,15 +106,12 @@ public class NewAlarmFormFragment extends Fragment implements StepperFormListene
 
     private Thread saveData() {
         // Fake data saving effect
-        Thread thread = new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    Thread.sleep(1000);
-                    sendAlarmDataBack();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+        Thread thread = new Thread(() -> {
+            try {
+                Thread.sleep(1000);
+                sendAlarmDataBack();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         });
         thread.start();
@@ -127,17 +121,14 @@ public class NewAlarmFormFragment extends Fragment implements StepperFormListene
     private void sendAlarmDataBack() {
         Activity activity = getActivity();
         if (activity != null) {
-            activity.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    Alarm alarm = new Alarm(
-                            nameStep.getStepData(),
-                            descriptionStep.getStepData(),
-                            timeStep.getStepData().hour,
-                            timeStep.getStepData().minutes,
-                            daysStep.getStepData());
-                    goBack(alarm);
-                }
+            activity.runOnUiThread(() -> {
+                Alarm alarm = new Alarm(
+                        nameStep.getStepData(),
+                        descriptionStep.getStepData(),
+                        timeStep.getStepData().hour,
+                        timeStep.getStepData().minutes,
+                        daysStep.getStepData());
+                goBack(alarm);
             });
         }
     }

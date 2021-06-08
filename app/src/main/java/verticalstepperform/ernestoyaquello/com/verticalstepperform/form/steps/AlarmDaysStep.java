@@ -117,13 +117,10 @@ public class AlarmDaysStep extends Step<boolean[]> {
             updateDayLayout(index, dayLayout, false);
 
             if (dayLayout != null) {
-                dayLayout.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        alarmDays[index] = !alarmDays[index];
-                        updateDayLayout(index, dayLayout, true);
-                        markAsCompletedOrUncompleted(true);
-                    }
+                dayLayout.setOnClickListener(v -> {
+                    alarmDays[index] = !alarmDays[index];
+                    updateDayLayout(index, dayLayout, true);
+                    markAsCompletedOrUncompleted(true);
                 });
 
                 final TextView dayText = dayLayout.findViewById(R.id.day);

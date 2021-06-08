@@ -35,12 +35,9 @@ public class LandingFragment extends Fragment {
         binding = FragmentLandingBinding.inflate(inflater, container, false);
 
         final Fragment fragment = this;
-        binding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                NavController navController = NavHostFragment.findNavController(fragment);
-                navController.navigate(R.id.action_landingFragment_to_newAlarmFormFragment);
-            }
+        binding.fab.setOnClickListener(view -> {
+            NavController navController = NavHostFragment.findNavController(fragment);
+            navController.navigate(R.id.action_landingFragment_to_newAlarmFormFragment);
         });
 
         return binding.getRoot();
@@ -54,25 +51,22 @@ public class LandingFragment extends Fragment {
         MutableLiveData<String> liveData = navController.getCurrentBackStackEntry()
                 .getSavedStateHandle()
                 .getLiveData(NewAlarmFormFragment.ALARM_DATA_SERIALIZED_KEY);
-        liveData.observe(getViewLifecycleOwner(), new Observer<String>() {
-            @Override
-            public void onChanged(String alarmSerialized) {
-                dataReceived = alarmSerialized != null && !alarmSerialized.isEmpty();
-                if (dataReceived) {
-                    Alarm alarm = Alarm.fromSerialized(alarmSerialized);
-                    int hour = alarm.getTimeHour();
-                    int minutes = alarm.getTimeMinutes();
-                    String alertTime = ((hour > 9) ? hour : ("0" + hour)) + ":" + ((minutes > 9) ? minutes : ("0" + minutes));
-                    String alertInformationText = getResources().getString(R.string.main_activity_alarm_added_info, alarm.getTitle(), alertTime);
+        liveData.observe(getViewLifecycleOwner(), alarmSerialized -> {
+            dataReceived = alarmSerialized != null && !alarmSerialized.isEmpty();
+            if (dataReceived) {
+                Alarm alarm = Alarm.fromSerialized(alarmSerialized);
+                int hour = alarm.getTimeHour();
+                int minutes = alarm.getTimeMinutes();
+                String alertTime = ((hour > 9) ? hour : ("0" + hour)) + ":" + ((minutes > 9) ? minutes : ("0" + minutes));
+                String alertInformationText = getResources().getString(R.string.main_activity_alarm_added_info, alarm.getTitle(), alertTime);
 
-                    binding.information.setText(alertInformationText);
-                    binding.disclaimer.setVisibility(View.VISIBLE);
+                binding.information.setText(alertInformationText);
+                binding.disclaimer.setVisibility(View.VISIBLE);
 
-                    Snackbar.make(binding.fab, getString(R.string.new_alarm_added), Snackbar.LENGTH_LONG).show();
-                } else {
-                    binding.information.setText(R.string.main_activity_explanation);
-                    binding.disclaimer.setVisibility(View.GONE);
-                }
+                Snackbar.make(binding.fab, getString(R.string.new_alarm_added), Snackbar.LENGTH_LONG).show();
+            } else {
+                binding.information.setText(R.string.main_activity_explanation);
+                binding.disclaimer.setVisibility(View.GONE);
             }
         });
     }

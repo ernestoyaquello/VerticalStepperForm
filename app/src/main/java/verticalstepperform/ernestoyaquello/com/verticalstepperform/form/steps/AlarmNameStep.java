@@ -47,12 +47,9 @@ public class AlarmNameStep extends Step<String> {
             @Override
             public void afterTextChanged(Editable s) {}
         });
-        alarmNameEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                getFormView().goToNextStep(true);
-                return false;
-            }
+        alarmNameEditText.setOnEditorActionListener((v, actionId, event) -> {
+            getFormView().goToNextStep(true);
+            return false;
         });
 
         unformattedErrorString = getContext().getResources().getString(R.string.error_alarm_name_min_characters);

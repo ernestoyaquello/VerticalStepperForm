@@ -48,26 +48,18 @@ public class AlarmTimeStep extends Step<AlarmTimeStep.TimeHolder> {
     private void setupAlarmTime() {
         if (alarmTimePicker == null) {
             alarmTimePicker = new TimePickerDialog(getContext(),
-                    new TimePickerDialog.OnTimeSetListener() {
-                        @Override
-                        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                            alarmTimeHour = hourOfDay;
-                            alarmTimeMinutes = minute;
+                    (view, hourOfDay, minute) -> {
+                        alarmTimeHour = hourOfDay;
+                        alarmTimeMinutes = minute;
 
-                            updatedAlarmTimeText();
-                        }
+                        updatedAlarmTimeText();
                     }, alarmTimeHour, alarmTimeMinutes, true);
         } else {
             alarmTimePicker.updateTime(alarmTimeHour, alarmTimeMinutes);
         }
 
         if (alarmTimeTextView != null) {
-            alarmTimeTextView.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    alarmTimePicker.show();
-                }
-            });
+            alarmTimeTextView.setOnClickListener(v -> alarmTimePicker.show());
         }
     }
 

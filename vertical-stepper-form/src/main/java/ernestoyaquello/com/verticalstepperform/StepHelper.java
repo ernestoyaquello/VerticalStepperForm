@@ -29,7 +29,7 @@ import ernestoyaquello.com.verticalstepperform.VerticalStepperFormView.FormStyle
  */
 class StepHelper implements Step.InternalFormStepListener {
 
-    private Step step;
+    private Step<?> step;
     private FormStyle formStyle;
 
     private View stepNumberCircleView;
@@ -49,11 +49,11 @@ class StepHelper implements Step.InternalFormStepListener {
     private View titleAndSubtitleContainerView;
     private View errorContentAndButtonContainerView;
 
-    StepHelper(Step.InternalFormStepListener formListener, @NonNull Step step) {
+    StepHelper(Step.InternalFormStepListener formListener, @NonNull Step<?> step) {
         this(formListener, step, false);
     }
 
-    StepHelper(Step.InternalFormStepListener formListener, Step step, boolean isConfirmationStep) {
+    StepHelper(Step.InternalFormStepListener formListener, Step<?> step, boolean isConfirmationStep) {
         this.step = !isConfirmationStep ? step : new ConfirmationStep();
         this.step.addListenerInternal(this);
         this.step.addListenerInternal(formListener);
@@ -160,26 +160,13 @@ class StepHelper implements Step.InternalFormStepListener {
         subtitleView.setTextSize(TypedValue.COMPLEX_UNIT_PX, formStyle.stepSubtitleTextSizeInPx);
         errorMessageView.setTextSize(TypedValue.COMPLEX_UNIT_PX, formStyle.stepErrorMessageTextSizeInPx);
 
-        headerView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (formStyle.allowStepOpeningOnHeaderClick) {
-                    form.goToStep(form.getStepPosition(step), true);
-                }
+        headerView.setOnClickListener(view -> {
+            if (formStyle.allowStepOpeningOnHeaderClick) {
+                form.goToStep(form.getStepPosition(step), true);
             }
         });
-        nextButtonView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                form.goToStep(form.getStepPosition(step) + 1, true);
-            }
-        });
-        cancelButtonView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                form.cancelForm();
-            }
-        });
+        nextButtonView.setOnClickListener(view -> form.goToStep(form.getStepPosition(step) + 1, true));
+        cancelButtonView.setOnClickListener(view -> form.cancelForm());
 
         int position = form.getStepPosition(step);
         boolean isLast = (position + 1) == form.getTotalNumberOfSteps();
@@ -246,7 +233,7 @@ class StepHelper implements Step.InternalFormStepListener {
         onUpdatedStepVisibility(position, false);
     }
 
-    public Step getStepInstance() {
+    public Step<?> getStepInstance() {
         return step;
     }
 

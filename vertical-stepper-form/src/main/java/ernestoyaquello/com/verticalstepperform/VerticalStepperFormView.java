@@ -75,7 +75,7 @@ public class VerticalStepperFormView extends LinearLayout {
      * @param steps An array with the steps that will be displayed in the form.
      * @return An instance of the stepper form builder. Use it to configure and initialize the form.
      */
-    public Builder setup(StepperFormListener stepperFormListener, Step... steps) {
+    public Builder setup(StepperFormListener stepperFormListener, Step<?>... steps) {
         return new Builder(this, stepperFormListener, steps);
     }
 
@@ -86,8 +86,8 @@ public class VerticalStepperFormView extends LinearLayout {
      * @param steps A list with the steps that will be displayed in the form.
      * @return An instance of the stepper form builder. Use it to configure and initialize the form.
      */
-    public Builder setup(StepperFormListener stepperFormListener, List<Step> steps) {
-        Step[] stepsArray = steps.toArray(new Step[0]);
+    public Builder setup(StepperFormListener stepperFormListener, List<Step<?>> steps) {
+        Step<?>[] stepsArray = steps.toArray(new Step<?>[0]);
         return new Builder(this, stepperFormListener, stepsArray);
     }
 
@@ -319,7 +319,7 @@ public class VerticalStepperFormView extends LinearLayout {
      *
      * @return The currently open step, or null if not found.
      */
-    public synchronized Step getOpenStep() {
+    public synchronized Step<?> getOpenStep() {
         StepHelper openStepHelper = getOpenStepHelper();
         return openStepHelper != null ? openStepHelper.getStepInstance() : null;
     }
@@ -361,19 +361,17 @@ public class VerticalStepperFormView extends LinearLayout {
      */
     public void scrollToStepIfNecessary(final int stepPosition, final boolean smoothScroll) {
         if (stepPosition >= 0 && stepPosition < stepHelpers.size()) {
-            stepsScrollView.post(new Runnable() {
-                public void run() {
-                    Step stepInstance = stepHelpers.get(stepPosition).getStepInstance();
-                    View stepEntireLayout = stepInstance.getEntireStepLayout();
-                    View stepContentLayout = stepInstance.getContentLayout();
-                    Rect scrollBounds = new Rect();
-                    stepsScrollView.getDrawingRect(scrollBounds);
-                    if (stepContentLayout == null || scrollBounds.top > stepContentLayout.getY()) {
-                        if (smoothScroll) {
-                            stepsScrollView.smoothScrollTo(0, stepEntireLayout.getTop());
-                        } else {
-                            stepsScrollView.scrollTo(0, stepEntireLayout.getTop());
-                        }
+            stepsScrollView.post(() -> {
+                Step<?> stepInstance = stepHelpers.get(stepPosition).getStepInstance();
+                View stepEntireLayout = stepInstance.getEntireStepLayout();
+                View stepContentLayout = stepInstance.getContentLayout();
+                Rect scrollBounds = new Rect();
+                stepsScrollView.getDrawingRect(scrollBounds);
+                if (stepContentLayout == null || scrollBounds.top > stepContentLayout.getY()) {
+                    if (smoothScroll) {
+                        stepsScrollView.smoothScrollTo(0, stepEntireLayout.getTop());
+                    } else {
+                        stepsScrollView.scrollTo(0, stepEntireLayout.getTop());
                     }
                 }
             });
@@ -427,7 +425,7 @@ public class VerticalStepperFormView extends LinearLayout {
         StepHelper stepHelper = stepHelpers.get(openedStepPosition);
 
         if (style.closeLastStepOnCompletion) {
-            Step step = stepHelper.getStepInstance();
+            Step<?> step = stepHelper.getStepInstance();
             if (!step.isOpen()) {
                 step.openInternal(true);
             }
@@ -470,7 +468,7 @@ public class VerticalStepperFormView extends LinearLayout {
      * @param stepToAdd The step to add.
      * @return True if the step was added successfully; false otherwise.
      */
-    public boolean addStep(int index, Step stepToAdd) {
+    public boolean addStep(int index, Step<?> stepToAdd) {
         StepHelper lastStep = stepHelpers.get(stepHelpers.size() - 1);
         int lastAllowedIndex = lastStep.isConfirmationStep() ? stepHelpers.size() - 1 : stepHelpers.size();
         if (!initialized || formCompleted || index < 0 || index > lastAllowedIndex) {
@@ -556,7 +554,7 @@ public class VerticalStepperFormView extends LinearLayout {
      * @param step The step to find the position of.
      * @return The position of the step, or -1 if the step is not found.
      */
-    public int getStepPosition(Step step) {
+    public int getStepPosition(Step<?> step) {
         for (int i = 0; i < stepHelpers.size(); i++) {
             if (stepHelpers.get(i).getStepInstance() == step)
                 return i;
@@ -811,7 +809,7 @@ public class VerticalStepperFormView extends LinearLayout {
     void initializeForm(StepperFormListener listener, StepHelper[] stepsArray) {
         this.listener = listener;
         this.originalStepHelpers = Arrays.asList(stepsArray);
-        this.stepHelpers = new ArrayList<StepHelper>(originalStepHelpers);
+        this.stepHelpers = new ArrayList<>(originalStepHelpers);
 
         progressBar.setMax(stepHelpers.size());
 
@@ -942,7 +940,7 @@ public class VerticalStepperFormView extends LinearLayout {
         boolean markedConfirmationStepAsCompleted = false;
         String confirmationStepErrorMessage = "";
         StepHelper lastStepHelper = stepHelpers.get(stepHelpers.size() - 1);
-        Step lastStep = lastStepHelper.getStepInstance();
+        Step<?> lastStep = lastStepHelper.getStepInstance();
         if (!isCancellation) {
             if (!lastStep.isCompleted() && lastStepHelper.isConfirmationStep()) {
                 confirmationStepErrorMessage = lastStep.getErrorMessage();
@@ -994,18 +992,8 @@ public class VerticalStepperFormView extends LinearLayout {
     }
 
     private void registerListeners() {
-        previousStepButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                goToPreviousStep(true);
-            }
-        });
-        nextStepButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                goToNextStep(true);
-            }
-        });
+        previousStepButton.setOnClickListener(view -> goToPreviousStep(true));
+        nextStepButton.setOnClickListener(view -> goToNextStep(true));
 
         addObserverForKeyboard();
     }
@@ -1047,7 +1035,7 @@ public class VerticalStepperFormView extends LinearLayout {
         String[] errorMessages = new String[originalStepHelpers.size()];
         for (int i = 0; i < completedSteps.length; i++) {
             StepHelper stepHelper = originalStepHelpers.get(i);
-            Step step = stepHelper.getStepInstance();
+            Step<?> step = stepHelper.getStepInstance();
 
             completedSteps[i] = step.isCompleted();
             errorSteps[i] = step.hasError();
@@ -1116,7 +1104,7 @@ public class VerticalStepperFormView extends LinearLayout {
 
         for (int i = 0; i < completedSteps.length; i++) {
             StepHelper stepHelper = stepHelpers.get(i);
-            Step step = stepHelper.getStepInstance();
+            Step<?> step = stepHelper.getStepInstance();
 
             step.restoreErrorState(errorSteps[i]);
             step.updateTitle(titles[i], false);

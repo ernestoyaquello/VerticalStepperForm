@@ -13,7 +13,7 @@ public class Builder {
     private StepperFormListener listener;
     private StepHelper[] steps;
 
-    Builder(VerticalStepperFormView formView, StepperFormListener listener, Step[] steps) {
+    Builder(VerticalStepperFormView formView, StepperFormListener listener, Step<?>[] steps) {
         this.formView = formView;
         this.listener = listener;
         this.steps = new StepHelper[steps.length];

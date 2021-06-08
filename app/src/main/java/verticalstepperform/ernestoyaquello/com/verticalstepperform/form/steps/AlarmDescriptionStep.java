@@ -31,12 +31,9 @@ public class AlarmDescriptionStep extends Step<String> {
         alarmDescriptionEditText = new TextInputEditText(getContext());
         alarmDescriptionEditText.setHint(R.string.form_hint_description);
         alarmDescriptionEditText.setSingleLine(true);
-        alarmDescriptionEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            @Override
-            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                getFormView().goToNextStep(true);
-                return false;
-            }
+        alarmDescriptionEditText.setOnEditorActionListener((v, actionId, event) -> {
+            getFormView().goToNextStep(true);
+            return false;
         });
 
         return alarmDescriptionEditText;
