@@ -60,7 +60,9 @@ public class NewAlarmFormFragment extends Fragment implements StepperFormListene
         timeStep = new AlarmTimeStep(stepTitles[2]);//, stepSubtitles[2]);
         daysStep = new AlarmDaysStep(stepTitles[3]);//, stepSubtitles[3]);
 
-        binding.stepperForm.setup(this, nameStep, descriptionStep, timeStep, daysStep).init();
+        binding.stepperForm
+                .setup(this, nameStep, descriptionStep, timeStep, daysStep)
+                .init();
 
         return binding.getRoot();
     }
