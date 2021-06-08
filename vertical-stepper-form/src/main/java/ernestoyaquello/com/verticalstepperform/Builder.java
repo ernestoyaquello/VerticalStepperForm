@@ -450,6 +450,20 @@ public class Builder {
     }
 
     /**
+     * Specifies whether or not a confirmation button should be displayed in the last step.
+     * If displayed, this button will invoke the callback onCompletedForm() when clicked.
+     *
+     * @param displayNextButtonInLastStep True to display a confirmation button in the last step;
+     *                                    false to not.
+     * @return The builder instance.
+     */
+    public Builder displayNextButtonInLastStep(boolean displayNextButtonInLastStep) {
+        formView.style.displayNextButtonInLastStep = displayNextButtonInLastStep;
+
+        return this;
+    }
+
+    /**
      * Specifies whether or not a confirmation step should be added as an extra step at the end of
      * the form.
      *

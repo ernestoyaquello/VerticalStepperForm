@@ -632,6 +632,7 @@ public class VerticalStepperFormView extends LinearLayout {
         style.displayBottomNavigation = true;
         style.displayStepButtons = true;
         style.displayCancelButtonInLastStep = false;
+        style.displayNextButtonInLastStep = true;
         style.displayStepDataInSubtitleOfClosedSteps = true;
         style.displayDifferentBackgroundColorOnDisabledElements = false;
         style.includeConfirmationStep = true;
@@ -754,6 +755,9 @@ public class VerticalStepperFormView extends LinearLayout {
             style.displayCancelButtonInLastStep = vars.getBoolean(
                     R.styleable.VerticalStepperFormView_form_display_cancel_button_in_last_step,
                     style.displayCancelButtonInLastStep);
+            style.displayNextButtonInLastStep = vars.getBoolean(
+                    R.styleable.VerticalStepperFormView_form_display_next_button_in_last_step,
+                    style.displayNextButtonInLastStep);
             style.displayStepDataInSubtitleOfClosedSteps = vars.getBoolean(
                     R.styleable.VerticalStepperFormView_form_display_step_data_in_subtitle_of_closed_steps,
                     style.displayStepDataInSubtitleOfClosedSteps);
@@ -1198,6 +1202,7 @@ public class VerticalStepperFormView extends LinearLayout {
         boolean displayBottomNavigation;
         boolean displayStepButtons;
         boolean displayCancelButtonInLastStep;
+        boolean displayNextButtonInLastStep;
         boolean displayStepDataInSubtitleOfClosedSteps;
         boolean displayDifferentBackgroundColorOnDisabledElements;
         boolean includeConfirmationStep;

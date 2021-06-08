@@ -34,6 +34,7 @@
         <attr name="form_display_bottom_navigation" format="boolean" />
         <attr name="form_display_step_buttons" format="boolean" />
         <attr name="form_display_cancel_button_in_last_step" format="boolean" />
+        <attr name="form_display_next_button_in_last_step" format="boolean" />
         <attr name="form_display_step_data_in_subtitle_of_closed_steps" format="boolean" />
         <attr name="form_display_different_background_color_on_disabled_elements" format="boolean" />
         <attr name="form_include_confirmation_step" format="boolean" />
