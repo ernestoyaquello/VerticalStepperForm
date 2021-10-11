@@ -230,13 +230,15 @@ class StepHelper implements Step.InternalFormStepListener {
             cancelButtonView.setVisibility(View.GONE);
         }
 
-        if (formStyle.displayNextButtonInLastStep && isLast) {
-            String nextButtonText = formStyle.lastStepNextButtonText == null
-                    ? "" : formStyle.lastStepNextButtonText;
-            nextButtonView.setText(nextButtonText);
-            nextButtonView.setVisibility(View.VISIBLE);
-        } else {
-            nextButtonView.setVisibility(View.GONE);
+        if (isLast) {
+            if (formStyle.displayNextButtonInLastStep) {
+                String nextButtonText = formStyle.lastStepNextButtonText == null
+                        ? "" : formStyle.lastStepNextButtonText;
+                nextButtonView.setText(nextButtonText);
+                nextButtonView.setVisibility(View.VISIBLE);
+            } else {
+                nextButtonView.setVisibility(View.GONE);
+            }
         }
 
         lineView1.setVisibility(isLast ? View.GONE : View.VISIBLE);
