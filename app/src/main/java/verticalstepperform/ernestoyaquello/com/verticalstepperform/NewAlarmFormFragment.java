@@ -21,6 +21,7 @@ import androidx.fragment.app.Fragment;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
+import ernestoyaquello.com.verticalstepperform.Step;
 import ernestoyaquello.com.verticalstepperform.listener.StepperFormListener;
 import verticalstepperform.ernestoyaquello.com.verticalstepperform.databinding.FragmentNewAlarmBinding;
 import verticalstepperform.ernestoyaquello.com.verticalstepperform.form.steps.AlarmDaysStep;
@@ -32,12 +33,6 @@ import verticalstepperform.ernestoyaquello.com.verticalstepperform.models.Alarm;
 public class NewAlarmFormFragment extends Fragment implements StepperFormListener, DialogInterface.OnClickListener {
 
     public static final String ALARM_DATA_SERIALIZED_KEY = "newAlarmData";
-
-    public static final String STATE_TITLE = "title";
-    public static final String STATE_DESCRIPTION = "description";
-    public static final String STATE_TIME_HOUR = "time_hour";
-    public static final String STATE_TIME_MINUTES = "time_minutes";
-    public static final String STATE_WEEK_DAYS = "week_days";
 
     private ProgressDialog progressDialog;
     private FragmentNewAlarmBinding binding;
@@ -102,6 +97,16 @@ public class NewAlarmFormFragment extends Fragment implements StepperFormListene
     @Override
     public void onCancelledForm() {
         showCloseConfirmationDialog();
+    }
+
+    @Override
+    public void onStepAdded(int index, Step<?> addedStep) {
+        // Nothing to do here
+    }
+
+    @Override
+    public void onStepRemoved(int index) {
+        // Nothing to do here
     }
 
     private Thread saveData() {
@@ -190,48 +195,6 @@ public class NewAlarmFormFragment extends Fragment implements StepperFormListene
         super.onStop();
 
         dismissDialogIfNecessary();
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-
-        outState.putString(STATE_TITLE, nameStep.getStepData());
-        outState.putString(STATE_DESCRIPTION, descriptionStep.getStepData());
-        outState.putInt(STATE_TIME_HOUR, timeStep.getStepData().hour);
-        outState.putInt(STATE_TIME_MINUTES, timeStep.getStepData().minutes);
-        outState.putBooleanArray(STATE_WEEK_DAYS, daysStep.getStepData());
-
-        super.onSaveInstanceState(outState);
-    }
-
-    @Override
-    public void onViewStateRestored(@Nullable Bundle savedInstanceState) {
-
-        if(savedInstanceState != null && savedInstanceState.containsKey(STATE_TITLE)) {
-            String title = savedInstanceState.getString(STATE_TITLE);
-            nameStep.restoreStepData(title);
-        }
-
-        if(savedInstanceState != null && savedInstanceState.containsKey(STATE_DESCRIPTION)) {
-            String description = savedInstanceState.getString(STATE_DESCRIPTION);
-            descriptionStep.restoreStepData(description);
-        }
-
-        if(savedInstanceState != null && savedInstanceState.containsKey(STATE_TIME_HOUR)
-                && savedInstanceState.containsKey(STATE_TIME_MINUTES)) {
-            int hour = savedInstanceState.getInt(STATE_TIME_HOUR);
-            int minutes = savedInstanceState.getInt(STATE_TIME_MINUTES);
-            AlarmTimeStep.TimeHolder time = new AlarmTimeStep.TimeHolder(hour, minutes);
-            timeStep.restoreStepData(time);
-        }
-
-        if(savedInstanceState != null && savedInstanceState.containsKey(STATE_WEEK_DAYS)) {
-            boolean[] alarmDays = savedInstanceState.getBooleanArray(STATE_WEEK_DAYS);
-            daysStep.restoreStepData(alarmDays);
-        }
-
-        // IMPORTANT: The call to super method must be here at the end
-        super.onViewStateRestored(savedInstanceState);
     }
 
     private void goBack(Alarm alarm) {

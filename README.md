@@ -212,42 +212,6 @@ This method will get called when the user clicks on the optional cancellation bu
 
 Right before calling this method, the form disables the navigation between steps, as well as all the buttons. To revert the form to normal (for example, because the user decides not to cancel it), it is necessary to call `verticalStepperForm.cancelFormCompletionOrCancellationAttempt()`.
 
-### 5. Handle Configuration Changes
-To restore your form after configuration changes, such as screen rotation, you must save and restore the data of all your steps like this:
-
-```java
-@Override
-public void onSaveInstanceState(Bundle savedInstanceState) {
-    savedInstanceState.putString("user_name", userNameStep.getStepData());
-    savedInstanceState.putString("user_email", userEmailStep.getStepData());
-    savedInstanceState.putInt("user_age", userAgeStep.getStepData());
-
-    // IMPORTANT: The call to the super method must be here at the end.
-    super.onSaveInstanceState(savedInstanceState);
-}
-
-@Override
-public void onRestoreInstanceState(Bundle savedInstanceState) {
-    if(savedInstanceState.containsKey("user_name")) {
-        String userName = savedInstanceState.getString("user_name");
-        userNameStep.restoreStepData(userName);
-    }
-
-    if(savedInstanceState.containsKey("user_email")) {
-        String userEmail = savedInstanceState.getString("user_email");
-        userEmailStep.restoreStepData(userEmail);
-    }
-    
-    if(savedInstanceState.containsKey("user_age")) {
-        int userAge = savedInstanceState.getInt("user_age");
-        userAgeStep.restoreStepData(userAge);
-    }
-
-    // IMPORTANT: The call to the super method must be here at the end.
-    super.onRestoreInstanceState(savedInstanceState);
-}
-```
-
 ## Further Details
 Check out the [sample application code](https://github.com/ernestoyaquello/VerticalStepperForm/tree/master/app/src/main/java/verticalstepperform/ernestoyaquello/com/verticalstepperform) to see a more complete example of how this library can be used to create vertical stepper forms.
 

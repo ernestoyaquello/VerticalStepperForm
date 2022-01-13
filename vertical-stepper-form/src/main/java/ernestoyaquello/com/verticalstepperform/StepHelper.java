@@ -525,15 +525,15 @@ class StepHelper implements Step.InternalFormStepListener {
     /**
      * This step will just display a button that the user will have to click to complete the form.
      */
-    private class ConfirmationStep extends Step<Object> {
+    private class ConfirmationStep extends Step<Integer> {
 
         ConfirmationStep() {
             super("");
         }
 
         @Override
-        public Object getStepData() {
-            return null;
+        public Integer getStepData() {
+            return 0;
         }
 
         @Override
@@ -542,12 +542,12 @@ class StepHelper implements Step.InternalFormStepListener {
         }
 
         @Override
-        public void restoreStepData(Object data) {
+        public void restoreStepData(Integer data) {
             // No need to do anything here
         }
 
         @Override
-        protected IsDataValid isStepDataValid(Object stepData) {
+        protected IsDataValid isStepDataValid(Integer stepData) {
             return null;
         }
 

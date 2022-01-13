@@ -4,9 +4,11 @@ import android.app.TimePickerDialog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.TextView;
-import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
+
+import java.io.Serializable;
+
 import ernestoyaquello.com.verticalstepperform.Step;
 import verticalstepperform.ernestoyaquello.com.verticalstepperform.R;
 
@@ -115,13 +117,29 @@ public class AlarmTimeStep extends Step<AlarmTimeStep.TimeHolder> {
         alarmTimeTextView.setText(getStepDataAsHumanReadableString());
     }
 
-    public static class TimeHolder {
+    public static class TimeHolder implements Serializable {
 
         public int hour;
         public int minutes;
 
         public TimeHolder(int hour, int minutes) {
             this.hour = hour;
+            this.minutes = minutes;
+        }
+
+        public int getHour() {
+            return hour;
+        }
+
+        public void setHour(int hour) {
+            this.hour = hour;
+        }
+
+        public int getMinutes() {
+            return minutes;
+        }
+
+        public void setMinutes(int minutes) {
             this.minutes = minutes;
         }
     }

@@ -3,6 +3,7 @@ package ernestoyaquello.com.verticalstepperform;
 import android.content.Context;
 import android.view.View;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,7 +13,7 @@ import java.util.List;
  *
  * @param <T> The type of the data that the step will hold. E.g., For a user email, T = String
  */
-public abstract class Step<T> {
+public abstract class Step<T extends Serializable> {
 
     private String originalNextButtonText;
     private String title;
@@ -62,7 +63,7 @@ public abstract class Step<T> {
     public abstract String getStepDataAsHumanReadableString();
 
     /**
-     * Restores the step data. Useful for when restoring the state of the form.
+     * Restores the step data. Will be called automatically by the form view upon restoration.
      *
      * @param data The step data to restore.
      */
@@ -405,7 +406,11 @@ public abstract class Step<T> {
         }
     }
 
-    void restoreErrorState(boolean hasError) {
+    void restoreStepDataInternal(Serializable data) {
+        restoreStepData((T)data);
+    }
+
+    void restoreErrorStateInternal(boolean hasError) {
         this.hasError = hasError;
     }
 
