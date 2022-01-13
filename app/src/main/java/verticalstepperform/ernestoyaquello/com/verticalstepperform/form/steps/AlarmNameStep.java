@@ -96,7 +96,7 @@ public class AlarmNameStep extends Step<String> {
     }
 
     @Override
-    public void restoreStepData(String data) {
+    protected void restoreStepData(String data) {
         if (alarmNameEditText != null) {
             alarmNameEditText.setText(data);
         }

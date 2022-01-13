@@ -133,7 +133,7 @@ public class UserNameStep extends Step<String> {
     }
 
     @Override
-    public void restoreStepData(String stepData) {
+    protected void restoreStepData(String stepData) {
         // To restore the step after a configuration change, we restore the text of its EditText view.
         userNameView.setText(stepData);
     }

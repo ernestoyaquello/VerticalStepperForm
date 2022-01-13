@@ -100,7 +100,7 @@ public class AlarmTimeStep extends Step<AlarmTimeStep.TimeHolder> {
     }
 
     @Override
-    public void restoreStepData(TimeHolder data) {
+    protected void restoreStepData(TimeHolder data) {
         alarmTimeHour = data.hour;
         alarmTimeMinutes = data.minutes;
 

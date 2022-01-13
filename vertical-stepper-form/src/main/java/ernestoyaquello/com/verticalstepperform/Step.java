@@ -67,7 +67,7 @@ public abstract class Step<T extends Serializable> {
      *
      * @param data The step data to restore.
      */
-    public abstract void restoreStepData(T data);
+    protected abstract void restoreStepData(T data);
 
     /**
      * Returns an instance of IsDataValid that indicates whether the step data is valid or not.

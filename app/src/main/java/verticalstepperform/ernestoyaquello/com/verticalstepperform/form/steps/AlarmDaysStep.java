@@ -81,7 +81,7 @@ public class AlarmDaysStep extends Step<boolean[]> {
     }
 
     @Override
-    public void restoreStepData(boolean[] data) {
+    protected void restoreStepData(boolean[] data) {
         alarmDays = data;
         setupAlarmDays();
     }
