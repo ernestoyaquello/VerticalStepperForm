@@ -810,8 +810,7 @@ public class VerticalStepperFormView extends LinearLayout {
 
     void initializeForm(StepperFormListener listener, StepHelper[] stepsArray) {
         this.listener = listener;
-        this.stepHelpers = Arrays.asList(stepsArray);
-        this.stepHelpers = new ArrayList<>(stepHelpers);
+        this.stepHelpers = new ArrayList<>(Arrays.asList(stepsArray));
 
         progressBar.setMax(stepHelpers.size());
 
