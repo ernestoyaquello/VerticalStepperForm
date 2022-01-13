@@ -23,7 +23,7 @@ Add the library to your project via `mavenCentral` by adding the following in th
 
 ```
 dependencies {
-    implementation 'com.ernestoyaquello.stepperform:vertical-stepper-form:2.6.0'
+    implementation 'com.ernestoyaquello.stepperform:vertical-stepper-form:2.7.0'
 }
 ```
 
