@@ -1,3 +1,11 @@
+## 🪦 RIP: This library is now archived
+
+It was nice while it lasted, but this library has endured too much hardship already. First Kotlin, then Compose...
+
+> If you must, the rest of this outdated readme continues below.
+
+---
+
 # Vertical Stepper Form Library
 
 [![issues](https://img.shields.io/github/issues/ernestoyaquello/VerticalStepperForm?style=for-the-badge)](https://github.com/ernestoyaquello/VerticalStepperForm/issues)
